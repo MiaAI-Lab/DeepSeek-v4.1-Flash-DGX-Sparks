@@ -78,6 +78,14 @@ NCCL_SHM_DISABLE="${NCCL_SHM_DISABLE:-1}"
 NCCL_DEBUG="${NCCL_DEBUG:-WARN}"
 NCCL_HOST_DIR="${NCCL_HOST_DIR:-$HOME/nccl-2.30.7}"
 NCCL_CONTAINER_DIR="${NCCL_CONTAINER_DIR:-/nccl}"
+# Container path of the base image's pip-installed NCCL. A patched host build
+# can be overlaid here (NCCL_OVERLAY_PIP) instead of being pushed onto
+# LD_LIBRARY_PATH, which leaves two NCCL runtimes visible and makes DeepEP's
+# check_nccl_so() abort before NCCL is ever initialised.
+NCCL_PIP_SO="${NCCL_PIP_SO:-/opt/sglang/lib/python3.12/site-packages/nvidia/nccl/lib/libnccl.so.2}"
+# Overlay the patched library; defaults to the switchless-ring switch below,
+# so it can also be enabled on its own with NCCL_OVERLAY_PIP=1.
+NCCL_OVERLAY_PIP="${NCCL_OVERLAY_PIP:-${NCCL_SWITCHLESS_RING_ONLY:-0}}"
 
 MODEL_DIR="${MODEL_DIR:-$HOME/NewModels/DeepSeek-V4.1-Flash}"
 COMMON_MODEL="${COMMON_MODEL:-/var/tmp/DeepSeek-V4.1-Flash}"
@@ -314,8 +322,22 @@ docker_common_args() {
   if [[ -n "${EXTRA_SGLANG_ARGS:-}" ]]; then
     _a+=(-e "EXTRA_SGLANG_ARGS=$EXTRA_SGLANG_ARGS")
   fi
+  if [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == "1" ]]; then
+    _a+=(-e "NCCL_SWITCHLESS_RING_ONLY=1")
+    _a+=(-e "NCCL_ALGO=${NCCL_ALGO:-Ring}")
+    _a+=(-e "NCCL_SKIP_TREE_CONNECT=${NCCL_SKIP_TREE_CONNECT:-1}")
+    _a+=(-e "NCCL_IB_SUBNET_PREFIX_LEN=${NCCL_IB_SUBNET_PREFIX_LEN:-24}")
+    _a+=(-e "NCCL_MIN_NCHANNELS=${NCCL_MIN_NCHANNELS:-4}")
+    _a+=(-e "NCCL_P2P_LEVEL=${NCCL_P2P_LEVEL:-SYS}")
+  fi
   if [[ -f "$NCCL_HOST_DIR/libnccl.so.2.30.7" || -f "$NCCL_HOST_DIR/libnccl.so.2" ]]; then
-    _a+=(-v "$NCCL_HOST_DIR:$NCCL_CONTAINER_DIR:ro" -e "LD_LIBRARY_PATH=$NCCL_CONTAINER_DIR")
+    local _nccl_so="libnccl.so.2.30.7"
+    [[ -f "$NCCL_HOST_DIR/$_nccl_so" ]] || _nccl_so="libnccl.so.2"
+    if [[ "$NCCL_OVERLAY_PIP" == "1" ]]; then
+      _a+=(-v "$NCCL_HOST_DIR/$_nccl_so:$NCCL_PIP_SO:ro")
+    else
+      _a+=(-v "$NCCL_HOST_DIR:$NCCL_CONTAINER_DIR:ro" -e "LD_LIBRARY_PATH=$NCCL_CONTAINER_DIR")
+    fi
   fi
 }
 
@@ -342,6 +364,22 @@ push_spec_tables() {
       fi
     done
   done
+}
+
+# Extra `-e NCCL_...` lines for a switchless ring: a 4-node ring where opposite
+# nodes (rank0 <-> rank2) have no direct fabric path, so NCCL's Tree and PAT
+# transports cannot be set up. Only a NCCL carrying the sparkring
+# switchless-cycle patch understands NCCL_SWITCHLESS_RING_ONLY; stock NCCL
+# ignores unknown NCCL_* variables, hence the explicit opt-in.
+# See docs/switchless-ring.md.
+switchless_ring_env_lines() {
+  [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == "1" ]] || return 0
+  printf '        -e NCCL_SWITCHLESS_RING_ONLY=1 \\\n'
+  printf '        -e NCCL_ALGO=%s \\\n' "${NCCL_ALGO:-Ring}"
+  printf '        -e NCCL_SKIP_TREE_CONNECT=%s \\\n' "${NCCL_SKIP_TREE_CONNECT:-1}"
+  printf '        -e NCCL_IB_SUBNET_PREFIX_LEN=%s \\\n' "${NCCL_IB_SUBNET_PREFIX_LEN:-24}"
+  printf '        -e NCCL_MIN_NCHANNELS=%s \\\n' "${NCCL_MIN_NCHANNELS:-4}"
+  printf '        -e NCCL_P2P_LEVEL=%s \\\n' "${NCCL_P2P_LEVEL:-SYS}"
 }
 
 worker_env_lines() {
@@ -382,6 +420,7 @@ worker_env_lines() {
         -e NCCL_BUFFSIZE=${NCCL_BUFFSIZE:-4194304} -e NCCL_LL128_BUFFSIZE=${NCCL_LL128_BUFFSIZE:--2} \\
         -e NCCL_PROTO=${NCCL_PROTO:-LL,LL128,Simple} -e NCCL_MAX_NCHANNELS=${NCCL_MAX_NCHANNELS:-32} \\
         -e NCCL_DEBUG_SUBSYS=${NCCL_DEBUG_SUBSYS:-INIT} \\
+$(switchless_ring_env_lines)
         -e DSV41_MXFP8_BACKEND=${DSV41_MXFP8_BACKEND:-b12x} \\
         -e SGLANG_FLASHINFER_MOE_FUSED_FINALIZE=${SGLANG_FLASHINFER_MOE_FUSED_FINALIZE:-1} \\
         -e PYTORCH_CUDA_ALLOC_CONF=${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:False} \\
@@ -632,8 +671,12 @@ cmd_serve() {
       NCCL_VOL=''
       NCCL_ENV=''
       if [ -f \$HOME/nccl-2.30.7/libnccl.so.2.30.7 ]; then
-        NCCL_VOL=\"-v \$HOME/nccl-2.30.7:$NCCL_CONTAINER_DIR:ro\"
-        NCCL_ENV='-e LD_LIBRARY_PATH=$NCCL_CONTAINER_DIR'
+        if [ \"$NCCL_OVERLAY_PIP\" = 1 ]; then
+          NCCL_VOL=\"-v \$HOME/nccl-2.30.7/libnccl.so.2.30.7:$NCCL_PIP_SO:ro\"
+        else
+          NCCL_VOL=\"-v \$HOME/nccl-2.30.7:$NCCL_CONTAINER_DIR:ro\"
+          NCCL_ENV='-e LD_LIBRARY_PATH=$NCCL_CONTAINER_DIR'
+        fi
       fi
       docker run -d --name $WORKER_CTN \
         --network host --ipc host --privileged --cap-add IPC_LOCK --gpus all \
