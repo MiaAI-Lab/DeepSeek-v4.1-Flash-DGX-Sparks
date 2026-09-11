@@ -306,8 +306,10 @@ docker_common_args() {
     -e "DSV41_TP_PAD=${DSV41_TP_PAD:-1}"
     -e "VLLM_HOST_IP=$hip"
     -e "HOST_IP=$hip"
-    -e "NCCL_IB_GID_INDEX=$gid"
   )
+  # Empty gid = let NCCL (>=2.21) pick the RoCEv2 GID per HCA. A single forced
+  # index is wrong on a triangle whose ports do not all share the same index.
+  [[ -n "$gid" ]] && _a+=(-e "NCCL_IB_GID_INDEX=$gid")
   if [[ -n "${API_KEY}" ]]; then
     _a+=(-e "API_KEY=$API_KEY")
   fi
@@ -385,7 +387,7 @@ worker_env_lines() {
         -e DSV41_MXFP8_BACKEND=${DSV41_MXFP8_BACKEND:-b12x} \\
         -e SGLANG_FLASHINFER_MOE_FUSED_FINALIZE=${SGLANG_FLASHINFER_MOE_FUSED_FINALIZE:-1} \\
         -e PYTORCH_CUDA_ALLOC_CONF=${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:False} \\
-        -e NCCL_IB_GID_INDEX=$wgid \\
+        ${wgid:+-e NCCL_IB_GID_INDEX=$wgid} \\
         -e CUDA_DEVICE_ORDER=PCI_BUS_ID \\
         -e SGLANG_ENABLE_DSV41_ENGRAM_HOST_TABLE=0 \\
         -e DSV41_TP_PAD=${DSV41_TP_PAD:-1} \\
@@ -604,13 +606,19 @@ cmd_serve() {
 
   local GID_HEAD gi g
   local -a WORKER_GIDS=()
+  # Only a node whose LAN address is itself on a RoCE port gets a pinned index.
+  # Otherwise leave it empty and let NCCL choose the RoCEv2 GID per HCA; the
+  # old fallback of 3 broke nodes whose ports had RoCEv2 at a different index.
+  # NCCL_IB_GID_INDEX in .env still forces one value everywhere.
   GID_HEAD=$(gid_index_local "$HEAD_IP" 2>/dev/null || true)
-  GID_HEAD="${GID_HEAD:-${NCCL_IB_GID_INDEX:-3}}"
+  GID_HEAD="${GID_HEAD:-${NCCL_IB_GID_INDEX:-}}"
   for gi in "${!WORKER_IPS[@]}"; do
     g=$(gid_index_remote "${WORKER_HOSTS[$gi]}" "${WORKER_IPS[$gi]}" | tr -d '\r' || true)
-    WORKER_GIDS+=("${g:-${NCCL_IB_GID_INDEX:-3}}")
+    WORKER_GIDS+=("${g:-${NCCL_IB_GID_INDEX:-}}")
   done
-  info "RoCEv2 GID indexes: head=$GID_HEAD workers=${WORKER_GIDS[*]}"
+  local gid_desc="" wg
+  for wg in "${WORKER_GIDS[@]}"; do gid_desc+=" ${wg:-auto}"; done
+  info "RoCEv2 GID indexes: head=${GID_HEAD:-auto} workers=${gid_desc# } (auto = NCCL picks per HCA)"
 
   docker rm -f "$HEAD_CTN" >/dev/null 2>&1 || true
   for h in "${WORKER_HOSTS[@]}"; do
