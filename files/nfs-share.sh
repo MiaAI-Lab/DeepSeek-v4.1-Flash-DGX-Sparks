@@ -22,7 +22,8 @@ nfs_server_ip_for() {
   # Per-worker override: NFS_SERVER_IPS="10.0.22.1 10.0.23.1 ..." (one entry per
   # worker, or a single entry used for all, e.g. behind a switch), else the legacy
   # NFS_SERVER_IP_<n>, else NFS_SERVER_IP.
-  local explicit="" -a _nfs_ips=()
+  local explicit=""
+  local -a _nfs_ips=()
   if [[ -n "${NFS_SERVER_IPS:-}" ]]; then
     read -r -a _nfs_ips <<<"$(tr ',' ' ' <<<"$NFS_SERVER_IPS")"
     if [[ ${#_nfs_ips[@]} -eq 1 ]]; then explicit="${_nfs_ips[0]}"; else explicit="${_nfs_ips[$idx]:-}"; fi
@@ -38,7 +39,8 @@ nfs_server_ip_for() {
   local peer="${WORKER_IPS[$idx]}"
   # Prefer the CX7 source address toward that worker's fabric IP if set:
   # WORKER_FABRIC_IPS="10.0.22.2 10.0.23.3 ..." or legacy WORKER<n>_FABRIC_IP.
-  local fabric_peer="" -a _fab=()
+  local fabric_peer=""
+  local -a _fab=()
   if [[ -n "${WORKER_FABRIC_IPS:-}" ]]; then
     read -r -a _fab <<<"$(tr ',' ' ' <<<"$WORKER_FABRIC_IPS")"
     fabric_peer="${_fab[$idx]:-}"
@@ -99,7 +101,10 @@ nfs_ensure_server() {
   if [[ -n "$live" ]] && nfs_rpc_ready 127.0.0.1; then
     info "NFS already up ($live) — adding spark2/spark3 CX7 clients"
     nfs_write_exports "$live" "$clients"
-    NFS_REUSE_EXPORT=1
+    # Only the HF-cache nfsd (vllm-fn-nfs) serves the published dsv41-native
+    # subtree. Reusing our own dsv41-nfs (which exports MODEL_DIR at /) must
+    # not trigger the HF-cache publish — its root is the checkpoint itself.
+    [[ "$live" != "$NFS_CONTAINER" ]] && NFS_REUSE_EXPORT=1
     NFS_LIVE_CTN="$live"
     return 0
   fi
