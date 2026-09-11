@@ -19,7 +19,20 @@ def load_dotenv(path: str) -> None:
                 continue
             k, v = line.split("=", 1)
             v = v.strip().strip('"').strip("'")
+            v = os.path.expandvars(v)
             os.environ.setdefault(k.strip(), v)
+
+
+def env_file_from_argv(argv: list[str]) -> str:
+    """Return the --env-file value from argv (both "--env-file X" and
+    "--env-file=X" forms) so the file can be loaded before argument
+    defaults are evaluated. Empty string when absent."""
+    for i, a in enumerate(argv):
+        if a == "--env-file" and i + 1 < len(argv):
+            return argv[i + 1]
+        if a.startswith("--env-file="):
+            return a.split("=", 1)[1]
+    return ""
 
 
 def ssh_cmd(
@@ -31,6 +44,7 @@ def ssh_cmd(
     timeout: int,
 ) -> int:
     dest = f"{user}@{host}"
+    identity = os.path.expandvars(os.path.expanduser(identity or ""))
     base = [
         "ssh",
         "-o",
@@ -129,6 +143,11 @@ def ssh_cmd(
 
 
 def main() -> int:
+    # Load the env file BEFORE the parser captures os.environ-based defaults,
+    # so SSH_IDENTITY / WORKER_HOST / WORKER_USER / REMOTE_TIMEOUT from .env
+    # take effect (previously they were only honored if exported in the shell).
+    load_dotenv(env_file_from_argv(sys.argv))
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--env-file", default="")
     ap.add_argument("--host", default=os.environ.get("WORKER_HOST", "10.0.0.2"))
@@ -147,8 +166,6 @@ def main() -> int:
     )
     ap.add_argument("remote")
     args = ap.parse_args()
-    if args.env_file:
-        load_dotenv(args.env_file)
     password = os.environ.get("WORKER_PASS") or None
     return ssh_cmd(
         args.host,
