@@ -269,6 +269,50 @@ Further readings from the same boot:
 * `/v1/responses` (streaming and non-streaming) and `/v1/chat/completions`
   all return 200.
 
+## Throughput
+
+Measured on the same fleet, against the running service, with the repository's
+own harnesses (`benchmarks/matrix.py` plus `benchmarks/common_window.py`, and
+`benchmarks/sweep.py`). Two local adjustments were needed: the scripts post to
+`127.0.0.1:8010` while this profile serves on `8888`, and they read
+`/state/api-key`, which does not exist when no API key is configured.
+
+Short prompts (~200 tokens, 4,096-token output budget); aggregate is delivered
+tokens per second over the interval in which every stream is producing:
+
+| Concurrency | TTFT | tok/s per request | aggregate tok/s |
+|---:|---:|---|---:|
+| 1 | 0.20-0.25 s | 62.5 / 70.0 / 71.4 | ~68 |
+| 2 | 0.47 s | 38.0 / 40.4 | 78.4 |
+| 4 | 0.51 s | 30.2 - 32.4 | 125.8 |
+| 8 | 0.59 s | 24.4 - 26.0 | 201.2 |
+
+Long prompts (1,024-token output budget), same harness:
+
+| prompt tokens | C1 | C2 | C4 | prefill tok/s |
+|---:|---:|---:|---:|---:|
+| 8,192 | 67.0 | 105.4 | 147.7 | 3,684 |
+| 32,768 | 73.4 | 104.4 | 149.4 | 3,758 |
+| 65,536 | 70.3 | 103.9 | 153.3 | 3,537 |
+
+Every cell succeeded -- no request failures, no retractions, no preemptions.
+
+Two caveats worth recording:
+
+* The first burst after a cold start is several times slower: one C1 run
+  measured 14.1 tok/s where immediate repeats measured 62.5-71.4. Warm up
+  before measuring, and discard the first run.
+* At C8 with long prompts the burst has no interval in which all eight streams
+  decode at once. The scheduler feeds prefills one at a time, so the last
+  request begins decoding (TTFT 53.8 s at 8K, 182.8 s at 64K) after the first
+  has already finished; peak overlap is 7 of 8. That is scheduling behaviour,
+  not a failure, and it is why the long-prompt table stops at C4. A longer
+  output budget (the 4,096-token sweep above) does reach a common window at C8.
+
+These numbers describe this configuration (TP4/EP4, 1M context, DSpark k=5,
+MXFP4 experts with FP8 dense weights, Engram on local NVMe); they are not a
+claim about other profiles.
+
 ## Limitations
 
 * Needs a patched NCCL; nothing in this repository builds it. The patch set and
