@@ -98,6 +98,10 @@ for the ~40 GB per rank that TP4 leaves free (~77 GiB of weights per rank instea
 | `CHUNKED_PREFILL_SIZE` | 4096 | indexer logits 4.3 GB per chunk at 1M context |
 | `MEM_FRACTION_STATIC` | 0.90 | keeps runtime slack for long prefills |
 | `DSV41_TP_PAD` | 0 | heads, o_groups, draft experts and vocab all divide by 4: no padded shards |
+| `EP_SIZE` | 2 | the step pays the max over the EP groups; two groups instead of four halves the expert-routing straggler. NCCL 16.5 → 10.2 ms per step at bs=1, MoE unchanged |
+| `DSV41_CACHE_GIB` / `_WAYS` | 4 / 16 | Engram rows do get reused: 67-76% hit, 4.1× fewer NVMe reads. Affordable at TP4, not at TP3 |
+| `--min-free-slots-delay` | 1 | without it the 8th request slot is never used |
+| `--enable-deepseek-v4-fp4-indexer` | on | attention 3.5 → 2.7 ms per step |
 
 ```bash
 cp -n .env.tp4.example .env.tp4      # IPs, ssh user, NFS addresses
@@ -117,6 +121,22 @@ What changes against the 3-node profile:
 | concurrency | 4 | 8 |
 | NCCL per step | 104 collectives across 3 nodes | 104 collectives across 4 nodes (one more ring hop each) |
 
+Measured on a four-Spark fleet with the settings above, using `scripts/verify/throughput.py`
+as shipped (prose, 300 tokens, from a worker against the head over the rail, idle server):
+
+| conc | temp 0.0 | temp 0.7 |
+|---:|---|---|
+| 1 | 30.7 → **35.3** | 28.2 → **34.1** |
+| 2 | 47.2 → **50.8** | 46.3 → **50.7** |
+| 3 | 57.7 → **62.2** | 54.3 → **58.6** |
+| 4 | 68.7 → **74.0** | 66.1 → **71.4** |
+
+Mean **+10.5%** (left: stock `.env.tp4.example`; right: with `EP_SIZE=2`, the Engram cache,
+`--min-free-slots-delay 1` and the FP4 indexer). Decode step time at bs=1, taken from the engine's
+own `Decode batch` lines as `accept len / gen throughput` and therefore content-independent:
+**69.0 → 61.0 ms median**. Output quality is unchanged — 75 auto-scored tasks compared pairwise
+after each step, zero broken every time, plus 30/30 on long-context needle retrieval up to 262k.
+
 Fabric: a Spark has two ConnectX-7 ports, so three nodes form a full triangle but four
 cannot; a 4-node fleet needs a RoCE switch (all NCCL and NFS traffic through it, one
 `NFS_SERVER_IPS` address) or a ring with NCCL routed over it. Set `NCCL_IB_HCA`,
@@ -133,8 +153,9 @@ legacy `WORKER1_IP`/`WORKER2_IP` pairs still work), so 5+ nodes only need a matc
 `TP_SIZE` and `NNODES`. Nothing in the image is TP-specific; the padded-shard repair simply
 finds nothing to repair at TP4.
 
-Every measurement in this README comes from the 3-node fleet; the TP4 profile has been
-validated for configuration and script paths only (`./start-tp4.sh doctor`), not booted.
+Most measurements in this README come from the 3-node fleet. The TP4 profile has since been
+booted and tuned on a four-Spark fleet (see the settings above); TP4-specific numbers are marked
+as such.
 Expect the same per-step structure (dense GEMMs, MoE, NCCL) with smaller attention GEMMs
 per rank and one extra network hop per collective; the memory headroom is what makes the
 long context and the higher concurrency safe, not a faster step.
@@ -292,13 +313,33 @@ fails), and the head has little RAM to spare.
 
 ## Still on the table
 
-- `wo_a` runs as a bf16 einsum (cuBLAS `cutlass_80` kernels, ~11 ms per step); an MXFP8 path
-  needs a small change in `models/deepseek_v4.py`.
-- The MoE cost scales with the 6-token verify window. A profiled SPS table
-  (`python -m sglang.benchmark.dspark_sps_profiler all --base-url ...`, pushed to every rank
-  by `start.sh`) turns on compact ragged verify, which mainly pays at concurrency ≥2.
-- Fewer, fused small kernels (~2000 per step) and the 13-16 ms of cross-node latency are the
-  remaining floor at TP=3.
+- `wo_a` runs as a bf16 einsum (cuBLAS `cutlass_80` kernels, ~11 ms per step) **at TP=3 only**;
+  an MXFP8 path needs a small change in `models/deepseek_v4.py`. **At TP=4 this is already
+  fixed**: the fast path in `_apply_wo_a_bf16_matmul` is gated on `o.shape[1:] == (2, 4096)` and
+  `wo_a.shape == (2, 1024, 4096)`, i.e. exactly 2 o_groups per rank, which is `o_groups 8 / TP4`.
+  The TP3 pad to 12 groups gives 4 per rank and the kernel is skipped. A TP4 decode profile shows
+  `_wo_a_partial` at 3.69 ms and `_wo_a_reduce` at 0.06 ms.
+- ~~A profiled SPS table turns on compact ragged verify~~ — **this crashes the engine on this
+  model; do not try it.** `boot.py` picks the table up and logs `DSpark ragged-verify scheduler
+  enabled (mode=compact, …)`, then the engine dies during CUDA-graph capture:
+  `srt/layers/engram.py:296  assert num_tokens == bs * block` —
+  *"engram target-verify expects one equal block per request, got 42 tokens for 8 requests of 6"*.
+  DeepSeek-V4.1's Engram hasher hard-requires a uniform verify block across requests; compact
+  ragged verify exists precisely to make them non-uniform. The two features are mutually exclusive.
+  `--speculative-dspark-align-verify-tokens-to-graph-tier` does not help (raggedness is the
+  problem, not the rounding), and `cap-accept` keeps the block uniform but verifies everything,
+  so it buys no compute.
+- Fewer, fused small kernels (~2000 per step) and the cross-node latency are the remaining floor.
+  At TP=4 with `EP_SIZE=2` that latency is 10.2 ms per step at bs=1, of which roughly 4 ms is
+  transfer and the rest is still waiting on the slowest rank.
+- Measured and rejected on a four-Spark fleet, so nobody spends a boot on them twice:
+  `DSV41_IO_THREADS` above 96 (the drive already runs at 89-100k IOPS during the burst, sampled
+  from `/sys/block/nvme0n1/stat` every 2 ms — the stall is volume ÷ IOPS, not queue depth);
+  `DSV41_RESIDENT_SCALES` (dead code with packed shards — the branch sits inside the `else` of
+  `if (s->packed_fd >= 0)`); `NCCL_ALGO=Tree` (the trace already shows `..._RING_LL`);
+  `DSV41_MXFP8_BACKEND=cudnn` (21.1 ms against b12x's 20.2, every shape accepted — b12x stays);
+  and raising the draft's precision with `SGLANG_DSPARK_FP32_LM_HEAD=1` +
+  `SGLANG_DSPARK_OPT_MARKOV_W2_BF16=0` (step 69 → 75 ms for ~1.6% more acceptance).
 
 ## Attribution
 
