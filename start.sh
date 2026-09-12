@@ -314,6 +314,12 @@ docker_common_args() {
   if [[ -n "${EXTRA_SGLANG_ARGS:-}" ]]; then
     _a+=(-e "EXTRA_SGLANG_ARGS=$EXTRA_SGLANG_ARGS")
   fi
+  # Generic passthrough so an experiment is one .env line, not a launcher edit.
+  # EXTRA_CONTAINER_ENV="FOO=1 BAR=2" (whitespace separated KEY=VALUE pairs).
+  if [[ -n "${EXTRA_CONTAINER_ENV:-}" ]]; then
+    local _kv
+    for _kv in ${EXTRA_CONTAINER_ENV}; do _a+=(-e "$_kv"); done
+  fi
   if [[ -f "$NCCL_HOST_DIR/libnccl.so.2.30.7" || -f "$NCCL_HOST_DIR/libnccl.so.2" ]]; then
     _a+=(-v "$NCCL_HOST_DIR:$NCCL_CONTAINER_DIR:ro" -e "LD_LIBRARY_PATH=$NCCL_CONTAINER_DIR")
   fi
@@ -346,6 +352,9 @@ push_spec_tables() {
 
 worker_env_lines() {
   local wip="$1" wgid="$2" rank="$3"
+  # Mirror of the head's EXTRA_CONTAINER_ENV passthrough; every rank must agree.
+  local _extra_env="-e DSV41_EXTRA_ENV=1" _kv
+  for _kv in ${EXTRA_CONTAINER_ENV:-}; do _extra_env+=" -e $(printf '%q' "$_kv")"; done
   cat <<EOF
         -e NODE_RANK=$rank -e NNODES=$NNODES \\
         -e TP_SIZE=$TP_SIZE -e EP_SIZE=$EP_SIZE \\
@@ -390,6 +399,7 @@ worker_env_lines() {
         -e SGLANG_ENABLE_DSV41_ENGRAM_HOST_TABLE=0 \\
         -e DSV41_TP_PAD=${DSV41_TP_PAD:-1} \\
         -e HOST_IP=$wip -e VLLM_HOST_IP=$wip \\
+        $_extra_env \\
 EOF
 }
 
