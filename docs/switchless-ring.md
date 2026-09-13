@@ -2,10 +2,15 @@
 
 This note documents how to run the 4-node profile (TP4/EP4) on four DGX Sparks
 wired as a **ring with no RoCE switch** — the alternative the README mentions
-("or a ring with NCCL routed over it") but does not spell out. The TP4 profile
-The TP4 profile had only ever been validated with `./start-tp4.sh doctor` before this work;
-the settings below are what a real boot on a 4-node ring needs, and that boot is recorded
-under *Tested configuration* near the end of this note.
+("or a ring with NCCL routed over it") but does not spell out. That profile had only ever
+been validated with `./start-tp4.sh doctor` before this work; the settings below are what a
+real boot on a 4-node ring needs, and the boot itself is recorded under *Tested
+configuration* near the end of this note.
+
+This note only covers what changes when the four nodes are cabled as a ring. It assumes the
+rest of the setup is done as the README describes: the base image (`./start-tp4.sh pull`), the
+checkpoint (`./start-tp4.sh download`, 476 GiB, gated on Hugging Face), and four nodes on the
+same DGX OS, driver and kernel.
 
 Everything here is opt-in. With `NCCL_SWITCHLESS_RING_ONLY` unset, `start.sh`
 behaves exactly as before.
@@ -159,6 +164,11 @@ NCCL_MAX_NCHANNELS=4               # TP4 memory optimisation keeps this at 4
 NCCL_P2P_LEVEL=SYS
 ```
 
+`.env.tp4.example` ships these lines **commented out**, so a `.env.tp4` copied straight from
+it boots as a switched profile and dies in `ncclTransportTreeConnect`. Uncomment them (or add
+the same values to your own `.env.tp4`) and keep `NCCL_SWITCHLESS_RING_ONLY=1` as the switch
+that turns the rest of this note on.
+
 Setting `NCCL_SWITCHLESS_RING_ONLY=1` does two things:
 
 * `start.sh` injects the ring-only NCCL settings into every rank (head and
@@ -301,6 +311,18 @@ profile was, which read like a bug report when there was none.)
 Four DGX Spark (GB10) wired as a ring, TP4/EP4, 1M context, DSpark k=5, weights
 local on every node (`NFS_SHARE=0` + bind volume), ring settings as above.
 Booted from `./start-tp4.sh serve` on 2026-09-11.
+
+Software baseline of that fleet, identical on all four nodes — a driver or kernel that differs
+on one node is the usual reason an NCCL behaves differently there, and it changes what GID
+index the RoCE ports use:
+
+| component | version |
+|---|---|
+| DGX OS | 7.5.0 (`/etc/dgx-release`, build 2026-03-23) |
+| kernel | `6.17.0-1031-nvidia` |
+| NVIDIA driver | 580.173.02 |
+| Docker | 29.2.1, with nvidia-container-toolkit (`--gpus all`) |
+| base image | `lmsysorg/sglang:dev-dsv41` (arm64) |
 
 Two values in the tested `.env.tp4` differ from the `.env.tp4.example` defaults and are kept
 as measured: `NCCL_PROTO=LL,LL128,Simple` (the example ships `^LL128`) and `NCCL_DEBUG=INFO`
