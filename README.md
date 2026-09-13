@@ -121,8 +121,17 @@ Fabric: a Spark has two ConnectX-7 ports, so three nodes form a full triangle bu
 cannot; a 4-node fleet needs a RoCE switch (all NCCL and NFS traffic through it, one
 `NFS_SERVER_IPS` address) or a ring with NCCL routed over it. Set `NCCL_IB_HCA`,
 `NCCL_SOCKET_IFNAME`/`GLOO_SOCKET_IFNAME`, `NFS_CLIENTS` and the GID index in `.env.tp4` for
-that fabric; `./start-tp4.sh doctor` checks reachability and the NFS mounts before a
-13-minute boot. `NCCL_DEBUG=INFO` for one boot shows the channels and protocol chosen.
+that fabric; `./start-tp4.sh doctor` checks reachability, the fabric addressing and — with the
+ring switch on — that every node carries the patched NCCL, all before a 13-minute boot.
+`NCCL_DEBUG=INFO` for one boot shows the channels and protocol chosen.
+
+A ring is not just a set of environment variables. Opposite nodes of a 4-node ring have no
+direct path, so NCCL's Tree/PAT transports can never connect (RoCE queue pairs do not follow
+IP routes) and a stock NCCL dies in `ncclTransportTreeConnect`. It needs a NCCL built with
+sparkring's tree/PAT-skip patch, `NCCL_SWITCHLESS_RING_ONLY=1`, and one /24 per link so that
+subnet-aware routing can tell a node's two ports apart. See
+**[docs/switchless-ring.md](docs/switchless-ring.md)** for the addressing plan, the
+build-and-verify recipe, and the pitfalls found on real hardware.
 
 Engram: `./start-tp4.sh pack` writes each rank's rows as `engram-l<layer>-r<rank>of4.bin`
 (~48 GiB per node at TP4) onto local NVMe; the names carry the TP size, so `ENGRAM_DIR` can
@@ -133,11 +142,14 @@ legacy `WORKER1_IP`/`WORKER2_IP` pairs still work), so 5+ nodes only need a matc
 `TP_SIZE` and `NNODES`. Nothing in the image is TP-specific; the padded-shard repair simply
 finds nothing to repair at TP4.
 
-Every measurement in this README comes from the 3-node fleet; the TP4 profile has been
-validated for configuration and script paths only (`./start-tp4.sh doctor`), not booted.
-Expect the same per-step structure (dense GEMMs, MoE, NCCL) with smaller attention GEMMs
-per rank and one extra network hop per collective; the memory headroom is what makes the
-long context and the higher concurrency safe, not a faster step.
+Every measurement in this README comes from the 3-node fleet. The TP4 profile has since been
+booted on four Sparks — over a **switchless ring**, not a switch, so it needs the patched NCCL
+and `NCCL_SWITCHLESS_RING_ONLY=1` described in
+[docs/switchless-ring.md](docs/switchless-ring.md), which carries that boot record, its
+measured throughput and the pitfalls. Expect the same per-step structure (dense GEMMs, MoE,
+NCCL) with smaller attention GEMMs per rank and one extra network hop per collective; the
+memory headroom is what makes the long context and the higher concurrency safe, not a
+faster step.
 
 ## What is in the box
 
@@ -159,6 +171,7 @@ scripts/pack_engram.py   repack one rank's Engram rows (weight+scale adjacent) t
 scripts/profile/         torch-profiler helper and trace analysers (see Profiling)
 files/                   NFS export helpers
 benchmarks/, tests/      upstream benchmark and row-store tests
+docs/switchless-ring.md   4-node ring without a RoCE switch: why the tree fails, patch recipe
 ```
 
 ## Knobs (`.env`)

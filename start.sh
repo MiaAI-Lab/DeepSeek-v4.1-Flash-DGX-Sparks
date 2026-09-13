@@ -478,15 +478,50 @@ cmd_doctor() {
     for _i in "${!WORKER_HOSTS[@]}"; do _mounts+=" ${WORKER_HOSTS[$_i]}→$(nfs_server_ip_for "${WORKER_HOSTS[$_i]}" "$_i" 2>/dev/null || echo '?')"; done
     info "NFSv4 listening on this host (workers should mount CX7:${_mounts})"
   else
-    warn "NFSv4 not listening yet — ./start.sh share will start or reuse the exporter"
+    if [[ "$NFS_SHARE" == "1" ]]; then
+      warn "NFSv4 not listening yet — ./start.sh share will start or reuse the exporter"
+    fi
   fi
-  info "weights: spark2/spark3 use docker NFS volume $NFS_VOLUME (head $MODEL_DIR); no rsync/SSHFS"
+  if [[ "$NFS_SHARE" == "1" ]]; then
+    info "weights: workers read $NFS_VOLUME over NFSv4 from $MODEL_DIR; no rsync/SSHFS"
+  else
+    info "weights: NFS_SHARE=0 — every node reads its own local copy through docker volume $NFS_VOLUME (head: $MODEL_DIR)"
+  fi
   if [[ "$TP_SIZE" -eq 3 ]]; then
     info "TP3 note: heads=64, o_groups=8, vocab=129280 are not divisible by 3; adapter/tp3_pad.py pads them"
     info "  (heads 64→96, groups 8→12, draft experts 128→129). experts=384 divides. Rank 2 holds padded shards only."
     info "  2 Sparks cannot hold the MXFP4 experts (290 GiB / 2 = 145 GiB > 121 GiB)."
   elif [[ "$TP_SIZE" -eq 4 ]]; then
     info "TP4 note: heads, o_groups, draft experts and vocab all divide by 4; no padding (DSV41_TP_PAD=${DSV41_TP_PAD:-0})."
+  fi
+
+  # ── switchless ring (NCCL_SWITCHLESS_RING_ONLY=1) ─────────────────────────────
+  # A 4-node ring has no direct path between opposite nodes, so NCCL's tree/PAT
+  # transports cannot be established and the boot only works with a NCCL carrying
+  # sparkring's patch. A missing or unpatched library on any single rank fails the
+  # whole boot with a Tree-transport error that reads like a bad fabric rather than
+  # a missing file, so check it here on every node. See docs/switchless-ring.md.
+  if [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == "1" ]]; then
+    local _nlib="$NCCL_HOST_DIR/libnccl.so.2.30.7" _nhca _ngid
+    [[ -f "$_nlib" ]] || _nlib="$NCCL_HOST_DIR/libnccl.so.2"
+    if [[ ! -f "$_nlib" ]]; then
+      warn "ring: no patched NCCL at $NCCL_HOST_DIR — stock NCCL ignores NCCL_SWITCHLESS_RING_ONLY and the boot dies in ncclTransportTreeConnect"
+      ok=1
+    elif grep -qa SWITCHLESS_RING_ONLY "$_nlib"; then
+      info "ring: head NCCL $(basename "$_nlib") ($(stat -c %s "$_nlib") B) carries SWITCHLESS_RING_ONLY"
+    else
+      warn "ring: $(basename "$_nlib") has no SWITCHLESS_RING_ONLY — that is not the sparkring build"
+      ok=1
+    fi
+    _nhca=$(for d in /sys/class/infiniband/*; do [[ -d "$d" ]] || continue; case "$(cat "$d/ports/1/state" 2>/dev/null)" in *ACTIVE*) basename "$d";; esac; done | paste -sd, -)
+    if [[ -n "$_nhca" ]]; then
+      info "ring: ACTIVE HCAs on head: $_nhca (NCCL_IB_HCA=$IB_HCA must name ACTIVE ports)"
+    else
+      warn "ring: no ACTIVE IB HCA on head"
+      ok=1
+    fi
+    _ngid=$(gid_index_local "$HEAD_IP" 2>/dev/null || true)
+    info "ring: RoCEv2 GID index on head = ${_ngid:-${NCCL_IB_GID_INDEX:-3}} (workers are probed in serve)"
   fi
 
   if nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader 2>/dev/null | grep -q .; then
@@ -501,6 +536,14 @@ cmd_doctor() {
       info "SSH $h OK → $(tr -d '\r' </tmp/dsv41-host-"$h".txt)"
       remote_on "$h" "command -v docker >/dev/null && nvidia-smi -L | head -1 && test -d /dev/infiniband && echo IB_OK" \
         || { warn "docker/GPU/IB check failed on $h"; ok=1; }
+      if [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == "1" ]]; then
+        if remote_ok_on "$h" "L=\$HOME/nccl-2.30.7/libnccl.so.2.30.7; [ -f \$L ] || L=\$HOME/nccl-2.30.7/libnccl.so.2; [ -f \$L ] && grep -qa SWITCHLESS_RING_ONLY \$L"; then
+          info "ring: $h provides a patched NCCL"
+        else
+          warn "ring: $h has no NCCL carrying SWITCHLESS_RING_ONLY — that rank would fall back to the image's stock NCCL and fail on the Tree transport"
+          ok=1
+        fi
+      fi
     else
       err "SSH to $h FAILED"
       cat /tmp/dsv41-ssh-"$h".err || true
@@ -622,6 +665,10 @@ cmd_serve() {
     if ! nfs_worker_has_model "$h"; then
       need_share=1
     fi
+    if [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == "1" ]] && \
+       ! remote_ok_on "$h" "L=\$HOME/nccl-2.30.7/libnccl.so.2.30.7; [ -f \$L ] || L=\$HOME/nccl-2.30.7/libnccl.so.2; [ -f \$L ] && grep -qa SWITCHLESS_RING_ONLY \$L"; then
+      die "$h has no patched NCCL carrying SWITCHLESS_RING_ONLY: with NCCL_SWITCHLESS_RING_ONLY=1 that rank falls back to the image's stock NCCL and the boot dies in ncclTransportTreeConnect. Copy \$HOME/nccl-2.30.7/libnccl.so.2.30.7 to it (see docs/switchless-ring.md)."
+    fi
     if ! remote_ok_on "$h" "docker image inspect $(printf '%q' "$IMAGE") >/dev/null 2>&1"; then
       info "image missing on $h — building"
       cmd_build
@@ -677,6 +724,9 @@ cmd_serve() {
           NCCL_VOL=\"-v \$HOME/nccl-2.30.7:$NCCL_CONTAINER_DIR:ro\"
           NCCL_ENV='-e LD_LIBRARY_PATH=$NCCL_CONTAINER_DIR'
         fi
+      elif [ \"$NCCL_SWITCHLESS_RING_ONLY\" = 1 ]; then
+        echo 'MISSING patched NCCL: \$HOME/nccl-2.30.7/libnccl.so.2.30.7 is required by NCCL_SWITCHLESS_RING_ONLY=1 (see docs/switchless-ring.md)'
+        exit 1
       fi
       docker run -d --name $WORKER_CTN \
         --network host --ipc host --privileged --cap-add IPC_LOCK --gpus all \
@@ -811,7 +861,11 @@ cmd_status() {
   local h
   for h in "${WORKER_HOSTS[@]}"; do
     echo "== worker $h =="
-    remote_on "$h" "docker ps --filter name=$WORKER_CTN --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}' ; test -f $COMMON_MODEL/config.json && echo weights:OK || echo weights:MISSING" || warn "status SSH $h failed"
+    remote_on "$h" "docker ps --filter name=$WORKER_CTN --format 'table {{.Names}}\t{{.Status}}\t{{.Image}}'" || warn "status SSH $h failed"
+    # Look inside $NFS_VOLUME, not at $COMMON_MODEL: the latter is a head-side symlink
+    # to MODEL_DIR and never exists on a worker, so the old check reported
+    # weights:MISSING on healthy workers in the NFS_SHARE=0 profile.
+    if nfs_worker_has_model "$h"; then echo "weights:OK ($NFS_VOLUME)"; else echo "weights:MISSING ($NFS_VOLUME)"; fi
     echo
   done
   echo "== API =="

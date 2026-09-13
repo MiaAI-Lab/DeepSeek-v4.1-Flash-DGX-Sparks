@@ -3,8 +3,9 @@
 This note documents how to run the 4-node profile (TP4/EP4) on four DGX Sparks
 wired as a **ring with no RoCE switch** — the alternative the README mentions
 ("or a ring with NCCL routed over it") but does not spell out. The TP4 profile
-was only ever validated with `./start-tp4.sh doctor`; the settings below are
-what a real boot on a 4-node ring needs.
+The TP4 profile had only ever been validated with `./start-tp4.sh doctor` before this work;
+the settings below are what a real boot on a 4-node ring needs, and that boot is recorded
+under *Tested configuration* near the end of this note.
 
 Everything here is opt-in. With `NCCL_SWITCHLESS_RING_ONLY` unset, `start.sh`
 behaves exactly as before.
@@ -44,6 +45,49 @@ traffic through a transit node.
 3. The fabric interface, HCA list and RoCE v2 GID index, as for a switched
    deployment.
 
+
+## Fabric addressing for a ring
+
+A ring makes the addressing plan part of the mechanism rather than a detail. Each node has
+two fabric ports and each one reaches exactly one neighbour, so a node has to send on the
+port that reaches the peer it is talking to. `start.sh` sets
+`NCCL_IB_SUBNET_AWARE_ROUTING=1` together with `NCCL_IB_SUBNET_PREFIX_LEN=24`, which lets
+NCCL use the peer's address to pick a local port — and that only discriminates if the two
+ends of a link share a subnet while no two *different* links do.
+
+The tested plan gives every link its own /24, `.10` on the lower-numbered rank and `.11` on
+the other (addresses illustrative; substitute your own private range):
+
+| link | one end | other end |
+|---|---|---|
+| rank0–rank1 | spark1 `enp1s0f0np0` 10.10.0.10/24 | spark2 `enp1s0f1np1` 10.10.0.11/24 |
+| rank1–rank2 | spark2 `enp1s0f0np0` 10.10.1.10/24 | spark3 `enp1s0f1np1` 10.10.1.11/24 |
+| rank2–rank3 | spark3 `enp1s0f0np0` 10.10.2.10/24 | spark4 `enp1s0f1np1` 10.10.2.11/24 |
+| rank3–rank0 | spark4 `enp1s0f0np0` 10.10.3.10/24 | spark1 `enp1s0f1np1` 10.10.3.11/24 |
+
+so the ring is rank0 — rank1 — rank2 — rank3 — rank0: ranks adjacent in the ring are adjacent
+in the numbering, and the diagonals (rank0–rank2, rank1–rank3) have no link at all. Treat this
+as the plan the tested fleet runs, not as a claim that other plans fail: a single /24 for all
+four ports was never tried, and the only reason to expect trouble is that subnet-aware
+routing then cannot separate a node's two ports.
+
+Avoid `198.18.0.0/15` here. It is the RFC 2544 benchmark range and the default fake-IP range
+of Clash/mihomo-style proxies, so DNS answers can collide with your fabric addresses. The
+management LAN carries SSH, the NCCL bootstrap and `--dist-init-addr`; the /24s above carry
+nothing but RoCE.
+
+Confirm two things before booting. Every port named in `NCCL_IB_HCA` must be ACTIVE on every
+node, and the RoCE v2 IPv4-mapped GID index must be the one `NCCL_IB_GID_INDEX` names (the
+tested fleet has it at index 3 on all four nodes):
+
+```bash
+for d in /sys/class/infiniband/rocep1s0f0 /sys/class/infiniband/rocep1s0f1; do
+  echo "$d: $(cat $d/ports/1/state) $(cat $d/ports/1/rate)"
+done
+```
+
+`./start-tp4.sh doctor` prints the ACTIVE HCAs and the resolved GID index for the head, and
+`serve` probes every worker's index and logs all four together.
 ## Building the patched NCCL
 
 The library used here was built locally on one of the Sparks; nothing in this
@@ -55,6 +99,15 @@ repository builds it. The recipe, for reproducibility:
 | patch | `spark_transport/nccl/nccl-2.30.7-dual-pci-domain.patch` (31610 B, md5 `1ea3719be357b2cebd5af169dda16fce`) |
 | build script | `runtime/sparkring/source_image/build_nccl.py` |
 | target arch | `-gencode=arch=compute_121,code=sm_121` (GB10 / SM121) |
+| patch source | `FujitsuPolycom/sparkring`, blob `f4853e84334eaa3f980dce69a12660d8f1774d7c`, last changed by `4b9b6a0a213456b96400c5e1a1cf59c20ff892c8` |
+
+Pin the patch set by blob rather than by `main`: the file was last changed in that commit and
+`main` keeps moving. Re-fetching that blob must reproduce the md5 above:
+
+```bash
+gh api repos/FujitsuPolycom/sparkring/contents/spark_transport/nccl/nccl-2.30.7-dual-pci-domain.patch \
+  --jq .content | base64 -d | md5sum     # 1ea3719be357b2cebd5af169dda16fce
+```
 
 `build_nccl.py` verifies the source archive and the compiler wrapper against
 `source-lock.json`, runs the CPU-only `tests/routing_handle/compat.cc` test
@@ -191,6 +244,33 @@ NCCL: queue-pair setup is per link and does not consult the routing table.
 That is the whole reason the tree transport has to be skipped rather than
 "routed".
 
+### 4. A worker without the patched library fails silently
+
+`start.sh` mounts the patched library only if `$HOME/nccl-2.30.7/libnccl.so.2.30.7` exists on
+that node. With `NCCL_SWITCHLESS_RING_ONLY=1` set, a worker that lacks it keeps the image's
+stock NCCL, and the boot then dies in `ncclTransportTreeConnect` — reporting exactly the
+failure the patch exists to prevent, with nothing in the message pointing at the missing
+file. `doctor` reports it and `serve` refuses to start when any node lacks a library carrying
+`SWITCHLESS_RING_ONLY`, so make sure all four have it:
+
+```bash
+for h in spark2 spark3 spark4; do
+  ssh $h 'mkdir -p ~/nccl-2.30.7'
+  scp ~/nccl-2.30.7/libnccl.so.2.30.7 $h:~/nccl-2.30.7/
+done
+```
+
+The check is `grep -qa SWITCHLESS_RING_ONLY <lib>`, so it needs no `binutils` on the worker.
+
+### 5. `status` reported `weights:MISSING` on workers under `NFS_SHARE=0`
+
+`cmd_status` used to test `$COMMON_MODEL/config.json` on each worker, but `$COMMON_MODEL` is a
+head-side symlink to `MODEL_DIR` and never exists on a worker. Under NFS that went unnoticed
+because the worker reads the checkpoint through the volume; with `NFS_SHARE=0` (the *Running
+without NFS* setup below) perfectly healthy workers printed `weights:MISSING`. The check now
+looks inside `$NFS_VOLUME`, which is right for both profiles, and prints `weights:OK
+(dsv41-weights)`.
+
 ## Running without NFS
 
 The profiled workers normally read the checkpoint from the head's NFS export.
@@ -211,14 +291,21 @@ then set `MODEL_DIR=$HOME/dsv41-model`, `NFS_VOLUME=dsv41-weights` and
 bind. `cp -rlL` shares inodes with the HF blob store, so the flattened
 directory costs no extra disk space.
 
-`./start-tp4.sh doctor` still prints *"spark2/spark3 use docker NFS volume
-dsv41-weights"* — that line is hard-coded and does not mean NFS is in use.
+`./start-tp4.sh doctor` reports the weights layout it is about to use: with `NFS_SHARE=1` it
+names the NFS volume, with `NFS_SHARE=0` it says every node reads its own local copy. (Older
+checkouts printed a hard-coded *"spark2/spark3 use docker NFS volume"* line whatever the
+profile was, which read like a bug report when there was none.)
 
 ## Tested configuration
 
 Four DGX Spark (GB10) wired as a ring, TP4/EP4, 1M context, DSpark k=5, weights
 local on every node (`NFS_SHARE=0` + bind volume), ring settings as above.
 Booted from `./start-tp4.sh serve` on 2026-09-11.
+
+Two values in the tested `.env.tp4` differ from the `.env.tp4.example` defaults and are kept
+as measured: `NCCL_PROTO=LL,LL128,Simple` (the example ships `^LL128`) and `NCCL_DEBUG=INFO`
+(the example ships `WARN`). Neither is proven necessary for a ring — they are simply what this
+fleet booted with, and they are listed so the numbers below stay traceable.
 
 | check | result |
 |---|---|
