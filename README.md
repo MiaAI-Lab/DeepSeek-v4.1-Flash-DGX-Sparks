@@ -160,6 +160,11 @@ What changes against the 3-node profile:
 Measured on 4× DGX Spark with [sparkDash](https://github.com/MiaAI-Lab/sparkDash) (prose
 decode, 256 completion tokens; prefill at 4K–128K). Decode is faster than the 3-node fleet at every concurrency — smaller
 attention GEMMs per rank and no padded shards more than pay for the extra NCCL hop.
+An independent switchless-ring reproduction (public OpenAI path, idle cluster,
+greedy code, estimated decode window 129–641) is in
+[`docs/tp4-switchless-ring-results.md`](docs/tp4-switchless-ring-results.md): C1 window
+67.4 tok/s estimated, C8 aggregate 224.8 tok/s (historical DSpark k=5; current
+default remains k=3).
 The memory headroom is what makes the 1M context possible. Decode has been measured out to
 16 streams (with `MAX_RUNNING_REQUESTS=16`): aggregate throughput is still climbing there
 (134.2 tok/s) but per-stream rate has flattened at ~22 tok/s and TTFT degrades sharply past
@@ -190,11 +195,16 @@ is a throughput operating point, not a latency one; the profile defaults to 8, a
 Prefill peaks at ~3.8k tok/s around 16–32K and is still 3.2k at 128K.
 
 Fabric: a Spark has two ConnectX-7 ports, so three nodes form a full triangle but four
-cannot; a 4-node fleet needs a RoCE switch (all NCCL and NFS traffic through it, one
-`NFS_SERVER_IPS` address) or a ring with NCCL routed over it. Set `NCCL_IB_HCA`,
-`NCCL_SOCKET_IFNAME`/`GLOO_SOCKET_IFNAME`, `NFS_CLIENTS` and the GID index in `.env.tp4` for
-that fabric; `./start-tp4.sh doctor` checks reachability and the NFS mounts before a
-13-minute boot. `NCCL_DEBUG=INFO` for one boot shows the channels and protocol chosen.
+cannot. A 4-node fleet needs either a RoCE switch, or the opt-in switchless-ring path in
+[`docs/switchless-ring.md`](docs/switchless-ring.md). The latter requires four DACs, one
+point-to-point subnet per cable, the patched `sparkring` NCCL on every rank, and
+`NCCL_SWITCHLESS_RING_ONLY=1`; setting only environment variables against stock NCCL is not
+enough. The guide includes physical cable diagrams, IP examples, patched-library verification,
+local-weight operation and the exact logs that prove Tree/PAT setup was skipped. For a switched
+fleet, route NCCL/NFS through the switch and use one `NFS_SERVER_IPS` address. In either layout,
+set `IB_HCA`, `NCCL_SOCKET_IFNAME`/`GLOO_SOCKET_IFNAME`, `NFS_CLIENTS` and the GID index in
+`.env.tp4`; `./start-tp4.sh doctor` validates the selected path before the cold boot.
+`NCCL_DEBUG=INFO` for one boot shows the channels and protocol chosen.
 
 Engram: `./start-tp4.sh pack` writes each rank's rows as `engram-l<layer>-r<rank>of4.bin`
 (~48 GiB per node at TP4) onto local NVMe; the names carry the TP size, so `ENGRAM_DIR` can

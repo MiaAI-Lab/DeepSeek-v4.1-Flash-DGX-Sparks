@@ -22,7 +22,8 @@ nfs_server_ip_for() {
   # Per-worker override: NFS_SERVER_IPS="10.0.22.1 10.0.23.1 ..." (one entry per
   # worker, or a single entry used for all, e.g. behind a switch), else the legacy
   # NFS_SERVER_IP_<n>, else NFS_SERVER_IP.
-  local explicit="" -a _nfs_ips=()
+  local explicit=""
+  local -a _nfs_ips=()
   if [[ -n "${NFS_SERVER_IPS:-}" ]]; then
     read -r -a _nfs_ips <<<"$(tr ',' ' ' <<<"$NFS_SERVER_IPS")"
     if [[ ${#_nfs_ips[@]} -eq 1 ]]; then explicit="${_nfs_ips[0]}"; else explicit="${_nfs_ips[$idx]:-}"; fi
@@ -38,7 +39,8 @@ nfs_server_ip_for() {
   local peer="${WORKER_IPS[$idx]}"
   # Prefer the CX7 source address toward that worker's fabric IP if set:
   # WORKER_FABRIC_IPS="10.0.22.2 10.0.23.3 ..." or legacy WORKER<n>_FABRIC_IP.
-  local fabric_peer="" -a _fab=()
+  local fabric_peer=""
+  local -a _fab=()
   if [[ -n "${WORKER_FABRIC_IPS:-}" ]]; then
     read -r -a _fab <<<"$(tr ',' ' ' <<<"$WORKER_FABRIC_IPS")"
     fabric_peer="${_fab[$idx]:-}"
@@ -97,9 +99,17 @@ nfs_ensure_server() {
   live="$(nfs_live_container || true)"
 
   if [[ -n "$live" ]] && nfs_rpc_ready 127.0.0.1; then
-    info "NFS already up ($live) — adding spark2/spark3 CX7 clients"
+    local export_source
+    export_source=$(docker inspect -f '{{range .Mounts}}{{if eq .Destination "/export"}}{{.Source}}{{end}}{{end}}' "$live")
+    if [[ "$export_source" == "$MODEL_DIR" ]]; then
+      NFS_REUSE_EXPORT=0
+    elif [[ "$export_source" == "$HF_EXPORT_ROOT" ]]; then
+      NFS_REUSE_EXPORT=1
+    else
+      die "NFS $live exports $export_source; expected $MODEL_DIR or $HF_EXPORT_ROOT"
+    fi
+    info "NFS already up ($live) — configuring worker clients"
     nfs_write_exports "$live" "$clients"
-    NFS_REUSE_EXPORT=1
     NFS_LIVE_CTN="$live"
     return 0
   fi
@@ -163,26 +173,47 @@ nfs_ensure_worker_volume() {
   info "NFS volume $NFS_VOLUME on $host → nfs://${addr}${device}"
   remote_on "$host" "
     set -e
-    docker volume rm '$NFS_VOLUME' >/dev/null 2>&1 || true
+    docker volume rm $(printf '%q' "$NFS_VOLUME") >/dev/null 2>&1 || true
     docker volume create --driver local \
       --opt type=nfs \
-      --opt o=addr=${addr},${NFS_OPTS_CLIENT} \
-      --opt device=${device} \
-      '$NFS_VOLUME' >/dev/null
+      --opt $(printf '%q' "o=addr=${addr},${NFS_OPTS_CLIENT}") \
+      --opt $(printf '%q' "device=${device}") \
+      $(printf '%q' "$NFS_VOLUME") >/dev/null
   "
+}
+
+local_model_has_weights() {
+  [[ -r "$MODEL_DIR/config.json" && -s "$MODEL_DIR/config.json" ]] || return 1
+  local -a shards=("$MODEL_DIR"/model-*-of-*.safetensors)
+  [[ ${#shards[@]} -ge "$EXPECTED_SHARDS" ]] || return 1
+  local shard
+  for shard in "${shards[@]}"; do
+    [[ -r "$shard" && -s "$shard" ]] || return 1
+  done
 }
 
 nfs_worker_has_model() {
   local host="$1"
+  # Inspect first: docker run -v would create an empty volume on a typo.
+  # Use the serving image already required by serve; status must not pull an
+  # unrelated mutable image, and the probe needs neither network nor GPUs.
+  local check='test -r /m/config.json && test -s /m/config.json || exit 1
+    expected=$1
+    set -- /m/model-*-of-*.safetensors
+    test "$#" -ge "$expected" || exit 1
+    for shard do test -r "$shard" && test -s "$shard" || exit 1; done'
   remote_on "$host" --timeout 180 \
-    "docker image inspect alpine:latest >/dev/null 2>&1 || docker pull alpine:latest >/dev/null
-     docker run --rm -v '${NFS_VOLUME}:/m:ro' alpine:latest test -f /m/config.json" \
+    "docker volume inspect $(printf '%q' "$NFS_VOLUME") >/dev/null 2>&1 &&
+     docker run --rm --pull=never --network none \
+       --mount $(printf '%q' "type=volume,source=$NFS_VOLUME,target=/m,readonly") \
+       --entrypoint /bin/sh $(printf '%q' "$IMAGE") \
+       -c $(printf '%q' "$check") sh $(printf '%q' "$EXPECTED_SHARDS")" \
     >/dev/null 2>&1
 }
 
 nfs_unmount_workers() {
   local h
   for h in "${WORKER_HOSTS[@]}"; do
-    remote_on "$h" "docker volume rm '$NFS_VOLUME' >/dev/null 2>&1 || true" || true
+    remote_on "$h" "docker volume rm $(printf '%q' "$NFS_VOLUME") >/dev/null 2>&1 || true" || true
   done
 }
