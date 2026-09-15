@@ -222,6 +222,10 @@ gid_index_local() {
   return 1
 }
 
+ib_hca_active_remote() {
+  remote_on "$1" "for d in /sys/class/infiniband/*; do h=\${d##*/}; s=\$(cat \$d/ports/1/state 2>/dev/null); case \$s in *ACTIVE*) echo \$h;; esac; done | paste -sd, -" | tr -d '\r'
+}
+
 gid_index_remote() {
   local host="$1" ip="$2" hex
   hex=$(printf '%02x%02x:%02x%02x' $(echo "$ip" | tr . ' '))
@@ -616,12 +620,22 @@ cmd_serve() {
 
   local GID_HEAD gi g
   local -a WORKER_GIDS=()
+  HEAD_HCA="$IB_HCA"
+  local -a WORKER_HCAS=()
+  local hc
+  for gi in "${!WORKER_HOSTS[@]}"; do
+    hc=$(ib_hca_active_remote "${WORKER_HOSTS[$gi]}" 2>/dev/null || true)
+    WORKER_HCAS+=("${hc:-$IB_HCA}")
+  done
+  info "RoCE HCAs per node: head=$HEAD_HCA workers=${WORKER_HCAS[*]}"
   GID_HEAD=$(gid_index_local "$HEAD_IP" 2>/dev/null || true)
   GID_HEAD="${GID_HEAD:-${NCCL_IB_GID_INDEX:-3}}"
   for gi in "${!WORKER_IPS[@]}"; do
+    IB_HCA="${WORKER_HCAS[$gi]}"
     g=$(gid_index_remote "${WORKER_HOSTS[$gi]}" "${WORKER_IPS[$gi]}" | tr -d '\r' || true)
     WORKER_GIDS+=("${g:-${NCCL_IB_GID_INDEX:-3}}")
   done
+  IB_HCA="$HEAD_HCA"
   info "RoCEv2 GID indexes: head=$GID_HEAD workers=${WORKER_GIDS[*]}"
 
   docker rm -f "$HEAD_CTN" >/dev/null 2>&1 || true
@@ -635,6 +649,7 @@ cmd_serve() {
   for h in "${WORKER_HOSTS[@]}"; do
     wip="${WORKER_IPS[$idx]}"
     wgid="${WORKER_GIDS[$idx]}"
+    IB_HCA="${WORKER_HCAS[$idx]:-$HEAD_HCA}"
     rank=$((idx + 1))
     remote_on "$h" "
       set -e
@@ -664,6 +679,7 @@ $(worker_env_lines "$wip" "$wgid" "$rank")
     idx=$((idx + 1))
   done
 
+  IB_HCA="$HEAD_HCA"
   info "Starting head (rank 0, API :$PORT)..."
   local -a head_args=()
   docker_common_args head_args "$HEAD_IP" "$GID_HEAD"
