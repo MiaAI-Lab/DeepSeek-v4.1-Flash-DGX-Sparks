@@ -19,9 +19,15 @@ class EngramLoader(importlib.abc.Loader):
         elif module.__name__ == 'sglang.srt.layers.quantization.fp8_utils':
             from mxfp8_b12x import install
             install(module)
+            # AFTER b12x, so this wraps its wrapper rather than the original.
+            # Gated on DSV41_SHARED_PAD_K, inactive by default.
+            from shared_pad_k import install as install_shared_pad
+            install_shared_pad(module)
         elif module.__name__ == 'sglang.srt.layers.quantization.fp8':
             from mxfp8_b12x import install_fp8
             install_fp8(module)
+            from shared_pad_k import install_fp8 as install_shared_pad_fp8
+            install_shared_pad_fp8(module)
         elif module.__name__ == 'sglang.srt.model_executor.model_runner':
             from prefill_empty_cache import install
             install(module)
