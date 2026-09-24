@@ -14,7 +14,8 @@
 # Usage: ./start-tp4.sh doctor | build | share | pack | serve | stop | status | logs | smoke
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export ENV_FILE="$ROOT/.env.tp4"
+# TP4_ENV_FILE selects an experiment arm (scripts/tp4/arm.sh writes one); default is .env.tp4.
+export ENV_FILE="${TP4_ENV_FILE:-$ROOT/.env.tp4}"
 export ENV_EXAMPLE="$ROOT/.env.tp4.example"
 export STATE_DIR="${STATE_DIR:-$ROOT/state-tp4}"
 export LOG_DIR="${LOG_DIR:-$ROOT/logs-tp4}"
