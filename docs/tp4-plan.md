@@ -29,10 +29,20 @@ Everything below runs on spark1 from the repository root. Code changes (adapter 
 scripts/tp4/preflight.sh           # ssh to all 4 nodes, same base image, overlay, shards or free disk
 ```
 
-**Base image mismatch:** if preflight reports different base image ids, rank 2 once ran a
-different SGLang build this way. Copy the head's base to the odd node before building:
-`docker save lmsysorg/sglang:dev-dsv41 | ssh zurih@<node> docker load`.
-Expected id: `37939c26c0ba…` (the TP3 fleet runs this).
+**Base image:** every result was measured on the Docker Hub digest
+`lmsysorg/sglang:dev-dsv41@sha256:3dbc313030a6ef2c5d7de8ecf48e9aece722694a82182cb618cc82b588816349`
+(public, anonymous pull; arm64 image id `37939c26c0ba…`). The plain `dev-dsv41` **tag** has since
+moved to a newer build (arm64 id `381b27ff…`), so don't go by the tag. The Dockerfile `FROM` and
+`BASE_IMAGE` in `.env.tp4.example` carry the digest. If your `.env.tp4` was created earlier, set:
+
+```bash
+BASE_IMAGE=lmsysorg/sglang:dev-dsv41@sha256:3dbc313030a6ef2c5d7de8ecf48e9aece722694a82182cb618cc82b588816349
+```
+
+then `./start-tp4.sh pull` (all nodes; ~33 GB once) and check each node:
+`docker image inspect "$BASE_IMAGE" -f '{{.Id}}'` must print `sha256:37939c26c0ba…`.
+Rerun `scripts/tp4/preflight.sh`: it checks the image named by `BASE_IMAGE`, so with the pin set it
+checks the right one.
 
 ```bash
 ./start-tp4.sh build               # overlay dsv41-4x-spark:local on all 4 nodes
