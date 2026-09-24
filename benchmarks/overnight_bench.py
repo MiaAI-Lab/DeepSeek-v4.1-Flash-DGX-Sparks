@@ -8,8 +8,8 @@ as the first-token time, so:
     decode tok/s = (completion_tokens - 1) / (t_last - t_first)
     e2e tok/s    = completion_tokens / (t_last - t_send)
 
-C4 aggregate = sum(completion_tokens) / (wave wall time), all four requests
-sent together. Prints UTC phase boundaries so acceptance/step lines in the head
+cN aggregate (PHASES=c1,c4,c8,...) = sum(completion_tokens) / (wave wall time), all N
+requests (alternating prose and code) sent together. Prints UTC phase boundaries so acceptance/step lines in the head
 log can be joined to each phase afterwards.
 
 Usage: BASE_URL=http://10.0.0.1:8888 python3 overnight_bench.py OUT.jsonl [reps] [max_tokens]
@@ -161,14 +161,18 @@ def main():
                 "completion_tokens": [r["completion_tokens"] for r in rs],
                 "distinct_outputs": len({r["text_sha"] for r in rs}),
                 "errors": [r["error"] for r in rs if r["error"]]}
-    if "c4" in phases:
+    # cN phases (c4, c8, c16, ...): N concurrent requests, alternating prose and code, per wave.
+    for ph in phases:
+        if not (ph.startswith("c") and ph[1:].isdigit()) or ph == "c1":
+            continue
+        n = int(ph[1:])
         start = now_utc()
         waves = []
-        mix = ["prose", "code", "prose", "code"]
+        mix = [("prose", "code")[i % 2] for i in range(n)]
         for i in range(reps):
             t0 = time.perf_counter()
-            with concurrent.futures.ThreadPoolExecutor(4) as ex:
-                rs = list(ex.map(lambda w: one(w, max_tokens, "c4"), mix))
+            with concurrent.futures.ThreadPoolExecutor(n) as ex:
+                rs = list(ex.map(lambda w: one(w, max_tokens, ph), mix))
             wall = time.perf_counter() - t0
             toks = sum(r["completion_tokens"] or 0 for r in rs)
             for r in rs:
@@ -177,7 +181,7 @@ def main():
             waves.append({"wall_s": wall, "tokens": toks, "agg_tps": toks / wall,
                           "per_stream_decode": [r.get("decode_tps") for r in rs],
                           "errors": [r["error"] for r in rs if r["error"]]})
-        summary["phases"]["c4"] = {
+        summary["phases"][ph] = {
             "start": start, "end": now_utc(),
             "agg_tps": summarize(waves, "agg_tps"),
             "per_stream_decode_median": statistics.median(
@@ -186,7 +190,7 @@ def main():
     with open(out.replace(".jsonl", "") + ".summary.json", "w") as f:
         json.dump(summary, f, indent=1)
     for k, v in summary["phases"].items():
-        if k == "c4":
+        if "agg_tps" in v:
             print(f"{k:16s} agg {v['agg_tps']['median']:.2f} tok/s (min {v['agg_tps']['min']:.2f} max {v['agg_tps']['max']:.2f}) "
                   f"per-stream {v['per_stream_decode_median']:.2f}  {v['start']}..{v['end']}")
         else:
