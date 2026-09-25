@@ -6,5 +6,8 @@
   "archive_change": "Only tar/gzip ownership, timestamps and metadata normalized for publication.",
   "b12x_upstream": "https://github.com/local-inference-lab/b12x",
   "roce_revision": "081b235931dbbcedcf0eb5899bae990c5dec5238",
-  "base": "SG4b qualified B12x 85d3681 with local clamp fixes"
+  "base": "SG4b qualified B12x 85d3681 with local clamp fixes",
+  "local_patches": [
+    "scripts/b12x-roce-columns-gather.patch (comm/roce/roce_oneshot.py + _allgather_cute.py): RoceOneshotAllReduce.all_gather(columns=..., column_offset=...), a last-dim all-gather of unequal per-rank shards written straight into the stock column order (compact gather for adapter/replicated_split.py, DSV41_SPLIT_COMPACT_GATHER). Without columns= every call is unchanged."
+  ]
 }

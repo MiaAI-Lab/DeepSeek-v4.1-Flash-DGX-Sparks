@@ -1,0 +1,120 @@
+diff -ru b12x_next/moe/_shared/kernels/dynamic.py b12x_next/moe/_shared/kernels/dynamic.py
+--- b12x_next/moe/_shared/kernels/dynamic.py
++++ b12x_next/moe/_shared/kernels/dynamic.py
+@@ -956,6 +956,11 @@
+         self.direct_routing = bool(direct_routing)
+         self.external_route_plan = bool(external_route_plan)
+         self.materialize_intermediate = bool(materialize_intermediate)
++        # ds41 patch (b12x_next only): set by fused_moe._impl._get_dynamic_kernel under
++        # prequantized_input(). The token-major W4A8-MX front-end then skips its per-token input
++        # quantization; the caller has already written the MXFP8 rows (E4M3 [token, K]) and their
++        # UE8M0 scales ([token, K/32]) into packed_input / packed_input_scale.
++        self.prequantized_input = False
+         self.w4a8_m1_materialized = bool(
+             self.w4a8_repacked
+             and self.direct_routing
+@@ -3303,6 +3308,11 @@
+         else:
+             output_bytes_per_row = cols // Int32(2)
+             mx_blocks_per_row = sf_blocks_per_row  # unused placeholder
++        # ds41 patch: K/32 blocks the shared-input W4A8 producer quantizes per token; none when the
++        # caller supplied the MXFP8 rows (prequantized_input), so a_input is never read.
++        input_quant_blocks = mx_blocks_per_row
++        if cutlass.const_expr(self.prequantized_input):
++            input_quant_blocks = Int32(0)
+         cols_u32 = cols // Int32(2)
+         scatter_output_u32 = cute.recast_tensor(scatter_output, cutlass.Uint32)
+         total_pairs = Int32(topk_ids.shape[0])
+@@ -3671,7 +3681,7 @@
+                                         )
+ 
+                                     blk_idx = lane_id + token_partition * Int32(32)
+-                                    while blk_idx < mx_blocks_per_row:
++                                    while blk_idx < input_quant_blocks:
+                                         block_start = blk_idx * Int32(32)
+                                         values, block_max = _load_bf16x32_to_f32(
+                                             a_input,
+@@ -3754,7 +3764,7 @@
+                                         blk_idx += Int32(self.input_warps_per_token * 32)
+                                 else:
+                                     blk_idx = lane_id + token_partition * Int32(32)
+-                                    while blk_idx < mx_blocks_per_row:
++                                    while blk_idx < input_quant_blocks:
+                                         block_start = blk_idx * Int32(32)
+                                         values, block_max = _load_bf16x32_to_f32(
+                                             a_input,
+diff -ru b12x_next/moe/fused_moe/_impl.py b12x_next/moe/fused_moe/_impl.py
+--- b12x_next/moe/fused_moe/_impl.py
++++ b12x_next/moe/fused_moe/_impl.py
+@@ -6,6 +6,7 @@
+ 
+ import os
+ import logging
++import threading
+ import time
+ from collections.abc import Mapping, Sequence
+ from contextlib import contextmanager, suppress
+@@ -2144,6 +2145,29 @@
+ _DYNAMIC_KERNEL_CACHE: Dict[Tuple, object] = {}
+ register_program_cache(_MICRO_KERNEL_CACHE)
+ register_program_cache(_DYNAMIC_KERNEL_CACHE)
++# ds41 patch (b12x_next only): pre-quantized W4A8-MX input. Inside ``prequantized_input()`` a
++# dynamic launch resolves the front-end specialization that does not quantize ``a``: the caller
++# has already written the MXFP8 rows (E4M3, [token, K], row stride K) and their UE8M0 scales
++# ([token, K/32]) into the binding's packed_input / packed_input_scale, and ``a`` is only a
++# [M, K] bf16 shape carrier that is never read. Only the token-major split-materialized front-end
++# (shared input across experts, M16/M64/M128 phase kernels) has that layout; anything else raises.
++_PREQUANT_STATE = threading.local()
++
++
++@contextmanager
++def prequantized_input():
++    prev = getattr(_PREQUANT_STATE, "on", False)
++    _PREQUANT_STATE.on = True
++    try:
++        yield
++    finally:
++        _PREQUANT_STATE.on = prev
++
++
++def _prequantized_input_requested() -> bool:
++    return bool(getattr(_PREQUANT_STATE, "on", False))
++
++
+ _MAC_CACHE: Dict[Tuple[int, str], int] = {}  # (device_idx, impl) → max_active_clusters
+ # Micro owns the tiny tail below this routed-row cutover; dynamic owns the rest.
+ # The measured GLM crossover under CUDA graph replay is 64 routed rows.
+@@ -10830,6 +10854,18 @@
+         int(trellis_bits),
+         bool(trellis_intermediate_hadamard),
+     )
++    prequantized = _prequantized_input_requested()
++    if prequantized:
++        # ds41 patch: appended only when on, so every existing key (and its object cache) is unchanged
++        if not (is_w4a8 and int(trellis_bits) == 0 and share_input_across_experts
++                and materialize_intermediate and not direct_routing):
++            raise ValueError(
++                "prequantized_input needs the token-major split-materialized W4A8-MX front-end "
++                f"(quant_mode={quant_mode}, trellis_bits={trellis_bits}, share_input="
++                f"{share_input_across_experts}, materialized={materialize_intermediate}, "
++                f"direct_routing={direct_routing})"
++            )
++        cache_key = cache_key + ("prequantized_input",)
+     reuse_compiled = _first_env(
+         "B12X_NEXT_DYNAMIC_REUSE_COMPILED",
+         "B12X_NEXT_LEVEL10_REUSE_COMPILED",
+@@ -10892,6 +10928,14 @@
+         # activations against "e2m3" FP6 weights).
+         kernel_kwargs["quant_recipe"] = quant_mode
+     kernel = activation_spec.make_dynamic_kernel(**kernel_kwargs)
++    if prequantized:
++        if not (kernel.w4a8_split_materialized and not kernel.w4a8_m1_materialized
++                and not kernel.w4a8_trellis and kernel.share_input_across_experts):
++            raise ValueError(
++                "prequantized_input: the resolved dynamic kernel is not the token-major "
++                f"split-materialized W4A8-MX front-end (tile {tuple(mma_tiler_mn)})"
++            )
++        kernel.prequantized_input = True
+     if is_w4a8:
+         launch = _DynamicMoEW4A8Launch(
+             kernel,

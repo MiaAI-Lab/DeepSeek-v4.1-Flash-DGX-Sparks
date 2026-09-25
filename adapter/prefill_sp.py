@@ -32,6 +32,9 @@ Modes
   DSV41_PREFILL_SP_MIN_ROWS  default 2048; chunks below it or not divisible by the TP size run
                          the stock path in every mode (same predicate).
   DSV41_PREFILL_SP_WKV=full  never run wkv on the shard (gather the lookup, full-M GEMM).
+  DSV41_PREFILL_SP_FP8=1     (stage 2) MXFP8 attention-input gathers on the non-source layers.
+  DSV41_PREFILL_SP_FP8_MOE=1 (stage 2b) MXFP8 MoE-input gathers, router + top-k on the shard, b12x
+                         pre-quantized routed input; self-checked per chunk size (see FP8_MOE).
 
 Scope: extend without speculation only (plain prefill chunks), eager (never under graph
 capture or torch.compile), TP only (no DP attention, no CP, no a2a MoE, PP 1). Decode,
@@ -67,6 +70,19 @@ WKV_SHARD = os.environ.get("DSV41_PREFILL_SP_WKV", "shard").strip().lower() != "
 # with the stock quantization of the gathered bf16 rows AND wqkv_a's output on both, agrees over
 # TP (MIN), and keeps the bf16 gather for that size on any difference.
 FP8 = os.environ.get("DSV41_PREFILL_SP_FP8", "0").strip().lower() in ("1", "on", "true")
+# Stage 2b (DSV41_PREFILL_SP_FP8_MOE=1, with DSV41_PREFILL_SP=1; independent of _FP8): the MoE input
+# gather goes MXFP8 as well, on every full-row layer. Each rank quantizes its shard with the same
+# FlashInfer quantizer, runs the router GEMM + top-k on its shard, and all-gathers the fp8 rows +
+# ue8m0 scales (straight into the b12x_next plan's input storage) and the top-k ids / weights. The
+# stock DeepseekV2MoE then runs on a NaN placeholder: its router and top-k are stubbed to return
+# the gathered result, the shared expert takes the rows as Mxfp8SwizzledInput (128x4 scales), and
+# the routed MoE (moe_b12x_next) launches b12x's front-end variant that does not quantize
+# (runtime patch scripts/b12x_next-prequant-input.patch). Checked, not assumed: the first chunk of
+# every size runs the stock bf16 path too and compares the top-k (router on the shard, else on a
+# zero-padded full-M input), the gathered bytes with b12x's own in-kernel quantization of the
+# gathered bf16 rows, and the MoE output bit for bit (needs DSV41_MOE_B12X_NEXT_DETERMINISTIC=1);
+# the ranks agree (MIN) and any difference keeps the bf16 gather for that size.
+FP8_MOE = os.environ.get("DSV41_PREFILL_SP_FP8_MOE", "0").strip().lower() in ("1", "on", "true")
 # Debug (never in production): DSV41_PREFILL_SP_DEBUG=compare,fp (either or both).
 #   fp       per traced prefill chunk, rank 0 logs the chunk layout and a checksum of every
 #            layer's input / attention in+out / MoE in+out / output residual and pre, over the full
@@ -114,6 +130,19 @@ _EXPECTED_FP8 = {
     "v4.MQALayer.accepts_mxfp8_swizzled_input": "5bb4fddfc5b329ca",
     "v4.MQALayer._compute_kv_to_cache": "f52f600c4986428c",
     "v4.MQALayer._compute_kv_bf16": "00c4ab90b403d1e9",
+}
+# Stage 2b (checked at install when DSV41_PREFILL_SP_FP8_MOE=1): how the stock MoE hands a
+# pre-quantized input to the shared expert and to the routed experts, and the router call.
+_EXPECTED_FP8_MOE = {
+    "v2.DeepseekV2MoE._forward_shared_experts": "e90ba60e4d5c3d10",
+    "v2.DeepseekV2MLP.forward": "f35466a33edfb991",
+    "v2.MoEGate.forward": "f6ae5a28f762772d",
+    "fmoe.FusedMoE.forward": "978c59903bdb0333",
+    "fmoe.FusedMoE.forward_impl": "2eac8aedf987c339",
+    "fmoe.FusedMoE._dispatch_with_pre_quant": "6f8480afc48c3864",
+    "fp8q.Fp8LinearMethod.apply": "a28262b999af3152",
+    "mxi.Mxfp8SwizzledInput": "93f8a398dc0a46d7",
+    "std.StandardDispatcher.dispatch": "df5e766edd5c8d1f",
 }
 _EXPECTED_TAIL = {
     "LateLayerTail.rows": "c58392d3ef651408",
@@ -450,6 +479,8 @@ def check_engine():
     exp = dict(_EXPECTED)
     if FP8:
         exp.update(_EXPECTED_FP8)
+    if FP8_MOE and MODE == "shard":
+        exp.update(_EXPECTED_FP8_MOE)
     got = {k: _src_hash(_resolve(k)) for k in exp}
     bad = [f"{k} {got[k]} != {exp[k]}" for k in got if exp[k] != got[k]]
     if bad:
@@ -463,6 +494,12 @@ def _load_modules(model_mod):
     from sglang.srt.models import deepseek_v2 as v2
 
     _M.update(v4=model_mod, v2=v2, engram=engram, hcn=hcn, mhc=mhc, linear=linear)
+    if FP8_MOE:
+        from sglang.srt.layers.moe.fused_moe_triton import layer as fmoe
+        from sglang.srt.layers.quantization import fp8 as fp8q
+        from sglang.srt.layers.moe.token_dispatcher import standard as std
+        from sglang.srt.layers.quantization import mxfp8_input as mxi
+        _M.update(fmoe=fmoe, fp8q=fp8q, mxi=mxi, std=std)
 
 
 def _check_hc_prefill_fused():
@@ -538,6 +575,11 @@ def _static_check(model, world):
             errs.append(f"layer {i}: engram tp")
     if errs:
         raise RuntimeError("DSV41_PREFILL_SP: unsupported configuration, refusing to run: " + "; ".join(errs))
+    if FP8_MOE and MODE == "shard" and world > 1:
+        why = sorted({moe8_static_reason(model.layers[i].mlp) for i in range(model.start_layer, last)})
+        if _M["v4"].get_tp_group().rank_in_group == 0:
+            print(f"DSV41_PREFILL_SP fp8 MoE gather: {'eligible on every full-row layer' if why == [''] else why}"
+                  f" (checked per chunk size before use)", flush=True)
     if FP8 and MODE == "shard" and world > 1:
         fp8_layers = [i for i in range(model.start_layer, last)
                       if fp8_eligible_attn(model.layers[i].self_attn)]
@@ -776,12 +818,18 @@ def _mxfp8_input_cls():
     return Mxfp8SwizzledInput
 
 
-def mxfp8_gather(p, x):
-    """This rank's bf16 shard [S, K] -> the whole chunk's (fp8 [M, K], linear scales [M, K/32])."""
+def mxfp8_shard(x):
+    """bf16 [S, K] -> (E4M3 bytes [S, K] uint8, linear ue8m0 scales [S, K/32] uint8, fp8 dtype)."""
     s_rows, k = x.shape
     q, sf = _mxfp8_quantize(x.contiguous(), False)
     sf = sf.view(torch.uint8).reshape(-1)[: s_rows * (k // 32)].view(s_rows, k // 32)
-    qg = _gather_rows(p, q.view(torch.uint8)).view(q.dtype)
+    return q.view(torch.uint8), sf, q.dtype
+
+
+def mxfp8_gather(p, x):
+    """This rank's bf16 shard [S, K] -> the whole chunk's (fp8 [M, K], linear scales [M, K/32])."""
+    q, sf, dt = mxfp8_shard(x)
+    qg = _gather_rows(p, q).view(dt)
     sg = _gather_rows(p, sf)
     return qg, sg
 
@@ -813,6 +861,392 @@ def _fp8_input(p, attn, x):
         if not ok:
             return None, xb
     return _mxfp8_input_cls()(qg, sw.view(state[2]).view(state[1])), None
+
+
+# ------------------------------------------------------------------------------------------
+# stage 2b: MXFP8 MoE-input gather (router + top-k on the shard, b12x pre-quantized input)
+# ------------------------------------------------------------------------------------------
+_MOE8 = {}                      # M -> {"ok", "router", "sf_shape", "sf_dtype"} agreed over TP
+_MOE8_CLS = []
+_MOE8_LOG = set()
+_MOE8_DANGER = [0]              # layer calls that fell back because of a tiny-block row
+
+
+def _mbn():
+    import moe_b12x_next
+    return moe_b12x_next
+
+
+def _moe8_input(data, scales, marker):
+    """Mxfp8SwizzledInput (data, 128x4 scales) for the shared expert, carrying moe_b12x_next's
+    pre-quantized-input marker for the routed experts (dispatch_output.hidden_states_pre_quant)."""
+    if not _MOE8_CLS:
+        class _SpMoeMxfp8Input(_mxfp8_input_cls()):
+            """Mxfp8SwizzledInput + ``_dsv41_b12x_rows`` (prefill SP stage 2b)."""
+        _MOE8_CLS.append(_SpMoeMxfp8Input)
+    obj = _MOE8_CLS[0](data, scales)
+    obj._dsv41_b12x_rows = marker
+    return obj
+
+
+def moe8_static_reason(moe):
+    """Why this DeepseekV2MoE cannot take the MXFP8 input gather (static config), or ''."""
+    v = getattr(moe, "_dsv41_sp_moe8", None)
+    if v is not None:
+        return v
+    try:
+        mbn = _mbn()
+        gate = moe.gate
+        if not (mbn.ENABLED and mbn.DETERMINISTIC):
+            v = "needs DSV41_MOE_B12X_NEXT=1 with _DETERMINISTIC=1 (bit-exact self-check)"
+        elif mbn._B.get("impl", "unset") is None:
+            v = "b12x_next lacks the prequant-input patch"
+        elif getattr(moe.experts, "_dsv41_b12x_next", None) is None:
+            v = "routed experts are not on b12x_next"
+        elif int(getattr(moe, "num_fused_shared_experts", 0) or 0):
+            v = "fused shared experts"
+        elif getattr(moe, "_fuse_shared_experts_inside_sbo", False):
+            v = "shared experts inside SBO"
+        elif getattr(gate, "weight", None) is None or gate.weight.dim() != 2:
+            v = "router weight"
+        elif not hasattr(moe, "shared_experts"):
+            v = "no shared expert"
+        elif not all(n in moe._modules for n in ("gate", "topk")):
+            v = "router / top-k are not submodules"
+        else:
+            v = ""
+    except Exception as exc:  # noqa: BLE001
+        v = f"inspection failed ({exc!r})"
+    moe._dsv41_sp_moe8 = v
+    return v
+
+
+class _Stub(torch.nn.Module):
+    """Stands in for moe.gate / moe.topk inside the stock MoE call: returns the gathered result."""
+
+    def __init__(self, value, **attrs):
+        super().__init__()
+        self._value = value
+        self.hits = 0
+        for k, v in attrs.items():
+            setattr(self, k, v)
+
+    def forward(self, *args, **kwargs):
+        self.hits += 1
+        return self._value
+
+
+class _Swapped:
+    """moe.gate / moe.topk -> stubs, moe._maybe_quant_moe_input_once -> the pre-quantized rows,
+    for exactly one stock MoE call on the placeholder xf."""
+
+    def __init__(self, moe, logits, topk_out, pre, xf):
+        self.moe, self.xf, self.pre = moe, xf, pre
+        self.gate = _Stub(logits, e_score_correction_bias_vl=None)
+        self.topk = _Stub(topk_out)
+        self.quant_hits = 0
+
+    def _quant_once(self, hidden_states):
+        if hidden_states is not self.xf:
+            raise RuntimeError("DSV41_PREFILL_SP fp8 MoE: quant-once called on an unexpected tensor")
+        self.quant_hits += 1
+        return self.pre
+
+    def __enter__(self):
+        m = self.moe
+        self.saved = (m._modules["gate"], m._modules["topk"])
+        m._modules["gate"], m._modules["topk"] = self.gate, self.topk
+        m.__dict__["_maybe_quant_moe_input_once"] = self._quant_once
+        return self
+
+    def __exit__(self, *exc):
+        m = self.moe
+        m._modules["gate"], m._modules["topk"] = self.saved
+        m.__dict__.pop("_maybe_quant_moe_input_once", None)
+
+    def all_hit(self):
+        return self.gate.hits == 1 and self.topk.hits == 1 and self.quant_hits == 1
+
+
+_SIGS = {}
+
+
+def _moe_args(orig, moe, hidden_states, args, kwargs):
+    """forward_batch / gemm allocator / input_ids_global of a DeepseekV2MoE.forward call."""
+    sig = _SIGS.get(orig)
+    if sig is None:
+        sig = _SIGS[orig] = inspect.signature(orig)
+    b = sig.bind(moe, hidden_states, *args, **kwargs).arguments
+    fb = b.get("forward_batch")
+    return {"alloc": b.get("gemm_output_zero_allocator"), "ids": b.get("input_ids_global"),
+            "ntnp": getattr(fb, "num_token_non_padded", None) if fb is not None else None}
+
+
+def _topk_call(moe, x, logits, ids, ntnp):
+    """The routing call forward_normal makes: vision_topk when the router has a VL bias, else
+    moe.topk (with input ids on hash layers)."""
+    if getattr(moe.gate, "e_score_correction_bias_vl", None) is not None:
+        return _M["v2"].vision_topk(moe, logits, ids, num_token_non_padded=ntnp)
+    kw = {"input_ids": ids} if getattr(moe, "is_hash", False) else {}
+    return moe.topk(x, logits, num_token_non_padded=ntnp, expert_location_dispatch_info=None, **kw)
+
+
+def _route_local(moe, p, x, a, mode):
+    """Router logits + top-k of this rank's rows (a top-k output of p.shard rows)."""
+    if mode == "shard":
+        logits = moe.gate(x, a["alloc"])
+    else:           # zero-padded full-M input: the GEMM of M rows, whose row r reads only row r
+        xp = x.new_zeros((p.rows, x.shape[1]))
+        xp[p.lo:p.hi] = x
+        logits = moe.gate(xp, a["alloc"])[p.lo:p.hi]
+        del xp
+    ntnp = a["ntnp"]
+    if isinstance(ntnp, torch.Tensor):
+        ntnp = (ntnp - p.lo).clamp(0, p.shard)
+    elif ntnp is not None:
+        ntnp = max(0, min(int(ntnp) - p.lo, p.shard))
+    ids = a["ids"][p.lo:p.hi] if a["ids"] is not None else None
+    return _topk_call(moe, x, logits, ids, ntnp)
+
+
+def _route_stock(moe, x, a):
+    """The stock router + top-k on all M rows (reference)."""
+    return _topk_call(moe, x, moe.gate(x, a["alloc"]), a["ids"], a["ntnp"])
+
+
+def _topk_fields(t):
+    names = list(getattr(type(t), "_fields", ()))
+    if "topk_ids" not in names or "topk_weights" not in names or "router_logits" not in names:
+        raise RuntimeError(f"top-k output {type(t).__name__} is not a standard-format tuple")
+    return [n for n in names if n != "router_logits"]
+
+
+def danger_rows(x, sf):
+    """[S, 1] int32: 1 where a row MAY have a 32-block that FlashInfer and b12x quantize differently.
+
+    Exhaustively (tests/test_prefill_sp_moe8_gpu.py quant) the two quantizers agree on every
+    block except those whose largest |value| is nonzero but at most ~448 * 2^-127 (2.6e-36):
+    there FlashInfer writes scale byte 0 and a sign-only payload, b12x scale byte 1 and the rounded
+    values. Every such block has FlashInfer scale byte 0; so does an all-zero block (quantized
+    identically), which is flagged too: conservative, and one compare over the [S, K/32] scales
+    instead of a pass over the bf16 rows."""
+    return (sf == 0).any(-1, keepdim=True).to(torch.int32)
+
+
+def _gather_topk_out(p, t, logits, extra=None):
+    """Every per-row field of this rank's top-k output, gathered (one 4-byte packed all-gather);
+    router_logits is the placeholder (the routed MoE on b12x_next reads ids and weights only).
+    ``extra`` ([S, c] int32) rides along; returns (top-k output, gathered extra or None)."""
+    names = _topk_fields(t)
+    parts = [getattr(t, n) for n in names]
+    if not all(isinstance(v, torch.Tensor) and v.dim() == 2 and v.shape[0] == p.shard
+               and v.element_size() == 4 for v in parts):
+        raise RuntimeError(f"top-k output fields {[(n, getattr(v, 'shape', None)) for n, v in zip(names, parts)]}")
+    widths = [v.shape[1] for v in parts]
+    cols = [v.contiguous().view(torch.int32) for v in parts] + ([extra] if extra is not None else [])
+    g = _gather_rows(p, torch.cat(cols, dim=1))
+    out, c = {}, 0
+    for n, v, w in zip(names, parts, widths):
+        out[n] = g[:, c:c + w].contiguous().view(v.dtype)
+        c += w
+    return type(t)(router_logits=logits, **out), (g[:, c:] if extra is not None else None)
+
+
+def _topk_equal(a, b):
+    names = _topk_fields(a)
+    return type(a) is type(b) and all(
+        torch.equal(getattr(a, n).contiguous().view(torch.int32), getattr(b, n).contiguous().view(torch.int32))
+        for n in names)
+
+
+def _logits_placeholder(moe, p, x):
+    return torch.empty((p.rows, moe.gate.weight.shape[0]), dtype=torch.float32, device=x.device)
+
+
+def _moe8_call(moe, p, orig, args, kwargs, xf, topk_out, pre):
+    """The stock MoE on the placeholder with the gathered routing and the pre-quantized rows."""
+    v4 = _M["v4"]
+    calls0 = _mbn().PREQUANT_STATS["calls"]
+    sw = _Swapped(moe, topk_out.router_logits, topk_out, pre, xf)
+    _ctx.inner += 1
+    try:
+        with sw, v4.get_forward().scoped(mlp_reduce_scatter=True):
+            out = orig(moe, xf, *args, **kwargs)
+    finally:
+        _ctx.inner -= 1
+    if not (sw.all_hit() and _mbn().PREQUANT_STATS["calls"] == calls0 + 1):
+        raise RuntimeError(
+            "DSV41_PREFILL_SP fp8 MoE: the stock MoE did not take the pre-quantized path (gate "
+            f"{sw.gate.hits}, top-k {sw.topk.hits}, quant-once {sw.quant_hits}, b12x pre-quantized "
+            f"launches {_mbn().PREQUANT_STATS['calls'] - calls0}); refusing to continue")
+    return out
+
+
+def _moe8_log(key, msg):
+    if key not in _MOE8_LOG and len(_MOE8_LOG) < 16:
+        _MOE8_LOG.add(key)
+        print(msg, flush=True)
+
+
+def _stock_moe(moe, p, orig, args, kwargs, xb):
+    v4 = _M["v4"]
+    _ctx.inner += 1
+    try:
+        with v4.get_forward().scoped(mlp_reduce_scatter=True):
+            return orig(moe, xb, *args, **kwargs)
+    finally:
+        _ctx.inner -= 1
+
+
+def _moe8_forward(moe, p, x, orig, args, kwargs):
+    """This layer's MoE partial [M, H] from an MXFP8 input gather, or None (bf16 gather)."""
+    st = _MOE8.get(p.rows)
+    if st is not None and not st["ok"]:
+        return None
+    why = moe8_static_reason(moe)
+    if why:
+        if p.rank == 0:
+            _moe8_log(why, f"DSV41_PREFILL_SP fp8 MoE input off for this layer: {why} (bf16 gather)")
+        return None
+    tgt = _mbn().prequant_target(moe.experts, p.rows)
+    if tgt is None:
+        if p.rank == 0:
+            _moe8_log(("rows", p.rows), f"DSV41_PREFILL_SP fp8 MoE input: no b12x pre-quantized plan "
+                                        f"for {p.rows} rows (bf16 gather)")
+        return None
+    a = _moe_args(orig, moe, x, args, kwargs)
+    if st is None:
+        return _moe8_first(moe, p, x, orig, args, kwargs, a, tgt)
+    marker, dst_q, dst_sf = tgt
+    t = _route_local(moe, p, x, a, st["router"])
+    q, sf, _ = mxfp8_shard(x)
+    topk_out, dg = _gather_topk_out(p, t, _logits_placeholder(moe, p, x), danger_rows(x, sf))
+    del t
+    if bool(dg.any()):          # host sync; every rank sees the same gathered flags
+        _MOE8_DANGER[0] += 1
+        if p.rank == 0:
+            _moe8_log("danger", f"DSV41_PREFILL_SP fp8 MoE input: a block with FlashInfer scale byte 0 "
+                                f"(max|x| <= 2.6e-36 or all zero; FlashInfer and b12x may differ there): bf16 "
+                                f"gather for this layer (logged once, counted in prefill_sp._MOE8_DANGER)")
+        return None
+    p.group.all_gather_into_tensor(dst_q, q)
+    p.group.all_gather_into_tensor(dst_sf, sf)
+    del q, sf
+    pre = _moe8_input(dst_q.view(torch.float8_e4m3fn),
+                      swizzle_128x4(dst_sf).view(st["sf_dtype"]).view(st["sf_shape"]), marker)
+    xf = x.new_full((1, 1), float("nan")).expand(p.rows, x.shape[1])
+    if _ctx.dbg is not None:
+        xb = _gather_rows(p, x)
+        _rec("min", xb, True)
+        if _comparing():
+            q_mine, sf_mine = dst_q.clone(), dst_sf.clone()
+    out = _moe8_call(moe, p, orig, args, kwargs, xf, topk_out, pre)
+    if _ctx.dbg is not None:
+        if _comparing():
+            ref = _stock_moe(moe, p, orig, args, kwargs, xb.clone())
+            # after the stock call the plan's input storage holds b12x's own quantization of xb
+            _cmp("moe mxfp8 data (b12x own)", q_mine, dst_q)
+            _cmp("moe mxfp8 scales (b12x own)", sf_mine, dst_sf)
+            _cmp("moe fp8 out", out, ref)
+            del ref, q_mine, sf_mine
+        del xb
+    return out
+
+
+def _moe8_first(moe, p, x, orig, args, kwargs, a, tgt):
+    """First chunk of this size: run both paths, compare, agree over TP, remember."""
+    marker, dst_q, dst_sf = tgt
+    xb = _gather_rows(p, x)
+    detail = {}
+    st = {"ok": False, "router": None, "sf_shape": None, "sf_dtype": None}
+    # 1. routing: stock top-k on all rows vs this rank's rows (router GEMM on the shard, else on a
+    #    zero-padded full-M input), gathered
+    try:
+        t_ref = _route_stock(moe, xb, a)
+        _topk_fields(t_ref)
+        ok = True
+    except Exception as exc:  # noqa: BLE001
+        detail["route error"] = repr(exc)
+        ok = False
+    router = topk_out = None
+    for mode in ("shard", "padded"):
+        if not _agree_min(p, ok):
+            break
+        try:
+            t = _route_local(moe, p, x, a, mode)
+            _topk_fields(t)
+            good = all(isinstance(getattr(t, n), torch.Tensor) and getattr(t, n).dim() == 2
+                       and getattr(t, n).shape[0] == p.shard and getattr(t, n).element_size() == 4
+                       for n in _topk_fields(t))
+        except Exception as exc:  # noqa: BLE001
+            detail[f"route {mode} error"] = repr(exc)
+            good = False
+        if not _agree_min(p, good):
+            break
+        topk_out, _ = _gather_topk_out(p, t, _logits_placeholder(moe, p, x))
+        same = bool(_topk_equal(topk_out, t_ref))
+        detail[f"router {mode}"] = same
+        if _agree_min(p, same):
+            router = mode
+            break
+    out8 = ref = None
+    if router is not None:
+        # 2. MXFP8 rows of the shards, gathered into the b12x plan's input storage
+        try:
+            q, sf, _ = mxfp8_shard(x)
+            rq, rs = _mxfp8_quantize(xb, True)
+            good = True
+        except Exception as exc:  # noqa: BLE001
+            detail["quant error"] = repr(exc)
+            good = False
+        agreed = _agree_min(p, good)
+        if agreed and not _agree_min(p, not bool(danger_rows(x, sf).any())):
+            # a tiny block (see danger_rows) in this chunk: no verdict for this size yet
+            ref = _stock_moe(moe, p, orig, args, kwargs, xb)
+            if p.rank == 0:
+                print(f"DSV41_PREFILL_SP fp8 MoE input (M={p.rows}): a row with a FlashInfer scale-byte-0 block in the check chunk, "
+                      f"deciding on a later chunk", flush=True)
+            if _ctx.dbg is not None:
+                _rec("min", xb, True)
+            return ref
+        if agreed:
+            p.group.all_gather_into_tensor(dst_q, q)
+            p.group.all_gather_into_tensor(dst_sf, sf)
+            del q, sf
+            sw = swizzle_128x4(dst_sf)
+            rs_u8 = rs.view(torch.uint8).reshape(-1)
+            detail["== FlashInfer stock"] = bool(
+                torch.equal(rq.view(torch.uint8), dst_q) and rs_u8.numel() == sw.numel()
+                and torch.equal(rs_u8, sw))
+            q_mine, sf_mine = dst_q.clone(), dst_sf.clone()
+            st.update(router=router, sf_shape=tuple(rs.shape), sf_dtype=rs.dtype)
+            # 3. the stock MoE on the placeholder with the pre-quantized rows ...
+            try:
+                pre = _moe8_input(dst_q.view(torch.float8_e4m3fn), sw.view(rs.dtype).view(rs.shape), marker)
+                xf = x.new_full((1, 1), float("nan")).expand(p.rows, x.shape[1])
+                out8 = _moe8_call(moe, p, orig, args, kwargs, xf, topk_out, pre)
+            except Exception as exc:  # noqa: BLE001
+                detail["fp8 path error"] = repr(exc)
+            del rq, rs
+    # 4. ... and the stock MoE on the gathered bf16 rows (the stage-1 result); after it the plan's
+    #    input storage holds b12x's own in-kernel quantization of those rows
+    ref = _stock_moe(moe, p, orig, args, kwargs, xb.clone())
+    local = out8 is not None
+    if local:
+        detail["== b12x in-kernel"] = bool(torch.equal(q_mine, dst_q) and torch.equal(sf_mine, dst_sf))
+        detail["MoE out"] = bool(torch.equal(out8, ref))
+        local = detail["== b12x in-kernel"] and detail["MoE out"]
+        del q_mine, sf_mine
+    ok = _agree_min(p, local)
+    st["ok"] = ok
+    _MOE8[p.rows] = st
+    if p.rank == 0:
+        print(f"DSV41_PREFILL_SP fp8 MoE input (M={p.rows}): router on the {router or 'none'}, "
+              f"rank 0 {detail} -> {'ON' if ok else 'OFF (bf16 gather for this size)'}", flush=True)
+    if _ctx.dbg is not None:
+        _rec("min", xb, True)
+    del xb
+    return out8 if ok else ref
 
 
 # ------------------------------------------------------------------------------------------
@@ -905,6 +1339,15 @@ def _make_moe_forward(orig):
             _rec("mout", o, True)
             return o
         v4 = _M["v4"]
+        if p.sharded and FP8_MOE:
+            o8 = _moe8_forward(self, p, hidden_states, orig, args, kwargs)
+            if o8 is not None:
+                if o8.shape[0] != p.rows:
+                    raise RuntimeError(f"DSV41_PREFILL_SP: MoE returned {tuple(o8.shape)} for {p.rows} rows")
+                res = _reduce_out(p, o8)
+                if _ctx.dbg is not None:
+                    _rec("mout", res)
+                return res
         xf = _gather_rows(p, hidden_states) if p.sharded else hidden_states
         if _mega_moe(self, xf):
             raise RuntimeError("DSV41_PREFILL_SP: mega MoE path is not wired")
@@ -1131,6 +1574,7 @@ def install(model_mod):
             f"rows sharded over TP on the full-row layers, bf16 gathers"
             f"{', EXACT (all-reduce + keep the quarter)' if EXACT else ''}"
             f"{', MXFP8 attention-input gathers (checked per chunk size)' if FP8 else ''}"
+            f"{', MXFP8 MoE-input gathers, router on the shard (checked per chunk size)' if FP8_MOE else ''}"
             f", wkv {'on the shard (self-checked)' if WKV_SHARD else 'full-M'}")
     print(f"DSV41_PREFILL_SP={_RAW} ARMED: prefill chunks >= {MIN_ROWS} rows: {what}", flush=True)
     if EXACT and MODE == "comm":

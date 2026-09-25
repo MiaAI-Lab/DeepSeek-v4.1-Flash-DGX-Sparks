@@ -19,7 +19,8 @@ capacity ladder. Also:
   the M64 prefill tile against the M16 plan on the same prepared experts and inputs, M = 2048,
     2049, 4095, 4096, 5000, concentrated and uniform routing (rel-L2 M64 vs M16 <= max(1e-3, 3x the
     M16 run-to-run spread), and the same rel-L2 vs the fp32 reference within 2e-4)
-  DSV41_MOE_B12X_NEXT_DETERMINISTIC (internal route planner at <= 8 rows): builds, matches the
+  DSV41_MOE_B12X_NEXT_DETERMINISTIC (at <= 8 rows the Triton route planner, DSV41_MOE_B12X_NEXT_DET_TRITON=1,
+    and the internal one, DET_TRITON=0; their outputs bit-identical to each other): builds, matches the
     fp32 reference, and two runs are bit-identical
 
 usage (inside `docker run --rm --gpus all` of the image, see RESULTS / report):
@@ -449,33 +450,54 @@ def m64_case(layer, src, geo):
     torch.cuda.empty_cache()
 
 
-def deterministic_case():
+def deterministic_case(planner):
     """DSV41_MOE_B12X_NEXT_DETERMINISTIC=1, as the module sets it at import: deterministic routing
-    spec, remap path, internal route planner at <= 8 rows. A fresh EP1 geometry."""
-    saved = dict(ad._GEOMS), ad.DETERMINISTIC, ad.SMALL_PLANNER
+    spec, remap path, ``planner`` ("triton" = DET_TRITON=1, needs the det-triton-planner runtime patch;
+    "internal" = DET_TRITON=0) at <= 8 rows. A fresh EP1 geometry. Returns the outputs of fixed inputs."""
+    saved = dict(ad._GEOMS), ad.DETERMINISTIC, ad.SMALL_PLANNER, ad.PLAN_TABLE
+    layers_before = set(ad._LAYERS)
     ad._GEOMS.clear()
-    ad.DETERMINISTIC, ad.SMALL_PLANNER = True, "internal"
+    ad.DETERMINISTIC, ad.SMALL_PLANNER = True, planner
+    ad.PLAN_TABLE = ad.parse_plan_table(f"1-8={planner}:48:16", planner == "internal")
     try:
         geo = dict(n_global=NE, topk=6, ep_size=1, ep_rank=0, moe_tp_size=4, moe_tp_rank=1)
         ly, me, sr, _ = make_layer("layers.5", **{k: geo[k] for k in ("topk", "ep_size", "ep_rank", "moe_tp_size",
                                                                        "moe_tp_rank")}, n_global=NE)
         g = ly._dsv41_b12x_next.geom
-        assert not g.direct and "internal" in g.plans[6].config, g.plans[6].config[:200]
-        check_case("ep1_deterministic_layer5_tp1", ly, me, sr, geo, [1, 6, 8, 48, 1024])
-        same = []
-        for m in (6, 96, 2049):
+        assert not g.direct and f"route_planner='{planner}'" in g.plans[6].config, g.plans[6].config[:200]
+        check_case(f"ep1_deterministic_{planner}_layer5_tp1", ly, me, sr, geo, [1, 6, 8, 48, 1024])
+        same, outs = [], {}
+        for m in (1, 5, 6, 8, 96, 2049):
             x, ids, w = routing(m, NE, 6, 11 + m)
-            same.append(bool(torch.equal(apply(ly, me, x, ids, w), apply(ly, me, x, ids, w))))
-        rec = {"case": "ep1_deterministic", "bit_identical_rerun": same, "small_plan": g.plans[6].config[:160]}
+            outs[m] = apply(ly, me, x, ids, w)
+            same.append(bool(torch.equal(outs[m], apply(ly, me, x, ids, w))))
+        rec = {"case": f"ep1_deterministic_{planner}", "bit_identical_rerun": same,
+               "small_plan": g.plans[6].config[:160]}
         print(json.dumps(rec), flush=True)
-        RESULTS["deterministic"] = rec
+        RESULTS[f"deterministic_{planner}"] = rec
         assert all(same), rec
         del ly, me, sr
+        return outs
     finally:
         ad._GEOMS.clear()
         ad._GEOMS.update(saved[0])
-        ad.DETERMINISTIC, ad.SMALL_PLANNER = saved[1], saved[2]
+        ad.DETERMINISTIC, ad.SMALL_PLANNER, ad.PLAN_TABLE = saved[1], saved[2], saved[3]
+        for k in set(ad._LAYERS) - layers_before:      # this case's layer states hold its experts
+            del ad._LAYERS[k]
+        import gc
+        gc.collect()
         torch.cuda.empty_cache()
+
+
+def deterministic_planners():
+    """The Triton and the internal route planner give bit-identical outputs under determinism."""
+    tri = deterministic_case("triton")
+    intl = deterministic_case("internal")
+    eq = {m: bool(torch.equal(tri[m], intl[m])) for m in tri}
+    rec = {"case": "ep1_deterministic_triton_vs_internal", "bit_identical": eq}
+    print(json.dumps(rec), flush=True)
+    RESULTS["deterministic_planners"] = rec
+    assert all(eq.values()), rec
 
 
 def sizing():
@@ -567,7 +589,7 @@ def main():
     sweep("ep1_target", l3, m3, geo1, sweep_ms)
     del lb, mb, sb
     torch.cuda.empty_cache()
-    deterministic_case()
+    deterministic_planners()
     RESULTS["memory"]["peak_total_mb"] = round(torch.cuda.max_memory_allocated() / 2**20, 1)
     RESULTS["geometries"] = ad.geometry_reports()
     print("RESULTS " + json.dumps(RESULTS, default=str), flush=True)

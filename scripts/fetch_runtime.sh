@@ -6,7 +6,8 @@
 #
 #   OUT_DIR/sglang-canary/python   SGLang dsv4.1 branch python/ tree (unpatched; the Dockerfile
 #                                  applies runtime/sglang-rocenante.patch + runtime/roce_tp4_adapt.py)
-#   OUT_DIR/b12x/{b12x,LICENSE}    SG17 b12x (b12x.comm.roce) + b12x.comm.roce_ring
+#   OUT_DIR/b12x/{b12x,LICENSE}    SG17 b12x (b12x.comm.roce, plus the columns all-gather patch)
+#                                  + b12x.comm.roce_ring
 #   OUT_DIR/b12x_next/{b12x_next,LICENSE}
 #                                  b12x main renamed to the package b12x_next, patched
 #
@@ -78,6 +79,13 @@ fetch_b12x() {
   tar -xzf "$tmp/b12x-sg17.tgz" -C "$tmp/sg17"
   [[ -d "$tmp/sg17/b12x/comm/roce" && -f "$tmp/sg17/LICENSE" ]] || die "b12x-sg17: unexpected archive layout"
   mv "$tmp/sg17/b12x" "$tmp/sg17/LICENSE" "$OUT/b12x/"
+  # RoceOneshotAllReduce.all_gather(columns=..., column_offset=...): a last-dim all-gather of
+  # unequal per-rank shards written straight into the stock column order (the compact gather of
+  # adapter/replicated_split.py, DSV41_SPLIT_COMPACT_GATHER). Without columns= nothing changes.
+  check_local scripts/b12x-roce-columns-gather.patch
+  (cd "$OUT/b12x" && patch -p1 --forward --quiet < "$ROOT/scripts/b12x-roce-columns-gather.patch") \
+    || die "roce columns-gather patch did not apply"
+  grep -q "column_offset" "$OUT/b12x/b12x/comm/roce/roce_oneshot.py" || die "roce columns-gather patch did not apply"
   # roce_ring: nine files, each pinned; sparkring stores some with CRLF line ends
   local ring="$tmp/ring/roce_ring" id f
   mkdir -p "$ring"
@@ -96,7 +104,7 @@ fetch_b12x() {
 fetch_b12x_next() {
   echo "b12x-next (b12x main as b12x_next)"
   fetch b12x-main "$tmp/b12x-main.tgz"
-  local commit dst="$OUT/b12x_next" patch_file="$ROOT/scripts/b12x_next-compact-n64-m64.patch"
+  local commit dst="$OUT/b12x_next" p
   read -r commit _ <<<"$(row b12x-main)"
   rm -rf "$dst"
   mkdir -p "$dst" "$tmp/main"
@@ -112,11 +120,30 @@ fetch_b12x_next() {
   find "$dst/b12x_next" -type f \( -name '*.py' -o -name '*.c' -o -name '*.cpp' -o -name '*.h' \) -print0 \
     | xargs -0 perl -pi -e 's/\bb12x\b(?!-)/b12x_next/g; s/\bB12X_(?!NEXT_)/B12X_NEXT_/g'
   echo "$commit" > "$dst/b12x_next/SOURCE_COMMIT"
-  # admit the M64 tile for compact-N64 (N=576, EP1) prefill capacities (b12x pins them to M16)
-  check_local scripts/b12x_next-compact-n64-m64.patch
-  (cd "$dst" && patch -p0 --forward --quiet < "$patch_file") || die "compact-n64-m64 patch did not apply"
+  # This repository's patches, in order:
+  #   compact-n64-m64:    admit the M64 tile for compact-N64 (N=576, EP1) prefill capacities
+  #                       (b12x pins them to M16)
+  #   prequant-input:     prequantized_input() launches of the token-major W4A8-MX front-end skip
+  #                       the in-kernel input quantization (prefill SP stage 2b, adapter/prefill_sp.py)
+  #   barrier-zero:       the per-launch re-zero of barrier_count + barrier_epoch (adjacent in the
+  #                       arena) is one fill over both instead of two
+  #   det-triton-planner: admit the Triton route planner with deterministic output (it writes only
+  #                       order-free integer row counts / tile prefix and resets the barrier words,
+  #                       so launches that use it skip the barrier fill); outputs are bit-identical
+  local patches=(scripts/b12x_next-compact-n64-m64.patch scripts/b12x_next-prequant-input.patch
+                 scripts/b12x_next-barrier-zero.patch scripts/b12x_next-det-triton-planner.patch)
+  for p in "${patches[@]}"; do
+    check_local "$p"
+    (cd "$dst" && patch -p0 --forward --quiet < "$ROOT/$p") || die "$p did not apply"
+  done
   grep -q "_compact_n64_tiles" "$dst/b12x_next/moe/fused_moe/_tuning.py" || die "compact-n64-m64 patch did not apply"
-  sha256 "$patch_file" | cut -c1-16 > "$dst/b12x_next/SOURCE_PATCH"
+  grep -q "def prequantized_input" "$dst/b12x_next/moe/fused_moe/_impl.py" || die "prequant-input patch did not apply"
+  grep -q "def _zero_barrier_state" "$dst/b12x_next/moe/fused_moe/_impl.py" || die "barrier-zero patch did not apply"
+  ! grep -q "_compact_w4a8_query(query) and not query.deterministic_output" "$dst/b12x_next/moe/fused_moe/_tuning.py" \
+    || die "det-triton-planner patch did not apply"
+  # SOURCE_PATCH: the first 16 hex digits of the sha256 of the four patches concatenated in order
+  (cd "$ROOT" && cat "${patches[@]}") > "$tmp/patches.cat"
+  sha256 "$tmp/patches.cat" | cut -c1-16 > "$dst/b12x_next/SOURCE_PATCH"
   # The measured images never carried sequence/engram (an op package unused by the MoE path;
   # a repository-wide `engram/` ignore rule kept it out). Left out so the build matches them.
   rm -rf "$dst/b12x_next/sequence/engram"

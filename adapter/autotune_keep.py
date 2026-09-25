@@ -51,6 +51,18 @@ def _volatile():
 def launch_fingerprint() -> str:
     volatile = _volatile()
     env = {k: v for k, v in os.environ.items() if k.startswith(_PREFIXES) and k not in volatile}
+    if os.environ.get("DSV41_LAUNCHER") == "tp4":
+        # In-boot A/B (adapter/ab_variant.py, test only, TP4 launcher) unions some gates into
+        # os.environ; fingerprint the base config it recorded instead, so an A/B boot keys like the
+        # boot of its base env.
+        env = {k: v for k, v in env.items() if not k.startswith("DSV41_AB_")}
+        for k, v in json.loads(os.environ.get("DSV41_AB_BASE") or "{}").items():
+            if k in volatile:
+                continue
+            if v is None:
+                env.pop(k, None)
+            else:
+                env[k] = v
     payload = {"argv": sys.argv, "env": env}
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 

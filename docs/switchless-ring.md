@@ -532,7 +532,8 @@ step time = the engine's `spec_verify_ct`, time to first token subtracted):
 The TP4 production line at v2 (knapcio/DeepSeek-V4.1-Flash-4x-DGX-Spark-TP4 `7ac7123`) with the ring
 additions, built with `Dockerfile.canary-roce`, measured on the four-Spark ring the same day, against
 the switched v2 numbers (v2.1's `DSV41_PREFILL_SP_FP8` came later; it is fabric-independent and was not
-in this run; [docs/tp4.md](tp4.md) shows v2.1: prose c1 87.7, prefill ~5.8-5.9k tok/s at 16k-128k). Raw
+in this run; v2.1 on the switched fabric gave prose c1 87.7 and prefill ~5.8-5.9k tok/s at 16k-128k, and
+[docs/tp4.md](tp4.md) now shows v2.2). Raw
 output: [`docs/results/tp4/ring-mesh-20260925.txt`](results/tp4/ring-mesh-20260925.txt).
 
 | | Ring (this) | Switched (v2) |

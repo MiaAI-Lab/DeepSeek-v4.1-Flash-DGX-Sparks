@@ -1,0 +1,71 @@
+# Recorded in knapcio/DeepSeek-V4.1-Flash-4x-DGX-Spark-TP4 (fresh clone of that repository on all four nodes); commit ids refer to it.
+fb8d106 v2.2 candidate: production env line, adapter docs, changelog stub (pre-gate)
+0
+DSV41_PREFILL_SP=1 DSV41_PREFILL_SP_FP8=1 DSV41_L2_PREFETCH=1 DSV41_L2_PREFETCH_WOA=1 DSV41_SPEC_SYNC_FREE=all DSV41_EAGER_GLUE=all DSV41_SPLIT_COMPACT_GATHER=1
+worker1 build rc=0
+worker2 build rc=0
+worker3 build rc=0
+head build rc=0
+build tests, every node: test_compact_gather: ok, test_spec_sync_free ALL OK, test_eager_glue 10/10 PASS, test_ab_variant PASS, test_roce_ring Ran 9 tests OK
+SOURCE_PATCH head/worker1/worker2/worker3: da662ccc7e2372b5 da662ccc7e2372b5 da662ccc7e2372b5 da662ccc7e2372b5
+compact gather 4-rank (RoCE):
+A. eager, M 1..96 x window/slice: columns gather, old path, minimal (RoCE and NCCL) byte-identical to stock: PASS
+B. adapter gather(): RoCE columns (pynccl on) and minimal (pynccl off), self-check once per (variant, M): PASS
+C. CUDA graphs (compact/old/minimal x M 6, 96 x 3 replays with fresh inputs; mixed graph all-reduce + plain dim-0/last-dim gathers + columns): PASS
+   (all-reduce reference = bf16(fp32 sum of the 4 inputs), bit-exact; the first run's allclose(1e-2) against NCCL's bf16 all-reduce failed on 1-9 elements per replay because NCCL is up to 0.046 off the exact sum, while RoCE equalled the exact sum on every rank and replay)
+D. M=  6 rank 0: us/call old  14.88  minimal  13.11  compact  11.31   old-compact  3.57  old-minimal  1.77
+D. M= 96 rank 0: us/call old  36.76  minimal  35.58  compact  30.05   old-compact  6.71  old-minimal  1.18
+E. RoCE health: error_seq 0 poisoned False: PASS
+RESULT PASS
+health 200 after 180 s
+boot log rank0: spec_sync_free armed, L2_PREFETCH wo_a windows, eager_glue stage+vcap, compact gather (roce) bit-identical ON, split ON window GEMMs, det_triton=True, RoCEnante ready world=4, hc_fused, moe_b12x_next armed
+boot log all ranks: DIFFER 0, CHECK FAILED 0, MISMATCH 0, Traceback 0
+max_total_num_tokens=6490112
+{"label": "v22-1", "kind": "prose", "step_ms": 32.5, "tok_per_step": 2.274, "tps": 66.4, "n": 6}
+{"label": "v22-1", "kind": "code", "step_ms": 37.84, "tok_per_step": 3.865, "tps": 102.3, "n": 6}
+{"label": "v22-2", "kind": "prose", "step_ms": 31.35, "tok_per_step": 2.274, "tps": 67.6, "n": 6}
+{"label": "v22-2", "kind": "code", "step_ms": 37.44, "tok_per_step": 3.865, "tps": 102.1, "n": 6}
+{"label": "v22-3", "kind": "prose", "step_ms": 31.24, "tok_per_step": 2.274, "tps": 67.6, "n": 6}
+{"label": "v22-3", "kind": "code", "step_ms": 37.4, "tok_per_step": 3.865, "tps": 102.4, "n": 6}
+prose c1 per 88.97 agg 88.97
+prose c1 per 90.21 agg 90.21
+prose c1 per 89.76 agg 89.76
+prose c1 per 89.69 agg 89.69
+prose c1 per 89.78 agg 89.78
+code c1 per 124.95 agg 124.95
+code c1 per 132.62 agg 132.62
+code c1 per 132.37 agg 132.37
+greedy identity (builtin x2, prose x1):
+prompt 0: 1 distinct over 2 runs {'738cfe226985': 2}
+prompt 1: 1 distinct over 2 runs {'2e1d3fbbaa15': 2}
+prompt 2: 1 distinct over 2 runs {'ca6f390899eb': 2}
+prompt 3: 1 distinct over 2 runs {'63f83635b712': 2}
+prompt 4: 1 distinct over 2 runs {'f8e00df03af5': 2}
+prompt 5: 1 distinct over 2 runs {'a37b9c6963e2': 2}
+prompt 0: 1 distinct over 1 runs {'738cfe226985': 1}
+prompt 1: 1 distinct over 1 runs {'2e1d3fbbaa15': 1}
+prompt 2: 1 distinct over 1 runs {'ca6f390899eb': 1}
+sha check builtin rows 12 vs canonical: ALL MATCH
+sha check prose rows 3 vs canonical: ALL MATCH
+prose c4 per 41.46 agg 164.09
+prose c16 per 22.16 agg 340.93
+code c4 per 64.14 agg 252.66
+code c16 per 29.23 agg 436.38
+structured c1 per 156.88 agg 156.88
+structured c4 per 70.15 agg 239.59
+structured c16 per 44.31 agg 565.5
+json c1 per 124.27 agg 124.27
+json c4 per 78.66 agg 311.2
+json c16 per 42.2 agg 653
+prefill [(4117, 3944.04), (16402, 5789.41), (32791, 5855.03), (65555, 5849.73), (131092, 5733.61), (262161, 5285.94)]
+{"label": "v22-1", "4k": [3969, 1.01, 3915], "16k": [14766, 3.11, 4743], "32k": [30443, 6.31, 4822], "64k": [56147, 11.35, 4946], "128k": [122653, 25.55, 4800]}
+v22-1m needle PASS prompt_tokens 1011084 wall_s 324.3 answer 'violet-otter-seventeen'
+  1m needle head MemAvailable low-water: 6029 MiB
+{"prose": 61.11, "structural": 98.96, "other": 74.71, "label": "v22"}
+qeval not run: greedy output byte-identical to the canonical shas (qeval 72/75 as v2.1)
+boot 2: health 200 after 160 s, boot-log checks as boot 1, max_total_num_tokens=5981440
+boot 2 prose c1 per 89.04 agg 89.04
+boot 2 prose c1 per 90.42 agg 90.42
+boot 2 prose c1 per 89.47 agg 89.47
+sha check boot 2 builtin rows 6 vs canonical: ALL MATCH
+V22-DONE
