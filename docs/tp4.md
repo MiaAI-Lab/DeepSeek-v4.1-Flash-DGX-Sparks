@@ -25,16 +25,17 @@ thinking off, idle fleet, 2026-09-25, switched RoCE fabric. Two boots, healthy i
 
 **Decode, aggregate tok/s (per stream in brackets)**
 
-| prompt type | c1 | c2 † | c4 | c8 † | c16 |
+| prompt type | c1 | c2 | c4 | c8 | c16 |
 |---|---:|---:|---:|---:|---:|
-| prose | 89.8 | 120.4 (61.9) | 164.1 (41.5) | 237.6 (30.8) | 340.9 (22.2) |
-| code | 132.4 | 175.0 (88.4) | 252.7 (64.1) | 309.8 (41.4) | 436.4 (29.2) |
-| structured | 156.9 | 177.6 (103.3) | 239.6 (70.2) | 295.5 (44.2) | 565.5 (44.3) |
-| json | 124.3 | 174.2 (89.8) | 311.2 (78.7) | 471.5 (60.2) | 653.0 (42.2) |
+| prose | 90.2 | 122.0 (62.6) | 164.1 (41.5) | 238.8 (31.0) | 340.9 (22.2) |
+| code | 132.4 | 177.8 (89.8) | 252.7 (64.1) | 308.9 (41.4) | 436.4 (29.2) |
+| structured | 156.9 | 181.6 (105.4) | 239.6 (70.2) | 295.7 (44.2) | 565.5 (44.3) |
+| json | 124.3 | 177.6 (91.6) | 311.2 (78.7) | 468.8 (59.8) | 653.0 (42.2) |
 
-† c2 and c8 were not re-measured for v2.2; they are the v2 sweep's values. The c1, c4 and c16 columns
-are from the v2.2 fresh-clone boot. Prose c1 is the median of five runs, 89.76 (88.97-90.21), after two
-discarded warm-ups; the second boot gave 89.04 / 90.42 / 89.47. Code c1 is the median of three runs
+Prose c1 is the median of three runs on a fresh clone of this repository's TP4 line, 90.2 (90.48 / 89.19 /
+90.17), after two discarded warm-ups; the source repository's gate measured 89.76 (88.97-90.21) over five runs
+and 89.04 / 90.42 / 89.47 on a second boot. c4 and c16 are from that gate; c2 and c8 were measured on the same
+image the same evening. Code c1 is the median of three runs
 (124.95 / 132.62 / 132.37). v2.1 measured prose c1 87.7 and code c1 124.8 on the same prompts, and
 greedy output is byte-identical to v2.1's (hash check of 15 outputs on the first boot and 6 on the
 second). With the deterministic MoE reduction the greedy text is identical run to run, so the sparkDash numbers repeat
