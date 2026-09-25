@@ -23,6 +23,9 @@ import types
 
 import torch
 
+# TP4-line adapters: armed only under start-tp4.sh, which sets DSV41_LAUNCHER=tp4 in every rank.
+os.environ["DSV41_LAUNCHER"] = "tp4"
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "adapter"))
 

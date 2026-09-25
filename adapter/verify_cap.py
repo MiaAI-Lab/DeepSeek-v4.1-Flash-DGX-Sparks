@@ -89,7 +89,8 @@ def share_live(buf, bs):
         from sglang.srt.distributed import get_tp_group
         group = _state["tp_group"] = get_tp_group()
     if group.world_size > 1:
-        if os.environ.get("DSV41_SPEC_SYNC_FREE", "").strip() not in ("", "0", "off", "false"):
+        if (os.environ.get("DSV41_LAUNCHER") == "tp4"
+                and os.environ.get("DSV41_SPEC_SYNC_FREE", "").strip() not in ("", "0", "off", "false")):
             # adapter/spec_sync_free.py: skipped with its vcap token, counted in audit mode
             from spec_sync_free import tp_broadcast
             tp_broadcast(group, buf[:bs], "vcap")

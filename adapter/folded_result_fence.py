@@ -12,8 +12,10 @@ tensors, and are left alone.
 import os
 
 ENABLED = os.environ.get("DSV41_FOLDED_FENCE", "0").strip() not in ("0", "", "off", "false")
-_GLUE = "fence" in os.environ.get("DSV41_EAGER_GLUE", "") or os.environ.get("DSV41_EAGER_GLUE", "").strip().lower() in (
-    "1", "on", "true", "all")
+# DSV41_EAGER_GLUE (adapter/eager_glue.py) is part of the TP4 line: armed only by start-tp4.sh
+_GLUE = os.environ.get("DSV41_LAUNCHER") == "tp4" and (
+    "fence" in os.environ.get("DSV41_EAGER_GLUE", "")
+    or os.environ.get("DSV41_EAGER_GLUE", "").strip().lower() in ("1", "on", "true", "all"))
 FIELDS = ("correct_len", "bonus", "cap_trim_lens", "commit_lens", "new_seq_lens", "out_tokens")
 
 

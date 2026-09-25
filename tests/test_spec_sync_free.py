@@ -20,6 +20,9 @@ import types
 
 import torch
 
+# TP4-line adapters: armed only under start-tp4.sh, which sets DSV41_LAUNCHER=tp4 in every rank.
+os.environ["DSV41_LAUNCHER"] = "tp4"
+
 
 class Site(enum.IntEnum):
     DSPARK_MEM = 1

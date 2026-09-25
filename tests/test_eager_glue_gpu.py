@@ -22,6 +22,9 @@ import os
 import sys
 import types
 
+# TP4-line adapters: armed only under start-tp4.sh, which sets DSV41_LAUNCHER=tp4 in every rank.
+os.environ["DSV41_LAUNCHER"] = "tp4"
+
 os.environ.setdefault("DSV41_EAGER_GLUE", "all")
 os.environ.setdefault("DSV41_VERIFY_CAP", "conf:0.1")
 import torch  # noqa: E402

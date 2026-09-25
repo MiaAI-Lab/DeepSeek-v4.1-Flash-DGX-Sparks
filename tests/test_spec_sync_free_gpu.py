@@ -16,6 +16,9 @@
 import math
 import os
 
+# TP4-line adapters: armed only under start-tp4.sh, which sets DSV41_LAUNCHER=tp4 in every rank.
+os.environ["DSV41_LAUNCHER"] = "tp4"
+
 os.environ.setdefault("DSV41_SPEC_SYNC_FREE", "draft,accept")
 import torch  # noqa: E402
 

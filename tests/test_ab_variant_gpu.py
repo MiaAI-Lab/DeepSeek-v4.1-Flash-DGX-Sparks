@@ -17,7 +17,7 @@ C (GPU, ~1 MB): SGLang's own FullCudaGraphBackend, hooked through ab_variant's i
    input (rewritten in place between replays). The warm-up reset runs before the second variant.
 
   docker run --rm --gpus all -v $PWD:/ds41 -w /ds41 -e PYTHONPATH=/ds41/adapter \
-      -e DSV41_AB_VARIANTS=2 \
+      -e DSV41_LAUNCHER=tp4 -e DSV41_AB_VARIANTS=2 \
       -e "DSV41_AB_V1=DSV41_L2_PREFETCH=1;DSV41_L2_PREFETCH_WOA=1;DSV41_L2_PREFETCH_ENGRAM=1;DSV41_L2_PREFETCH_DRAFT=1;DSV41_L2_PREFETCH_LMHEAD=1;DSV41_FUSE_QUANT=hcpad" \
       --entrypoint python3 <image> tests/test_ab_variant_gpu.py
 (sitecustomize.py arms the harness at interpreter start, as in the engine; part C is skipped
@@ -27,6 +27,7 @@ import json
 import os
 import types
 
+os.environ.setdefault("DSV41_LAUNCHER", "tp4")   # TP4 line: set by start-tp4.sh
 os.environ.setdefault("DSV41_AB_VARIANTS", "2")
 os.environ.setdefault("DSV41_AB_V1", "DSV41_L2_PREFETCH=1;DSV41_L2_PREFETCH_WOA=1;DSV41_L2_PREFETCH_ENGRAM=1;"
                                      "DSV41_L2_PREFETCH_DRAFT=1;DSV41_L2_PREFETCH_LMHEAD=1;DSV41_FUSE_QUANT=hcpad")

@@ -17,6 +17,9 @@ import sys
 import tempfile
 import types
 
+# TP4-line adapters: armed only under start-tp4.sh, which sets DSV41_LAUNCHER=tp4 in every rank.
+os.environ["DSV41_LAUNCHER"] = "tp4"
+
 ADAPTER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "adapter")
 sys.path.insert(0, ADAPTER)
 KEYS = [k for k in os.environ if k.startswith(("DSV41_AB", "DSV41_L2_PREFETCH", "DSV41_FUSE_QUANT"))]
