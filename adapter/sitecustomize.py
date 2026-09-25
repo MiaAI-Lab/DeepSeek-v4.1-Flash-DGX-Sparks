@@ -271,6 +271,22 @@ class EngramFinder(importlib.abc.MetaPathFinder):
 
 if os.environ.get('DSV41_SOURCE'):
     sys.meta_path.insert(0, EngramFinder())
+
+# TEST ONLY, TP4 launcher, gated on DSV41_AB_VARIANTS>=2: in-boot A/B, one CUDA graph set per
+# flag variant (adapter/ab_variant.py). After the finder, before tp3_pad imports any sglang module, so every
+# adapter reads the unioned gates at install. site swallows sitecustomize exceptions, which would
+# leave the engine up without its adapters: any failure here kills the process instead.
+if _tp4_launcher() and os.environ.get('DSV41_AB_VARIANTS', '').strip() not in ('', '0', '1'):
+    try:
+        import ab_variant
+        if ab_variant.configure():
+            print(ab_variant.describe(), flush=True)
+    except BaseException as exc:
+        print(f'DSV41_AB: refusing to start: {exc!r}', file=sys.stderr, flush=True)
+        print(f'DSV41_AB: refusing to start: {exc!r}', flush=True)
+        os._exit(1)
+
+if os.environ.get('DSV41_SOURCE'):
     try:
         import tp3_pad
         tp3_pad.install()
