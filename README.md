@@ -92,8 +92,8 @@ Set `API_KEY` in `.env` to require a bearer token (`state/api-key` holds it).
 on top of this profile: the upstream SGLang `dsv4.1` branch image with RoCEnante
 (`Dockerfile.canary-roce`), EP 1 with the routed MoE on b12x, prefill sequence parallel, the
 fast loader and gated decode adapters. Measured from a fresh clone (sparkDash 1.8.8, greedy,
-switched fabric): prose c1 87.7 tok/s, code c1 124.8, prose c16 342.7 aggregate, cold prefill
-4,059 / 5,855 / 5,900 / 5,925 / 5,797 / 5,394 tok/s at 4k–262k, real text 4.9k–5.0k tok/s at 16k–128k, qeval 72/75, a 1,011,084-token needle passes. The profile,
+switched fabric): prose c1 89.8 tok/s, code c1 132.4, prose c16 340.9 aggregate, cold prefill
+3,944 / 5,789 / 5,855 / 5,850 / 5,734 / 5,286 tok/s at 4k–262k, real text 4.7k–4.9k tok/s at 16k–128k, qeval 72/75, a 1,011,084-token needle passes. The profile,
 images, results, rollback and credits are on that page.
 
 The improvements for now are only for TP=4 and do not affect TP=3. Thanks to [@majewskizby](https://github.com/knapcio) for the awesome [PR](https://github.com/MiaAI-Lab/DeepSeek-v4.1-Flash-DGX-Sparks/pull/36), who brought the opt-in four-Spark production line: the RoCEnante image, EP 1 with the routed MoE on b12x, prefill sequence parallel, the fast loader and the gated decode adapters, and measured it from a fresh clone. `./start.sh` is unchanged.
@@ -465,7 +465,7 @@ fails), and the head has little RAM to spare.
     image. They are part of the opt-in TP4 production line below.
 - **TP4 production line** ([docs/tp4.md](docs/tp4.md)): contributed by knapcio from
   [knapcio/DeepSeek-V4.1-Flash-4x-DGX-Spark-TP4](https://github.com/knapcio/DeepSeek-V4.1-Flash-4x-DGX-Spark-TP4)
-  (v2.1; per-change history and measurements there), with work from b12x / local-inference-lab
+  (v2.2; per-change history and measurements there), with work from b12x / local-inference-lab
   (RoCEnante, fused MoE), rhys101 (SG17 RoCEnante overlay, SG18 prefill TP split), LuZ, sumsliu,
   FujitsuPolycom/sparkring and rsync (RoCEnante on a switchless ring), Saolence, kpham-sgl
   (sglang#39187) and the SGLang `dsv4.1` branch; full credits in docs/tp4.md. Third-party
