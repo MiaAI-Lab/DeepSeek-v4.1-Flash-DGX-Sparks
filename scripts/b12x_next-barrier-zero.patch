@@ -1,0 +1,65 @@
+diff -ru b12x_next/moe/fused_moe/_impl.py b12x_next/moe/fused_moe/_impl.py
+--- b12x_next/moe/fused_moe/_impl.py
++++ b12x_next/moe/fused_moe/_impl.py
+@@ -11208,6 +11208,41 @@
+     return compiled, mac
+ 
+ 
++# ds41 patch (b12x_next only): the per-launch re-zero of the read-before-write barrier scalars is
++# one fill instead of two. The workspace arena places barrier_epoch right after barrier_count (spec
++# order, each start aligned up to 16 bytes), so when epoch starts within the 16-byte alignment gap
++# after count's last element, one contiguous int32 span covers both; the gap holds no other tensor
++# (any tensor between them would start at or after the gap's end) and nothing reads it. Otherwise
++# (other layouts) the two fills run as before. Same values written, same stream, same order before
++# the MoE launch, so eager, CUDA-graph replay and deterministic runs see identical state.
++def _barrier_state_span(barrier_count: torch.Tensor, barrier_epoch: torch.Tensor):
++    if (
++        barrier_count.dtype != torch.int32
++        or barrier_epoch.dtype != torch.int32
++        or barrier_count.device != barrier_epoch.device
++        or not barrier_count.is_contiguous()
++        or not barrier_epoch.is_contiguous()
++        or barrier_count.untyped_storage().data_ptr()
++        != barrier_epoch.untyped_storage().data_ptr()
++    ):
++        return None
++    count_end = barrier_count.data_ptr() + barrier_count.numel() * 4
++    gap = barrier_epoch.data_ptr() - count_end
++    if gap < 0 or gap >= 16 or gap % 4 != 0:
++        return None
++    elems = barrier_count.numel() + gap // 4 + barrier_epoch.numel()
++    return barrier_count.as_strided((elems,), (1,), barrier_count.storage_offset())
++
++
++def _zero_barrier_state(barrier_count: torch.Tensor, barrier_epoch: torch.Tensor) -> None:
++    span = _barrier_state_span(barrier_count, barrier_epoch)
++    if span is None:
++        barrier_count.zero_()
++        barrier_epoch.zero_()
++    else:
++        span.zero_()
++
++
+ def _launch_dynamic_flat(
+     *,
+     packed_a_view: torch.Tensor,
+@@ -11487,8 +11522,7 @@
+         planned_num_tokens=planned_num_tokens,
+     )
+     if volatile_launch_state and not external_route_plan:
+-        barrier_count.zero_()
+-        barrier_epoch.zero_()
++        _zero_barrier_state(barrier_count, barrier_epoch)
+ 
+     if external_route_plan:
+         block_e = 1 << (int(E) - 1).bit_length()
+@@ -12253,8 +12287,7 @@
+     ):
+         raise RuntimeError("compiled direct micro MoE kernel cannot launch")
+     if volatile_launch_state:
+-        barrier_count.zero_()
+-        barrier_epoch.zero_()
++        _zero_barrier_state(barrier_count, barrier_epoch)
+     micro_cls.launch(
+         compiled,
+         x=a,

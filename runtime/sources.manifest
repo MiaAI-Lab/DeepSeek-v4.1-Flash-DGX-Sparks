@@ -15,7 +15,8 @@ sglang-canary  f80c91a4b97e52e17fbcff088aa6b47b6270f6b9  9968fcff7fa8218b8246a45
 
 # b12x as frozen for rhys101's SG17 RoCEnante overlay (b12x.comm.roce); published as a source
 # archive in rhys101/DeepSeek-V4.1-Flash-vLLM-DGX-Spark-8, provenance in
-# runtime/b12x/source-provenance.json. Apache-2.0 (local-inference-lab/b12x).
+# runtime/b12x/source-provenance.json. Apache-2.0 (local-inference-lab/b12x). Then
+# scripts/b12x-roce-columns-gather.patch (all_gather(columns=...), the compact gather).
 b12x-sg17  66aa6bd5085e63bbb011557075765e3191e807b2  4922d0db9395fb8b537d7e216d509a5747867a45f20c18290e385786609dd05f  https://raw.githubusercontent.com/rhys101/DeepSeek-V4.1-Flash-vLLM-DGX-Spark-8/66aa6bd5085e63bbb011557075765e3191e807b2/sglang/experiments/sg17-rocenante/b12x-source.tar.gz
 
 # b12x.comm.roce_ring: FujitsuPolycom/sparkring's path-aware RoCEnante (frozen release copy),
@@ -32,7 +33,8 @@ roce-ring/api.py  f16b5f43208c188c018c43820ccf52955006d1a5  02becd3757e71c917a71
 roce-ring/roce_oneshot.py  f16b5f43208c188c018c43820ccf52955006d1a5  2e431e7c5ef714636247b81602fdc1b85b38ebe1cef7665bc8d486f7841a65e1  https://raw.githubusercontent.com/FujitsuPolycom/sparkring/f16b5f43208c188c018c43820ccf52955006d1a5/runtime/glm53-spark-mtp3-mesh/performance/transport/bundle-source/b12x_overlay/b12x/comm/roce/roce_oneshot.py
 
 # b12x main, installed as the top-level package b12x_next beside the SG17 copy (renamed
-# identifiers, B12X_* knobs -> B12X_NEXT_*), then scripts/b12x_next-compact-n64-m64.patch.
+# identifiers, B12X_* knobs -> B12X_NEXT_*), then scripts/b12x_next-{compact-n64-m64,
+# prequant-input,barrier-zero,det-triton-planner}.patch in that order.
 # adapter/moe_b12x_next.py refuses any other commit. Apache-2.0.
 b12x-main  a7d7d29b2ef8869086e0ceaa787321f17544e3c9  e2d070850d50fb365a01f82f16e3f582a53e7ad1c6e3d657b50babb68814635d  https://github.com/local-inference-lab/b12x/archive/a7d7d29b2ef8869086e0ceaa787321f17544e3c9.tar.gz
 
@@ -43,4 +45,8 @@ b12x-main  a7d7d29b2ef8869086e0ceaa787321f17544e3c9  e2d070850d50fb365a01f82f16e
 local  runtime/sglang-rocenante.patch  e813f97a87539681a5951f055b4d0b78f14630437f7c0adaa7e012f7adc5c704  -
 local  runtime/flash_mla_sm120.canary.py  2fe25ba5e2ff91f6028b6a32c315ba8875d8780b9341bae9411af1cc927885bf  -
 local  scripts/b12x_next-compact-n64-m64.patch  1fb1f1eca87206618115f57f9303860bf7a3be8700356bca91ca87a2ba57b701  -
+local  scripts/b12x_next-prequant-input.patch  839e62728dcdf5d209ee907cb8b2828a3f3327f21b74b37ca3045e66c1264ee4  -
+local  scripts/b12x_next-barrier-zero.patch  dbec8235975450bf2963bf31e4949b369016fc3f93890ac4d7fe470ad02a4b60  -
+local  scripts/b12x_next-det-triton-planner.patch  d503f6fa8209ab0deafdfc2336e39ba433b891e7fa133a7de18fdcb3f4ecd741  -
+local  scripts/b12x-roce-columns-gather.patch  0434a9d20bc5e0202f7b2ddcea767237c8347d40794c63e58c8d9a66a4157409  -
 local  scripts/roce_ring-sparkring-f16b5f4.patch  4479d3d0fc847c787234ebd043890d1f4fd53fcee689f1cbfd14217215a7b6bf  -

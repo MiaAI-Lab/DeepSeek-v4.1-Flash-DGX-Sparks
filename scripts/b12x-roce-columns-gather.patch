@@ -1,0 +1,563 @@
+diff --git a/b12x/comm/roce/_allgather_cute.py b/b12x/comm/roce/_allgather_cute.py
+index 2636d53..3d1d592 100644
+--- a/b12x/comm/roce/_allgather_cute.py
++++ b/b12x/comm/roce/_allgather_cute.py
+@@ -16,6 +16,9 @@ Launch grid and message size are runtime scalars.  The host picks a
+ power-of-two grid from the shard size and hands the kernel that grid's own
+ staging and tail counters, so small gathers do not pay for the full grid and
+ gathers may interleave with reductions of any size inside one CUDA graph.
++
++``_RoceAllGatherColumnsLaunch`` (ds41) is a separate specialization for a last-dim
++gather of unequal column shards; the plain kernel above is unchanged.
+ """
+ 
+ from __future__ import annotations
+@@ -253,6 +256,235 @@ class _RoceAllGatherLaunch:
+                         st_release_gpu_u32(epoch_ptr, seq)
+ 
+ 
++class _RoceAllGatherColumnsLaunch:
++    """Uneven last-dim all-gather ("columns"): rank ``s`` contributes ``col_packs[s]``
++    16-byte packs per row and they land at pack ``sum(col_packs[:s])`` of every output
++    row (row stride ``sum(col_packs)``), so a gather of unequal column shards needs no
++    pad before the collective and no reorder or cat after it.
++
++    Same transport, doorbell, flag wait and epoch protocol as ``_RoceAllGatherLaunch``;
++    each rank sends only its own ``rows * col_packs[rank]`` packs (the proxy stripes
++    whatever byte count the doorbell carries and always writes every stripe flag, so
++    senders may use different sizes).  The local shard is read from a strided input:
++    ``in_row_packs`` packs per input row, the shard starting at pack ``in_col_off``, so a
++    rank whose GEMM output is wider than its own columns sends a view without a copy.
++    The column layout is a compile-time constant of the specialization.
++    """
++
++    def __init__(
++        self,
++        world_size: int,
++        rank: int,
++        threads: int,
++        slots: int,
++        flag_stride: int,
++        hca_count: int,
++        col_packs: tuple[int, ...],
++    ) -> None:
++        """Bind one kernel specialization: world, rank, layout constants and the column layout."""
++        if int(threads) < int(world_size) * int(hca_count):
++            raise ValueError(
++                "RoCE kernels need threads >= world_size * hca_count "
++                f"(one thread per stripe flag), got threads={threads} "
++                f"world_size={world_size} hca_count={hca_count}"
++            )
++        col_packs = tuple(int(c) for c in col_packs)
++        if len(col_packs) != int(world_size) or min(col_packs) < 1:
++            raise ValueError(
++                f"col_packs needs one positive pack count per rank, got {col_packs}"
++            )
++        self._world_size = int(world_size)
++        self._rank = int(rank)
++        self._threads = int(threads)
++        self._slots = int(slots)
++        self._flag_stride = int(flag_stride)
++        self._hca_count = int(hca_count)
++        self._col_packs = col_packs
++        self._col_offs = tuple(sum(col_packs[:s]) for s in range(len(col_packs)))
++        self._out_row_packs = sum(col_packs)
++
++    @cute.jit
++    def __call__(
++        self,
++        input_ptr: cute.Pointer,
++        output_ptr: cute.Pointer,
++        rows: Int32,
++        in_row_packs: Int32,
++        in_col_off: Int32,
++        nbytes: Int32,
++        recv_base: Int64,
++        flag_base: Int64,
++        send_base: Int64,
++        ctrl_base: Int64,
++        slot_bytes: Int64,
++        epoch_ptr: Int64,
++        stage_counter_ptr: Int64,
++        tail_counter_ptr: Int64,
++        poison_ptr: Int64,
++        spin_limit: Uint32,
++        grid_x: Int32,
++        stream: cuda.CUstream,
++    ) -> None:
++        """Host entry: launch the columns all-gather kernel with runtime scalars."""
++        self.kernel(
++            input_ptr,
++            output_ptr,
++            rows,
++            in_row_packs,
++            in_col_off,
++            nbytes,
++            recv_base,
++            flag_base,
++            send_base,
++            ctrl_base,
++            slot_bytes,
++            epoch_ptr,
++            stage_counter_ptr,
++            tail_counter_ptr,
++            poison_ptr,
++            spin_limit,
++        ).launch(
++            grid=(grid_x, 1, 1),
++            block=[self._threads, 1, 1],
++            cluster=(1, 1, 1),
++            stream=stream,
++        )
++
++    @cute.kernel
++    def kernel(
++        self,
++        input_ptr: cute.Pointer,
++        output_ptr: cute.Pointer,
++        rows: Int32,
++        in_row_packs: Int32,
++        in_col_off: Int32,
++        nbytes: Int32,
++        recv_base: Int64,
++        flag_base: Int64,
++        send_base: Int64,
++        ctrl_base: Int64,
++        slot_bytes: Int64,
++        epoch_ptr: Int64,
++        stage_counter_ptr: Int64,
++        tail_counter_ptr: Int64,
++        poison_ptr: Int64,
++        spin_limit: Uint32,
++    ) -> None:
++        """Device kernel: stage the compact local shard, doorbell, wait, scatter into columns, advance."""
++        tidx, _, _ = cute.arch.thread_idx()
++        bidx, _, _ = cute.arch.block_idx()
++        gdim, _, _ = cute.arch.grid_dim()
++        input_base = Int64(input_ptr.toint())
++        output_base = Int64(output_ptr.toint())
++        epoch = ld_relaxed_gpu_u32(epoch_ptr)
++        seq = epoch + Uint32(1)
++        slot = Int64(seq & Uint32(1))
++        send_slot = send_base + slot * slot_bytes
++
++        index = Int32(bidx) * Int32(self._threads) + Int32(tidx)
++        stride = Int32(gdim) * Int32(self._threads)
++        my_packs = Int32(self._col_packs[self._rank])
++        local_packs = rows * my_packs
++
++        poisoned = ld_relaxed_gpu_u32(poison_ptr)
++        if poisoned == Uint32(0):
++            # 1. stage the compact local shard (row-major, my_packs per row) into the send slot
++            stage_index = index
++            while stage_index < local_packs:
++                row = stage_index // my_packs
++                col = stage_index - row * my_packs
++                words = ld_global_v4_u32(
++                    input_base
++                    + (Int64(row) * Int64(in_row_packs) + Int64(in_col_off) + Int64(col))
++                    * Int64(PACK_BYTES)
++                )
++                st_global_v4_u32(
++                    send_slot + Int64(stage_index) * Int64(PACK_BYTES),
++                    words[0],
++                    words[1],
++                    words[2],
++                    words[3],
++                )
++                stage_index += stride
++            cute.arch.sync_threads()
++
++            # 2. the last block to finish staging rings the proxy doorbell (own byte count)
++            if Int32(tidx) == Int32(0):
++                fence_sc_sys()
++                prior = atomic_add_relaxed_gpu_u32(stage_counter_ptr, Uint32(1))
++                if (prior + Uint32(1)) % Uint32(gdim) == Uint32(0):
++                    st_relaxed_sys_u32(ctrl_base + Int64(4), Uint32(nbytes))
++                    st_relaxed_sys_u32(
++                        ctrl_base + Int64(16) + slot * Int64(4), Uint32(nbytes)
++                    )
++                    fence_sc_sys()
++                    st_relaxed_sys_u32(ctrl_base, seq)
++
++            # 3. wait for every peer's payload-stripe flags
++            if Int32(tidx) < Int32(self._world_size * self._hca_count):
++                peer = Int32(tidx) // Int32(self._hca_count)
++                hca = Int32(tidx) - peer * Int32(self._hca_count)
++                if peer != Int32(self._rank):
++                    flag_addr = flag_base + (
++                        (Int64(peer) * Int64(self._slots) + slot)
++                        * Int64(self._hca_count)
++                        + Int64(hca)
++                    ) * Int64(self._flag_stride)
++                    timed_out = spin_until_eq_acquire_sys(flag_addr, seq, spin_limit)
++                    if timed_out != Uint32(0):
++                        st_relaxed_sys_u32(ctrl_base + Int64(12), Uint32(peer))
++                        st_relaxed_sys_u32(ctrl_base + Int64(24), Uint32(hca))
++                        st_relaxed_sys_u32(ctrl_base + Int64(8), seq)
++                        st_release_gpu_u32(poison_ptr, seq)
++            cute.arch.sync_threads()
++            failed = ld_relaxed_gpu_u32(poison_ptr)
++            if failed == Uint32(0):
++                # 4. scatter: source s fills packs [col_offs[s], col_offs[s] + col_packs[s]) of every row
++                for source in cutlass.range_constexpr(self._world_size):
++                    src_packs = Int32(self._col_packs[source])
++                    src_total = rows * src_packs
++                    copy_index = index
++                    while copy_index < src_total:
++                        row = copy_index // src_packs
++                        col = copy_index - row * src_packs
++                        dest = output_base + (
++                            Int64(row) * Int64(self._out_row_packs)
++                            + Int64(self._col_offs[source])
++                            + Int64(col)
++                        ) * Int64(PACK_BYTES)
++                        if cutlass.const_expr(source == self._rank):
++                            words = ld_global_v4_u32(
++                                input_base
++                                + (
++                                    Int64(row) * Int64(in_row_packs)
++                                    + Int64(in_col_off)
++                                    + Int64(col)
++                                )
++                                * Int64(PACK_BYTES)
++                            )
++                        else:
++                            peer_slot = (
++                                recv_base
++                                + (Int64(source) * Int64(self._slots) + slot)
++                                * slot_bytes
++                            )
++                            words = ld_relaxed_sys_v4_u32(
++                                peer_slot + Int64(copy_index) * Int64(PACK_BYTES)
++                            )
++                        st_global_v4_u32(dest, words[0], words[1], words[2], words[3])
++                        copy_index += stride
++
++            # 5. the last block to finish publishes the next epoch
++            fence_sc_gpu()
++            cute.arch.sync_threads()
++            if Int32(tidx) == Int32(0):
++                prior = atomic_add_relaxed_gpu_u32(tail_counter_ptr, Uint32(1))
++                if (prior + Uint32(1)) % Uint32(gdim) == Uint32(0):
++                    fence_sc_gpu()
++                    if ld_relaxed_sys_u32(ctrl_base + Int64(8)) == Uint32(0):
++                        st_release_gpu_u32(epoch_ptr, seq)
++
++
+ def _dummy(dtype, alignment: int):
+     """A CUDA tensor of ``dtype`` used to trace launcher argument types."""
+     return make_ptr(dtype, 16, cute.AddressSpace.gmem, assumed_align=alignment)
+@@ -382,4 +614,136 @@ def get_launcher(
+     return run
+ 
+ 
+-__all__ = ["PACK_BYTES", "get_launcher", "is_launcher_prepared"]
++def _columns_process_key(
++    world_size: int,
++    rank: int,
++    threads: int,
++    slots: int,
++    flag_stride: int,
++    hca_count: int,
++    device_index: int,
++    col_packs: tuple[int, ...],
++) -> tuple[object, ...]:
++    """Cache key of one compiled columns-gather specialization (tagged apart from the plain gather)."""
++    return ("columns",) + _process_key(
++        world_size, rank, threads, slots, flag_stride, hca_count, device_index
++    ) + (tuple(int(c) for c in col_packs),)
++
++
++def is_columns_launcher_prepared(*key) -> bool:
++    """True when the columns-gather launcher for ``key`` is already compiled."""
++    return _columns_process_key(*key) in _PREPARED_LAUNCHERS
++
++
++@functools.cache
++def get_columns_launcher(
++    world_size: int,
++    rank: int,
++    threads: int,
++    slots: int,
++    flag_stride: int,
++    hca_count: int,
++    device_index: int,
++    col_packs: tuple[int, ...],
++) -> Callable[..., None]:
++    """Compile the columns-gather launcher for ``key`` once and return it."""
++    col_packs = tuple(int(c) for c in col_packs)
++    process_key = _columns_process_key(
++        world_size, rank, threads, slots, flag_stride, hca_count, device_index, col_packs
++    )
++    launch = _RoceAllGatherColumnsLaunch(
++        world_size, rank, threads, slots, flag_stride, hca_count, col_packs
++    )
++    cache_key = (
++        int(world_size),
++        int(rank),
++        int(threads),
++        int(slots),
++        int(flag_stride),
++        int(hca_count),
++        tuple(col_packs),
++    )
++    raise_if_kernel_resolution_frozen(
++        "cute.compile", target=launch, cache_key=cache_key
++    )
++    raw = b12x_compile(
++        launch,
++        _dummy(cutlass.Uint32, 16),
++        _dummy(cutlass.Uint32, 16),
++        1,
++        1,
++        0,
++        16,
++        1,
++        16,
++        16,
++        16,
++        4096,
++        16,
++        16,
++        16,
++        16,
++        1,
++        1,
++        current_cuda_stream(),
++        compile_spec=KernelCompileSpec.from_key(
++            "comm.roce.allgather_columns", 1, cache_key
++        ),
++    )
++
++    def run(
++        input_address: int,
++        output_address: int,
++        rows: int,
++        in_row_packs: int,
++        in_col_off: int,
++        nbytes: int,
++        recv_base: int,
++        flag_base: int,
++        send_base: int,
++        ctrl_base: int,
++        slot_bytes: int,
++        epoch_address: int,
++        stage_counter_address: int,
++        tail_counter_address: int,
++        poison_address: int,
++        spin_limit: int,
++        grid_x: int,
++    ) -> None:
++        """Launch the compiled kernel with runtime scalar arguments."""
++        raw(
++            make_ptr(
++                cutlass.Uint32, input_address, cute.AddressSpace.gmem, assumed_align=16
++            ),
++            make_ptr(
++                cutlass.Uint32, output_address, cute.AddressSpace.gmem, assumed_align=16
++            ),
++            int(rows),
++            int(in_row_packs),
++            int(in_col_off),
++            int(nbytes),
++            int(recv_base),
++            int(flag_base),
++            int(send_base),
++            int(ctrl_base),
++            int(slot_bytes),
++            int(epoch_address),
++            int(stage_counter_address),
++            int(tail_counter_address),
++            int(poison_address),
++            int(spin_limit),
++            int(grid_x),
++            current_cuda_stream(),
++        )
++
++    _PREPARED_LAUNCHERS.add(process_key)
++    return run
++
++
++__all__ = [
++    "PACK_BYTES",
++    "get_columns_launcher",
++    "get_launcher",
++    "is_columns_launcher_prepared",
++    "is_launcher_prepared",
++]
+diff --git a/b12x/comm/roce/roce_oneshot.py b/b12x/comm/roce/roce_oneshot.py
+index 83f047a..f35909f 100644
+--- a/b12x/comm/roce/roce_oneshot.py
++++ b/b12x/comm/roce/roce_oneshot.py
+@@ -717,6 +717,8 @@ class RoceOneshotAllReduce:
+         dim: int = -1,
+         out: Optional[torch.Tensor] = None,
+         stream: object = None,
++        columns: Optional[Sequence[int]] = None,
++        column_offset: int = 0,
+     ) -> torch.Tensor:
+         """Concatenate every rank's ``inp`` along ``dim`` (0 or the last dim).
+ 
+@@ -724,8 +726,15 @@ class RoceOneshotAllReduce:
+         directly (no reshape or copy afterwards).  Otherwise the shards are
+         gathered contiguously with 16-byte padding and finished with a torch
+         reshape, which still keeps the collective on RDMA.
++
++        ``columns`` (ds41): a last-dim gather of unequal shards; see
++        ``_all_gather_columns``.  Without it this method is unchanged.
+         """
+ 
++        if columns is not None:
++            return self._all_gather_columns(
++                inp, columns, column_offset=column_offset, out=out, stream=stream
++            )
+         with self._lock:
+             self.check_health()
+             if not self.should_all_gather(inp, dim):
+@@ -791,6 +800,145 @@ class RoceOneshotAllReduce:
+                 out.copy_(result)
+                 return out
+ 
++    # -- uneven last-dim all-gather ("columns", ds41) -----------------------------
++
++    def _columns_launcher_key(self, col_packs: Sequence[int]) -> tuple[object, ...]:
++        """Cache key of the columns all-gather launcher for one column layout (in packs)."""
++        return self._gather_launcher_key() + (tuple(int(c) for c in col_packs),)
++
++    def _column_packs(self, columns: Sequence[int], element_size: int) -> tuple[int, ...]:
++        """Per-rank 16-byte pack counts of ``columns`` elements, or ValueError."""
++        columns = tuple(int(c) for c in columns)
++        if len(columns) != self.world_size or min(columns) < 1:
++            raise ValueError(
++                f"columns needs one positive width per rank ({self.world_size}), got {columns}"
++            )
++        if any((c * element_size) % PACK_BYTES for c in columns):
++            raise ValueError(
++                f"every column width must be a multiple of 16 bytes, got {columns} x {element_size} B"
++            )
++        return tuple(c * element_size // PACK_BYTES for c in columns)
++
++    def should_all_gather_columns(
++        self, inp: torch.Tensor, columns: Sequence[int]
++    ) -> bool:
++        """Eligible for ``all_gather(columns=...)``: 2-D CUDA tensor on this device, unit column
++        stride, 16-byte widths, and the widest rank's shard within ``max_gather_bytes``.
++
++        Depends only on dtype, shape and the shared ``columns``, never on pointers or on which
++        rank asks, so tensor-parallel ranks take the same decision.
++        """
++
++        if self._closed or self._proxy is None:
++            raise RuntimeError("RoCE runtime is closed")
++        if not inp.is_cuda or inp.dim() != 2 or inp.device != self.device:
++            return False
++        if inp.is_complex() or inp.is_sparse or inp.dtype == torch.bool:
++            return False
++        try:
++            packs = self._column_packs(columns, inp.element_size())
++        except ValueError:
++            return False
++        nbytes = inp.shape[0] * max(packs) * PACK_BYTES
++        return 0 < nbytes <= self.max_gather_bytes
++
++    def prepare_columns(self, columns: Sequence[int], dtype: torch.dtype = torch.bfloat16) -> None:
++        """Compile the columns all-gather launcher for this layout ahead of CUDA graph capture."""
++        packs = self._column_packs(columns, torch.empty((), dtype=dtype).element_size())
++        with torch.cuda.device(self.device):
++            _allgather_cute.get_columns_launcher(*self._columns_launcher_key(packs))
++
++    def _all_gather_columns(
++        self,
++        inp: torch.Tensor,
++        columns: Sequence[int],
++        *,
++        column_offset: int = 0,
++        out: Optional[torch.Tensor] = None,
++        stream: object = None,
++    ) -> torch.Tensor:
++        """Last-dim gather of unequal shards straight into the concatenated layout.
++
++        Rank ``r`` contributes ``inp[:, column_offset:column_offset + columns[r]]`` (``inp`` may be
++        wider than its shard; rows may be strided, 16-byte aligned) and the result is
++        ``out[M, sum(columns)]`` with rank ``r``'s columns at ``sum(columns[:r])``.  Each rank
++        sends only its own ``M * columns[r]`` elements; there is no padding before the collective
++        and no reorder after it.  Same ordering, capture and failure rules as ``all_gather``.
++        """
++
++        with self._lock:
++            self.check_health()
++            if not self.should_all_gather_columns(inp, columns):
++                raise ValueError("input is not eligible for the RoCE columns all-gather")
++            es = inp.element_size()
++            packs = self._column_packs(columns, es)
++            rows = int(inp.shape[0])
++            own = int(columns[self.rank])
++            column_offset = int(column_offset)
++            if inp.stride(1) != 1 or (inp.stride(0) * es) % PACK_BYTES != 0:
++                raise ValueError("columns all-gather needs unit column stride and 16-byte rows")
++            if (column_offset * es) % PACK_BYTES != 0 or inp.data_ptr() % PACK_BYTES != 0:
++                raise ValueError("columns all-gather needs a 16-byte aligned shard start")
++            if column_offset < 0 or column_offset + own > inp.shape[1]:
++                raise ValueError(
++                    f"shard [{column_offset}, {column_offset + own}) is outside the input's "
++                    f"{inp.shape[1]} columns"
++                )
++            shape = [rows, sum(int(c) for c in columns)]
++            if out is not None and (
++                list(out.shape) != shape
++                or out.dtype != inp.dtype
++                or out.device != inp.device
++                or not out.is_contiguous()
++                or out.data_ptr() % PACK_BYTES != 0
++            ):
++                raise ValueError(
++                    "out must be a contiguous 16-byte aligned tensor on the input's device of "
++                    "the gathered shape"
++                )
++            key = self._columns_launcher_key(packs)
++            context = (
++                torch.cuda.stream(stream) if stream is not None else _nullcontext()
++            )
++            with torch.cuda.device(self.device), context:
++                capturing = torch.cuda.is_current_stream_capturing()
++                if capturing and not _allgather_cute.is_columns_launcher_prepared(*key):
++                    raise RuntimeError(
++                        "RoCE columns all-gather launcher must be prepared before CUDA graph "
++                        "capture (prepare_columns)"
++                    )
++                launcher = _allgather_cute.get_columns_launcher(*key)
++                if out is None:
++                    out = torch.empty(shape, dtype=inp.dtype, device=inp.device)
++                grid_blocks = _grid_blocks(
++                    rows * max(packs), self._threads, self._blocks
++                )
++                stage_counter, tail_counter = self._counter_addresses(grid_blocks)
++                self._order_stream(capturing)
++                launcher(
++                    inp.data_ptr(),
++                    out.data_ptr(),
++                    rows,
++                    inp.stride(0) * es // PACK_BYTES,
++                    column_offset * es // PACK_BYTES,
++                    rows * packs[self.rank] * PACK_BYTES,
++                    self._recv_base,
++                    self._flag_base,
++                    self._send_base,
++                    self._ctrl_base,
++                    self._slot_bytes,
++                    self._epoch_address,
++                    stage_counter,
++                    tail_counter,
++                    self._poison_address,
++                    self.spin_limit,
++                    grid_blocks,
++                )
++                if not capturing:
++                    self.check_health()
++                self._mark_stream(capturing)
++            return out
++
+     def _gather_scratch(self, padded: int) -> tuple[torch.Tensor, torch.Tensor]:
+         """Fixed device scratch for the padded all-gather path, allocated once.
+ 

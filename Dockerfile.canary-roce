@@ -10,7 +10,9 @@
 # Tag: dsv41-4x-spark:canary-roce
 FROM lmsysorg/sglang:dev-dsv41@sha256:3dbc313030a6ef2c5d7de8ecf48e9aece722694a82182cb618cc82b588816349 AS fetch
 COPY runtime/sources.manifest runtime/sglang-rocenante.patch runtime/flash_mla_sm120.canary.py /src/runtime/
-COPY scripts/fetch_runtime.sh scripts/b12x_next-compact-n64-m64.patch scripts/roce_ring-sparkring-f16b5f4.patch /src/scripts/
+COPY scripts/fetch_runtime.sh scripts/b12x_next-compact-n64-m64.patch scripts/b12x_next-prequant-input.patch \
+     scripts/b12x_next-barrier-zero.patch scripts/b12x_next-det-triton-planner.patch \
+     scripts/b12x-roce-columns-gather.patch scripts/roce_ring-sparkring-f16b5f4.patch /src/scripts/
 RUN bash /src/scripts/fetch_runtime.sh /fetched sglang-canary b12x b12x-next
 
 FROM lmsysorg/sglang:dev-dsv41@sha256:3dbc313030a6ef2c5d7de8ecf48e9aece722694a82182cb618cc82b588816349
