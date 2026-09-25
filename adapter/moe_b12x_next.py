@@ -42,8 +42,9 @@ of plans, so the M -> plan mapping is rank-invariant. Race buffers are released 
 Knobs: DSV41_MOE_B12X_NEXT_TUNE (1), _TUNE_ROWS ("6:6,3:5" top-k:rows raced), _GRAPH_BS
 ("1,2,3,4,5,6,7,8,10,12,14,16"), _LADDER ("128,256,512,1024,2048,4096"), _CACHE_ONLY (0),
 _WARM (1: run every plan once at load), _DETERMINISTIC (0; EP1 only, b12x rejects it at N=1152;
-the <= 8 row plan then uses the internal route planner, the Triton one refuses deterministic output,
-and nothing is raced: b12x's race cannot compile the deterministic top-k sum kernel),
+nothing is raced: b12x's race cannot compile the deterministic top-k sum kernel), _DET_TRITON (1:
+under _DETERMINISTIC the pinned plans keep the Triton route planner, which needs the runtime patch
+scripts/b12x_next-det-triton-planner.patch, else internal with a warning; 0: internal planner),
 _MEMSTATS (0: 1 logs load-time peak transients, resetting torch's peak counters),
 _SMALL_PLAN ("triton:48:16": route planner, max active clusters, tile rows of the dynamic plan pinned
 at <= 8 rows for compact N64), _PLAN_TABLE ("1-8=<_SMALL_PLAN>": per-capacity compact-N64 plans,
@@ -54,6 +55,16 @@ warning),
 _DIRECT_IDS (1: at EP_SIZE=1 the router's int32 ids / fp32 weights go straight to b12x, no remap
 kernel; b12x skips ids outside [0, E), so CUDA-graph padding rows (-1) contribute nothing and their
 output rows are 0. Off, or at EP>1, or with other dtypes / _DETERMINISTIC, the remap kernel runs).
+
+Pre-quantized input (prefill sequence parallel, DSV41_PREFILL_SP_FP8_MOE=1; needs the runtime patch
+scripts/b12x_next-prequant-input.patch): at prefill capacities b12x's front-end stores one MXFP8 row
+per token (E4M3 [token, K], UE8M0 [token, K/32]) in the plan's packed_input / packed_input_scale
+and the FC1 phase reads it from there. ``prequant_views(layer, M)`` returns those two views, the
+caller writes the rows (an all-gather of per-shard MXFP8 rows), and a dispatch carrying
+``hidden_states_pre_quant`` with the ``_dsv41_b12x_rows`` marker launches the front-end variant
+that skips its own quantization. Same bytes -> same FC1/FC2 inputs; whether the caller's quantizer
+gives b12x's bytes is prefill_sp's runtime check, not assumed here. The variant is compiled at load
+for the prefill capacities of the top-k _PREQUANT_TOPK (6) geometry when prefill SP FP8-MoE is on.
 """
 import bisect
 import dataclasses
@@ -92,6 +103,14 @@ MEMSTATS = _env("DSV41_MOE_B12X_NEXT_MEMSTATS", "0") not in ("0", "off", "false"
 # 1 = EP1 skips the ep_remap launch (3 us/layer): b12x's dynamic/micro kernels and the triton route
 # planner all bounds-check expert ids, so -1 padding needs no rewrite (verified: numerics_noremap.py).
 DIRECT_IDS = _env("DSV41_MOE_B12X_NEXT_DIRECT_IDS", "1") not in ("0", "off", "false", "")
+# Pre-quantized prefill input (see the docstring). Warm (compile at load) only when prefill SP will
+# use it; the capacities from the SP row floor up.
+_ON = ("1", "on", "true")
+PREQUANT_WARM = (_env("DSV41_PREFILL_SP_FP8_MOE", "0").lower() in _ON
+                 and _env("DSV41_PREFILL_SP", "0").lower() in _ON + ("shard",))
+PREQUANT_MIN_ROWS = int(_env("DSV41_PREFILL_SP_MIN_ROWS", "2048") or 2048)
+PREQUANT_TOPK = int(_env("DSV41_MOE_B12X_NEXT_PREQUANT_TOPK", "6") or 6)
+PREQUANT_STATS = {"calls": 0, "warm_caps": {}}
 
 
 def _peak_begin(dev):
@@ -119,7 +138,15 @@ M64_MIN_CAP = int(_env("DSV41_MOE_B12X_NEXT_M64_MIN_CAP", "2048") or 0)
 _SMALL_SPEC = _env("DSV41_MOE_B12X_NEXT_SMALL_PLAN", "triton:48:16")
 _SMALL = _SMALL_SPEC.split(":")
 SMALL_PLANNER, SMALL_MAC, SMALL_TILE = _SMALL[0], (int(_SMALL[1]) if _SMALL[1] != "none" else None), int(_SMALL[2])
-if DETERMINISTIC and SMALL_PLANNER == "triton":
+# 1 = keep the Triton route planner of the pinned small plans under DETERMINISTIC. Needs the runtime
+# patch scripts/b12x_next-det-triton-planner.patch (stock b12x refuses the combination); without it
+# _b12x() falls back to the internal planner. The planner only writes per-expert row counts, the tile
+# prefix and the barrier words (order-free integers), so the output is bit-identical to the internal
+# planner; it replaces 2 zero-fill launches + 2 grid barriers + the one-warp prefix scan of the
+# front-end with one 1-CTA Triton launch. Measured (diagnostics/dsv41-moe-launch): -3.5 us per call at
+# E=128, bit-identical on 9530 cases (M 1-8, 12-64, eager and graph).
+DET_TRITON = _env("DSV41_MOE_B12X_NEXT_DET_TRITON", "1") not in ("0", "off", "false", "")
+if DETERMINISTIC and SMALL_PLANNER == "triton" and not DET_TRITON:
     # b12x's Triton route planner refuses deterministic compact queries (_tuning validation)
     SMALL_PLANNER = "internal"
 
@@ -163,7 +190,20 @@ def parse_plan_table(text, deterministic):
 # M = 10..96 (target top-6) and 10..80 (draft top-3) no max_active_clusters / tile choice beat the
 # heuristic beyond noise; every candidate was bit-identical to it; the calls run at the ~214 GB/s MoE
 # read ceiling, so the per-call cost is set by the distinct experts' bytes, not the plan.
-PLAN_TABLE = parse_plan_table(_env("DSV41_MOE_B12X_NEXT_PLAN_TABLE", f"1-8={_SMALL_SPEC}"), DETERMINISTIC)
+_PLAN_TABLE_SPEC = _env("DSV41_MOE_B12X_NEXT_PLAN_TABLE", f"1-8={_SMALL_SPEC}")
+PLAN_TABLE = parse_plan_table(_PLAN_TABLE_SPEC, DETERMINISTIC and not DET_TRITON)
+
+
+def _det_triton_supported(fimpl):
+    """True when the b12x_next runtime admits the Triton route planner with deterministic output."""
+    try:
+        from b12x_next.moe.fused_moe import _tuning
+        gate = inspect.getsource(fimpl._dynamic_external_route_plan_supported)
+        val = inspect.getsource(_tuning.validate_moe_decode_config)
+    except Exception:  # noqa: BLE001
+        return False
+    return ("not deterministic_output" not in gate
+            and "_compact_w4a8_query(query) and not query.deterministic_output" not in val)
 
 
 def table_plan(cap, topk):
@@ -233,7 +273,17 @@ def _b12x():
             _die(f"b12x_next _FusedMoeState.bind drifted (missing {needle!r})")
     if "replace(state.bind(**kwargs), plan=plan)" not in inspect.getsource(fapi.bind):
         _die("b12x_next fused_moe.bind drifted")
-    _B.update(fm=fm, prep=prep, pkg=b12x_next)
+    try:        # the prequant-input runtime patch (optional: without it prefill SP keeps bf16 gathers)
+        from b12x_next.moe.fused_moe import _impl as fimpl
+    except ImportError:
+        fimpl = None
+    if DETERMINISTIC and DET_TRITON and not _det_triton_supported(fimpl):
+        global PLAN_TABLE
+        PLAN_TABLE = parse_plan_table(_PLAN_TABLE_SPEC, True)
+        print(f"{_TAG} WARNING: DSV41_MOE_B12X_NEXT_DET_TRITON=1 but this b12x_next lacks the "
+              f"det-triton-planner patch; deterministic plans use the internal planner", flush=True)
+    _B.update(fm=fm, prep=prep, pkg=b12x_next,
+              impl=fimpl if callable(getattr(fimpl, "prequantized_input", None)) else None)
     _state["b12x_ready"] = True
     return _B
 
@@ -361,6 +411,8 @@ class _Geometry:
         self.w_buf = None
         self.ready = False
         self.report = {}
+        self.impl0 = None           # any layer's prepared experts (binding views do not depend on it)
+        self.pq_views = {}          # capacity -> (packed_input [rows, K] u8, packed_input_scale flat u8)
 
     def capacities(self):
         rows = sorted({r * b for r in (BLOCK, BLOCK + 1) for b in GRAPH_BS})
@@ -452,9 +504,12 @@ class _Geometry:
         self.ids_buf = torch.empty(self.chunk, self.topk, dtype=torch.int32, device=dev)
         self.w_buf = torch.empty(self.chunk, self.topk, dtype=torch.float32, device=dev)
         self.ready = True
+        self.impl0 = experts._impl
         t_prep = time.time() - t0
         if WARM:
             self._warm(experts)
+        if PREQUANT_WARM and self.topk == PREQUANT_TOPK:
+            self._warm_prequant(experts)
         peak = _peak_mb(dev, base)
         torch.cuda.empty_cache()
         persistent = self.arena.numel() + self.ids_buf.numel() * 8
@@ -505,6 +560,110 @@ class _Geometry:
             ep_remap(ids[:m], w[:m], self.ids_buf[:m], self.w_buf[:m], 0, self.E)
         torch.cuda.synchronize(self.device)
         del x, out, ids, w
+
+    # ---------------------------------------------------------------------------------------
+    # pre-quantized input (prefill SP)
+    # ---------------------------------------------------------------------------------------
+    def prequant_caps(self, min_rows):
+        """Capacities a pre-quantized batch of min_rows .. chunk rows can land on."""
+        if not self.ready or min_rows > self.chunk:
+            return []
+        return sorted({self.cap_for(min_rows)} | {c for c in self.caps if c >= min_rows})
+
+    def prequant_views(self, m):
+        """(q [m, K] uint8, scales [m, K/32] uint8): where the front-end of the plan that runs m
+        rows reads its MXFP8 input rows. None when m needs more than one launch, the runtime lacks
+        the pre-quantized patch, or the plan does not expose token-major input storage."""
+        if _B.get("impl") is None or not self.ready or not 1 <= m <= self.chunk:
+            return None
+        cap = self.cap_for(m)
+        v = self.pq_views.get(cap)
+        if v is None:
+            v = self.pq_views[cap] = self._bind_views(cap)
+        if v is False:
+            return None
+        pin, psc = v
+        kb = self.K // 32
+        return pin[:m], psc[: m * kb].view(m, kb)
+
+    def _bind_views(self, cap):
+        e = self.plans[cap]
+        st = e.state
+        dev = self.device
+        a = torch.empty((1, self.K), dtype=torch.bfloat16, device=dev)
+        ids = torch.zeros((1, self.topk), dtype=torch.int32, device=dev)
+        w = torch.zeros((1, self.topk), dtype=torch.float32, device=dev)
+        out = torch.empty((1, self.K), dtype=torch.bfloat16, device=dev)
+        kw = dict(scratch=e.views, a=a, topk_ids=ids, topk_weights=w, output=out,
+                  fast_math=st.scratch.caps.w4a16_fast_math, experts=self.impl0, unit_scale_contract=False)
+        if st.w4a16_launches is not None:
+            kw["_w4a16_launches"] = st.w4a16_launches
+        try:
+            b = st.scratch.bind(**kw)
+            pin, psc = getattr(b, "packed_input", None), getattr(b, "packed_input_scale", None)
+            kb = self.K // 32
+            ok = (isinstance(pin, torch.Tensor) and isinstance(psc, torch.Tensor)
+                  and pin.dtype == torch.uint8 and psc.dtype == torch.uint8
+                  and pin.dim() == 3 and pin.shape[0] == 1 and pin.shape[1] >= cap and pin.shape[2] == self.K
+                  and pin.is_contiguous() and psc.is_contiguous() and psc.numel() >= cap * kb)
+        except Exception as exc:  # noqa: BLE001
+            print(f"{_TAG} WARNING: capacity {cap}: cannot bind the pre-quantized input views ({exc!r})",
+                  flush=True)
+            return False
+        if not ok:
+            print(f"{_TAG} WARNING: capacity {cap}: packed_input {getattr(pin, 'shape', None)} / scale "
+                  f"{getattr(psc, 'shape', None)} are not token-major MXFP8 storage; no pre-quantized "
+                  f"input at this capacity", flush=True)
+            return False
+        return pin[0], psc.view(-1)
+
+    def forward_prequant(self, impl, m, topk_ids, topk_weights, out):
+        """Routed MoE of m rows whose MXFP8 input is already in prequant_views(m)."""
+        if _B.get("impl") is None:
+            raise RuntimeError("DSV41_MOE_B12X_NEXT: pre-quantized input needs the patched b12x_next runtime")
+        if not 1 <= m <= self.chunk:
+            raise RuntimeError(f"DSV41_MOE_B12X_NEXT: pre-quantized input of {m} rows (one launch holds "
+                               f"<= {self.chunk})")
+        direct = (self.direct and topk_ids.dtype == torch.int32 and topk_weights.dtype == torch.float32
+                  and topk_ids.is_contiguous() and topk_weights.is_contiguous())
+        if direct:
+            ids, w = topk_ids, topk_weights
+        else:
+            ids, w = self.ids_buf[:m], self.w_buf[:m]
+            ep_remap(topk_ids, topk_weights, ids, w, self.offset, self.E)
+        # [m, K] bf16 shape carrier: the pre-quantized front-end never reads it (no kernel, no bytes)
+        a = torch.empty((m, self.K), dtype=torch.bfloat16, device=self.device)
+        with _B["impl"].prequantized_input():
+            self._run(self.cap_for(m), a, ids, w, out, impl)
+        PREQUANT_STATS["calls"] += 1
+        return out
+
+    def _warm_prequant(self, experts):
+        """Compile the pre-quantized front-end variant of every prefill capacity at load."""
+        if _B.get("impl") is None:
+            print(f"{_TAG} WARNING: DSV41_PREFILL_SP_FP8_MOE=1 but b12x_next lacks the prequant-input "
+                  f"patch; prefill SP keeps the bf16 MoE gather", flush=True)
+            return
+        t0 = time.time()
+        done = []
+        for cap in self.prequant_caps(PREQUANT_MIN_ROWS):
+            v = self.prequant_views(cap)
+            if v is None:
+                continue
+            q, sf = v
+            q.zero_()
+            sf.zero_()
+            ids = torch.zeros((cap, self.topk), dtype=torch.int32, device=self.device)
+            w = torch.zeros((cap, self.topk), dtype=torch.float32, device=self.device)
+            out = torch.empty((cap, self.K), dtype=torch.bfloat16, device=self.device)
+            self.forward_prequant(experts._impl, cap, ids, w, out)
+            done.append(cap)
+            del ids, w, out
+        torch.cuda.synchronize(self.device)
+        PREQUANT_STATS["calls"] = 0
+        PREQUANT_STATS["warm_caps"][self.key] = done
+        print(f"{_TAG} pre-quantized prefill input ready at capacities {done} "
+              f"({time.time() - t0:.1f} s, E={self.E} top-k {self.topk})", flush=True)
 
     def _run(self, cap, x, ids, w, out, impl):
         if x.shape[0] > cap:
@@ -654,7 +813,7 @@ def install_method(module):
     print(f"{_TAG} armed: routed MoE on b12x_next {PINNED_COMMIT[:8]} (W4A8, in-place repack); "
           f"graph bs {GRAPH_BS}, rows {BLOCK}/{BLOCK + 1}, ladder {LADDER}, tune={TUNE}", flush=True)
     if DETERMINISTIC:
-        print(f"{_TAG} deterministic reduction: plan table {PLAN_TABLE} (triton planner -> internal), no "
+        print(f"{_TAG} deterministic reduction: plan table {PLAN_TABLE} (det_triton={DET_TRITON}), no "
               f"autotune race (heuristic plans elsewhere)", flush=True)
     rows = uncovered_rows()
     if rows:
@@ -790,9 +949,35 @@ def _fused_b12x_next(dispatch_output, quant_info, runner_config):
     if _ENG["TopKOutputChecker"].format_is_bypassed(topk):
         topk = topk.to_standard()
     out = _alloc_out(x.shape[0], x.shape[1], x.device)
+    pre = getattr(dispatch_output, "hidden_states_pre_quant", None)
+    rows = getattr(pre, "_dsv41_b12x_rows", None) if pre is not None else None
+    if rows is not None:
+        # prefill SP wrote this chunk's MXFP8 rows into the plan's input storage; x is a
+        # shape-only placeholder. Any mismatch would compute on stale bytes: refuse.
+        m = x.shape[0]
+        views = st.geom.prequant_views(m)
+        if (views is None or rows[0] is not st.geom or rows[1] != m
+                or rows[2] != views[0].data_ptr() or rows[3] != views[1].data_ptr()):
+            raise RuntimeError(f"DSV41_MOE_B12X_NEXT: pre-quantized input marker {rows[1:]} does not "
+                               f"match this layer's plan for {m} rows")
+        st.geom.forward_prequant(st.impl, m, topk.topk_ids, topk.topk_weights, out)
+        return _ENG["StandardCombineInput"](hidden_states=out)
     if x.shape[0]:
         st.geom.forward(st.impl, x, topk.topk_ids, topk.topk_weights, out)
     return _ENG["StandardCombineInput"](hidden_states=out)
+
+
+def prequant_target(layer, m):
+    """For prefill SP: (marker, q [m, K] u8, scales [m, K/32] u8) of FusedMoE ``layer`` (the
+    DeepseekV2MoE's ``experts``) when its routed MoE can take m pre-quantized rows, else None."""
+    st = getattr(layer, "_dsv41_b12x_next", None)
+    if st is None or not ENABLED:
+        return None
+    views = st.geom.prequant_views(m)
+    if views is None:
+        return None
+    q, sf = views
+    return (st.geom, m, q.data_ptr(), sf.data_ptr()), q, sf
 
 
 def geometry_reports():

@@ -12,6 +12,8 @@ tensors, and are left alone.
 import os
 
 ENABLED = os.environ.get("DSV41_FOLDED_FENCE", "0").strip() not in ("0", "", "off", "false")
+_GLUE = "fence" in os.environ.get("DSV41_EAGER_GLUE", "") or os.environ.get("DSV41_EAGER_GLUE", "").strip().lower() in (
+    "1", "on", "true", "all")
 FIELDS = ("correct_len", "bonus", "cap_trim_lens", "commit_lens", "new_seq_lens", "out_tokens")
 
 
@@ -32,6 +34,12 @@ def install(module):
         outs = orig(self, *a, **kw)
         if not kw.get("folded_accept", False):
             return outs
+        if _GLUE:
+            # DSV41_EAGER_GLUE=fence (adapter/eager_glue.py): the six copies in one kernel
+            from eager_glue import fused_clone
+            fresh = fused_clone([getattr(outs, f) for f in FIELDS])
+            if fresh is not None:
+                return outs_cls(**dict(zip(FIELDS, fresh)))
         return outs_cls(**{f: getattr(outs, f).clone() for f in FIELDS})
 
     cls.accept_and_finalize = accept_and_finalize

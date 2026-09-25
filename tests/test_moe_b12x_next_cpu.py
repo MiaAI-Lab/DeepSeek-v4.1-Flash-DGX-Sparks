@@ -10,8 +10,10 @@
   65536 plan is dropped, the chunk is 4096, and ``forward`` never hands a plan more rows than its
   capacity for any M up to 140k; ``_run`` refuses an oversized batch.
 - CUDA_GRAPH_MAX_BS_DECODE above the adapter's graph list names the uncovered row counts.
-- DSV41_MOE_B12X_NEXT_DETERMINISTIC=1 moves the <= 8 row plan to the internal route planner and
-  races nothing.
+- DSV41_MOE_B12X_NEXT_DETERMINISTIC=1 races nothing. With DSV41_MOE_B12X_NEXT_DET_TRITON=0 it moves
+  the <= 8 row plan to the internal route planner; by default (DET_TRITON=1) the pinned plan keeps the
+  Triton route planner, and ``_b12x()`` falls back to internal (with a WARNING) when the runtime lacks
+  scripts/b12x_next-det-triton-planner.patch (probed on fake patched / stock / absent sources).
 
 usage: python3 tests/test_moe_b12x_next_cpu.py   (needs torch; runs each scenario in a subprocess)
 """
@@ -91,8 +93,38 @@ FAKE_FILES = {
         """),
 }
 
-def make_tree(root, commit, drift=False):
-    for rel, text in FAKE_FILES.items():
+# det-triton probe targets (moe_b12x_next._det_triton_supported reads these two functions' source)
+DET_SOURCES = {
+    "patched": {
+        "b12x_next/moe/fused_moe/_impl.py": textwrap.dedent("""\
+            def _dynamic_external_route_plan_supported(*, deterministic_output, dynamic_route_mode):
+                return bool(dynamic_route_mode == "grouped")
+            """),
+        "b12x_next/moe/fused_moe/_tuning.py": textwrap.dedent("""\
+            def _compact_w4a8_query(query):
+                return True
+            def validate_moe_decode_config(config, query):
+                return _compact_w4a8_query(query)
+            """),
+    },
+    "stock": {
+        "b12x_next/moe/fused_moe/_impl.py": textwrap.dedent("""\
+            def _dynamic_external_route_plan_supported(*, deterministic_output, dynamic_route_mode):
+                return bool(dynamic_route_mode == "grouped"
+                            and not deterministic_output)
+            """),
+        "b12x_next/moe/fused_moe/_tuning.py": textwrap.dedent("""\
+            def _compact_w4a8_query(query):
+                return True
+            def validate_moe_decode_config(config, query):
+                return _compact_w4a8_query(query) and not query.deterministic_output
+            """),
+    },
+}
+
+
+def make_tree(root, commit, drift=False, det=None):
+    for rel, text in {**FAKE_FILES, **DET_SOURCES.get(det, {})}.items():
         path = os.path.join(root, rel)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         if drift and rel.endswith("_preparation.py"):
@@ -254,11 +286,13 @@ def check_graph_bs_and_planner():
     assert r["rows"] == [] and r["bs"] == [1, 2, 3, 4, 5, 6, 7, 8], r
     d = graph({})
     assert d["planner"] == "triton" and d["tuned"] == [6 * b for b in d["bs"]], d
-    det = graph({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1"})
+    det = graph({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1", "DSV41_MOE_B12X_NEXT_DET_TRITON": "0"})
     assert det["planner"] == "internal" and det["tuned"] == [], det
+    det = graph({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1"})     # DET_TRITON default 1
+    assert det["planner"] == "triton" and det["tuned"] == [], det
     assert graph({"DSV41_MOE_B12X_NEXT_SMALL_PLAN": "internal:none:16"})["planner"] == "internal"
     print(f"graph bs: CUDA_GRAPH_MAX_BS_DECODE=32 names {len(want)} uncovered row counts ({want[0]}..{want[-1]}), "
-          f"none at 16 or with a covering list; DETERMINISTIC=1 -> internal route planner, no race")
+          f"none at 16 or with a covering list; DETERMINISTIC=1: no race, triton planner kept (DET_TRITON=0 -> internal)")
 
 
 TABLE = """
@@ -276,10 +310,12 @@ def table(env):
 def check_plan_table():
     d = table({})
     assert d["p6"] == [["triton", 48, 16]] * 3 + [None] * 3 and d["p3"] == [["triton", 48, 16], None, None], d
-    det = table({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1"})
+    det = table({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1", "DSV41_MOE_B12X_NEXT_DET_TRITON": "0"})
     assert det["p6"][:3] == [["internal", 48, 16]] * 3 and det["p6"][3:] == [None] * 3, det
+    det = table({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1"})
+    assert det["p6"] == d["p6"] and det["p3"] == d["p3"], det
     assert table({"DSV41_MOE_B12X_NEXT_SMALL_PLAN": "internal:none:16"})["p6"][0] == ["internal", None, 16]
-    t = table({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1",
+    t = table({"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1", "DSV41_MOE_B12X_NEXT_DET_TRITON": "0",
                "DSV41_MOE_B12X_NEXT_PLAN_TABLE": "1-8=triton:48:16, 40-80@k3=internal:32:16, 96=heur, 9-96=internal:none:16"})
     assert t["p6"] == [["internal", 48, 16]] * 3 + [["internal", None, 16], None, None], t
     assert t["p3"] == [["internal", 48, 16], ["internal", 32, 16], ["internal", 32, 16]], t
@@ -290,7 +326,34 @@ def check_plan_table():
         except AssertionError as exc:
             assert "DSV41_MOE_B12X_NEXT_PLAN_TABLE: bad" in str(exc), (bad, str(exc)[-300:])
     print("plan table: default = <= 8 row pin only (unchanged plans), SMALL_PLAN still honoured, top-k scoping, "
-          "first match wins, heur entries, deterministic triton -> internal, malformed entries refuse to load")
+          "first match wins, heur entries, deterministic triton kept (DET_TRITON=0 -> internal), malformed entries "
+          "refuse to load")
+
+
+PROBE = """
+import moe_b12x_next as ad
+before = [ad.table_plan(c, 6) for c in (1, 8, 9)]
+ad._b12x()
+print("RESULT " + __import__("json").dumps(dict(before=before, after=[ad.table_plan(c, 6) for c in (1, 8, 9)],
+                                                p3=ad.table_plan(5, 3))))
+"""
+
+
+def check_det_triton_probe():
+    pinned = run("import moe_b12x_next as ad; print(ad.PINNED_COMMIT)").strip()
+    tri, intl = [["triton", 48, 16]] * 2 + [None], [["internal", 48, 16]] * 2 + [None]
+    det = {"DSV41_MOE_B12X_NEXT_DETERMINISTIC": "1"}
+    for kind, env, want, warn in (("patched", det, tri, False), ("stock", det, intl, True),
+                                  (None, det, intl, True), ("stock", {}, tri, False),
+                                  ("patched", dict(det, DSV41_MOE_B12X_NEXT_DET_TRITON="0"), intl, False)):
+        with tempfile.TemporaryDirectory() as tree:
+            make_tree(tree, pinned, det=kind)
+            out = run(PROBE, env=env, path=tree)
+            res = json.loads(out.split("RESULT ", 1)[1])
+            assert res["after"] == want and res["p3"] == want[0], (kind, env, res)
+            assert ("lacks the det-triton-planner patch" in out) == warn, (kind, env, out[-500:])
+    print("det-triton probe: patched runtime keeps the triton planner under DETERMINISTIC; stock / absent "
+          "sources fall back to internal with a WARNING; non-deterministic and DET_TRITON=0 unaffected")
 
 
 def main():
@@ -299,6 +362,7 @@ def main():
     check_chunk_selection()
     check_graph_bs_and_planner()
     check_plan_table()
+    check_det_triton_probe()
     print("moe_b12x_next CPU OK")
 
 

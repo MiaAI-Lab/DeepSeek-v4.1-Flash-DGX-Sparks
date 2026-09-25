@@ -24,6 +24,12 @@ class EngramLoader(importlib.abc.Loader):
             # hasher. Gated on DSV41_ENGRAM_PREFETCH, inactive by default.
             from engram_prefetch import install as install_engram_prefetch
             install_engram_prefetch(module)
+            # After engram_prefetch: the row join forks an L2 prefetch of the engram.wkv slice.
+            # Gated on DSV41_L2_PREFETCH + DSV41_L2_PREFETCH_ENGRAM (adapter/l2_prefetch.py).
+            if (os.environ.get('DSV41_L2_PREFETCH', '0').strip() not in ('0', 'off', 'false', '')
+                    and os.environ.get('DSV41_L2_PREFETCH_ENGRAM', '0').strip() not in ('0', 'off', 'false', '')):
+                from l2_prefetch import install_engram as install_l2_prefetch_engram
+                install_l2_prefetch_engram(module)
         elif module.__name__ == 'sglang.srt.model_loader.utils':
             if os.environ.get('DSV41_SERIAL_WEIGHT_LOAD', '0') == '1':
                 # On GB10 the CPU shard pages and CUDA allocations share RAM.
@@ -132,17 +138,38 @@ class EngramLoader(importlib.abc.Loader):
                 else:
                     from draft_head_fp8 import install as install_draft_head_fp8
                 install_draft_head_fp8(module)
+            # Gated on DSV41_L2_PREFETCH + DSV41_L2_PREFETCH_DRAFT: the draft forward is bracketed
+            # like the target's, so its collectives prefetch the next stage's weights.
+            if (os.environ.get('DSV41_L2_PREFETCH', '0').strip() not in ('0', 'off', 'false', '')
+                    and os.environ.get('DSV41_L2_PREFETCH_DRAFT', '0').strip() not in ('0', 'off', 'false', '')):
+                from l2_prefetch import install_draft as install_l2_prefetch_draft
+                install_l2_prefetch_draft(module)
         elif module.__name__ == 'sglang.srt.speculative.dspark_components.dspark_draft_sampler':
+            # Gated on DSV41_SPEC_SYNC_FREE: rank-invariant draft noise, per-step rank-0 broadcasts
+            # dropped / merged / audited (adapter/spec_sync_free.py). Gate checked BEFORE the import.
+            if os.environ.get('DSV41_SPEC_SYNC_FREE', '').strip() not in ('', '0', 'off', 'false'):
+                from spec_sync_free import install_sampler as install_spec_sync_free_sampler
+                install_spec_sync_free_sampler(module)
             # Gated on DSV41_DRAFT_TAU (unset or 1 = off): draft proposal temperature.
             if os.environ.get('DSV41_DRAFT_TAU', '1').strip() not in ('', '1', '1.0'):
                 from draft_tau import install as install_draft_tau
                 install_draft_tau(module)
+            # Gated on DSV41_EAGER_GLUE (adapter/eager_glue.py): stage / vcap. After draft_tau and
+            # spec_sync_free: its stage cache must be the outermost stage_sampling_params.
+            if os.environ.get('DSV41_EAGER_GLUE', '').strip() not in ('', '0', 'off', 'false'):
+                from eager_glue import install_sampler as install_eager_glue_sampler
+                install_eager_glue_sampler(module)
         elif module.__name__ == 'sglang.kernels.ops.speculative.dspark.dspark_accept':
             # Gated on DSV41_BLOCK_VERIFY: block verification for sampled rows (lossless).
             if os.environ.get('DSV41_BLOCK_VERIFY', '0').strip() not in ('0', 'off', 'false', ''):
                 from block_verify import install as install_block_verify
                 install_block_verify(module)
         elif module.__name__ == 'sglang.srt.speculative.dspark_components.dspark_verify':
+            # Gated on DSV41_SPEC_SYNC_FREE (adapter/spec_sync_free.py). First in this branch: its
+            # merge mode checks the engine's own DsparkVerifyEpilogue._accept source.
+            if os.environ.get('DSV41_SPEC_SYNC_FREE', '').strip() not in ('', '0', 'off', 'false'):
+                from spec_sync_free import install_verify as install_spec_sync_free_verify
+                install_spec_sync_free_verify(module)
             # Gated on DSV41_FOLDED_FENCE: folded results cloned off the persistent verify buffers
             # (sglang#40919 race under overlap scheduling).
             if os.environ.get('DSV41_FOLDED_FENCE', '0').strip() not in ('0', 'off', 'false', ''):
@@ -160,6 +187,9 @@ class EngramLoader(importlib.abc.Loader):
             if os.environ.get('DSV41_VERIFY_CAP', '').strip() not in ('', '0', 'off'):
                 from verify_cap import install_draft as install_verify_cap_draft
                 install_verify_cap_draft(module)
+            if os.environ.get('DSV41_EAGER_GLUE', '').strip() not in ('', '0', 'off', 'false'):
+                from eager_glue import install_draft as install_eager_glue_draft
+                install_eager_glue_draft(module)
         elif module.__name__ == 'sglang.srt.speculative.dspark_components.dspark_planner':
             if os.environ.get('DSV41_VERIFY_CAP', '').strip() not in ('', '0', 'off'):
                 from verify_cap import install_planner as install_verify_cap_planner

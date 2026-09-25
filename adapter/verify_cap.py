@@ -76,6 +76,11 @@ def set_live_from_confidence(confidence, bs):
         thr = _state["thr_t"]
     k = (cum >= thr).to(torch.int64).cumprod(dim=1).sum(dim=1).clamp(min=_state["kmin"], max=STRIDE - 1)
     buf[:bs].copy_(k + 1)
+    share_live(buf, bs)
+
+
+def share_live(buf, bs):
+    """Rank 0's live lengths to every rank (also called by adapter/eager_glue.py's fused update)."""
     # Rank-invariant by construction: the head's input comes out of an all-reduce that may differ
     # in the last bits between ranks, and a live length that differs across ranks would give one
     # verify row two expert sets. Rank 0 decides, as for the engine's own accept (SpecTpSync).
@@ -84,7 +89,12 @@ def set_live_from_confidence(confidence, bs):
         from sglang.srt.distributed import get_tp_group
         group = _state["tp_group"] = get_tp_group()
     if group.world_size > 1:
-        group.broadcast(buf[:bs], src=0)
+        if os.environ.get("DSV41_SPEC_SYNC_FREE", "").strip() not in ("", "0", "off", "false"):
+            # adapter/spec_sync_free.py: skipped with its vcap token, counted in audit mode
+            from spec_sync_free import tp_broadcast
+            tp_broadcast(group, buf[:bs], "vcap")
+        else:
+            group.broadcast(buf[:bs], src=0)
 
 
 def _src_rows(m, device):
