@@ -1056,6 +1056,18 @@ shift || true
 cmd_pack() {
   local src
   src=$(model_src)
+  # `stop` can take the NFS exporter down with the engine; a worker's docker
+  # volume then fails to mount (`mount :/`) and the pack dies on the first
+  # worker after the head has already spent its ~10 minutes. Do what cmd_serve
+  # does: re-share when any worker cannot see the checkpoint, before packing.
+  local h need_share=0
+  for h in "${WORKER_HOSTS[@]}"; do
+    nfs_worker_has_model "$h" || need_share=1
+  done
+  if [[ "$need_share" -eq 1 ]]; then
+    info "a worker cannot see the checkpoint over NFS — running share first"
+    cmd_share
+  fi
   info "packing Engram shards: head $ENGRAM_DIR, workers $WORKER_ENGRAM_DIR"
   mkdir -p "$ENGRAM_DIR"
   docker run --rm --network host \
