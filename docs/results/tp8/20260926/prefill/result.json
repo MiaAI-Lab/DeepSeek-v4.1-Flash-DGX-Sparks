@@ -1,0 +1,305 @@
+{
+  "status": "PASS",
+  "label": "prefill",
+  "started": "2026-09-26T15:12:22.424Z",
+  "source": {
+    "repo": "https://github.com/MiaAI-Lab/sparkDash",
+    "commit": "754f40a7454fed1d26d47d1d68dd7bef930ce5ca",
+    "files_sha256": {
+      "server/collectors/DecodeBench.js": "65fc472092b6c577f05efe7498c938d5522a784a5762480f71d17abe47a3f8ea",
+      "server/collectors/PrefillBench.js": "6b14c4eb3fb510806024c4a6ccb01d5c4e011014ebc40919a306a1519f1d67d4",
+      "server/collectors/LlmStreaming.js": "77e117688dc67c4405188795aedab25d4a7ecea124c1974c8f5f1393e554b0cb",
+      "server/util/atomicWrite.js": "e4caf1065209d085561fa28a91e6af6c29857f40f8809b3554869e3815d28654",
+      "src/shared/llmPrompts.js": "f930fcfa13a041fcfe1ff6cfbf882f2c946293dc1ac29aba9f3768fd1ad327aa",
+      "src/shared/llmTarget.js": "74913ffd206454f31743d8bba76892f12d1204eae21055173bdde3796c793443",
+      "src/shared/prefillBench.js": "2b1c076c92ff491892f414fa733eb9c180914bee75b9ce6df2203a698654207f",
+      "LICENSE": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685"
+    },
+    "unchanged_upstream_files": true,
+    "source_version_is_known_tweet_version": false,
+    "release": "1.8.8"
+  },
+  "node": "v22.23.2",
+  "config": {
+    "base": "http://127.0.0.1:8000/v1",
+    "out": "/r/prefill",
+    "label": "prefill",
+    "trials": "1",
+    "prefill-only": true,
+    "sizes": "4096,16384,32768,65536,131072,262144",
+    "model": "deepseek-v41-flash",
+    "levels": "1,2,3,4,6,8",
+    "decode-only": false,
+    "prompt-type": "prose",
+    "extended-concurrency": false
+  },
+  "prefill": [
+    {
+      "trial": 1,
+      "targetTokens": 4096,
+      "salt": "b37140af-9213-4665-a867-148a20484f5f",
+      "promptChars": 16383,
+      "promptSha256": "89803afe4ad3ff2bb177edd20e2eb2c8a0a72e8fb48d057f360a515f314a8ff7",
+      "request": {
+        "ttftMs": 1514.76,
+        "ttftContentMs": 1514.76,
+        "reasoningChunks": 0,
+        "decodeMs": 0,
+        "completionTokens": 2,
+        "decodeTokens": 1,
+        "decodeTps": 0,
+        "prefillTokens": 4112,
+        "prefillTps": 2714.63,
+        "totalMs": 1542.95,
+        "t0": 368.210892,
+        "tFirst": 1882.967888,
+        "tLast": 1882.967888,
+        "model": "deepseek-v41-flash",
+        "error": null,
+        "httpStatus": 200,
+        "responseHeaders": {
+          "content-type": "text/event-stream; charset=utf-8",
+          "date": "Sat, 26 Sep 2026 15:12:21 GMT",
+          "server": "uvicorn"
+        },
+        "completionId": "37b6f673afe34bc9875ca83386e8e48e",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 4112,
+          "completionTokens": 2,
+          "totalTokens": 4114
+        },
+        "sseEventCount": 4,
+        "firstSseDataPreview": "{\"id\":\"37b6f673afe34bc9875ca83386e8e48e\",\"object\":\"chat.completion.chunk\",\"created\":1790435544,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+        "contentPreview": {
+          "first": "OK",
+          "last": "OK",
+          "chars": 2
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "targetTokens": 16384,
+      "salt": "d201d9cc-d08f-41f9-ae7b-228eead6c5b9",
+      "promptChars": 65535,
+      "promptSha256": "c4714d7e608dcbd5996c29b61b8cfe855242b868267d61ef2955f8187b083bad",
+      "request": {
+        "ttftMs": 2653.64,
+        "ttftContentMs": 2653.64,
+        "reasoningChunks": 0,
+        "decodeMs": 0,
+        "completionTokens": 2,
+        "decodeTokens": 1,
+        "decodeTps": 0,
+        "prefillTokens": 16405,
+        "prefillTps": 6182.06,
+        "totalMs": 2693.92,
+        "t0": 1912.466786,
+        "tFirst": 4566.111309,
+        "tLast": 4566.111309,
+        "model": "deepseek-v41-flash",
+        "error": null,
+        "httpStatus": 200,
+        "responseHeaders": {
+          "content-type": "text/event-stream; charset=utf-8",
+          "date": "Sat, 26 Sep 2026 15:12:23 GMT",
+          "server": "uvicorn"
+        },
+        "completionId": "9b32c9d690c7453f936b15236bfdc20a",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 16405,
+          "completionTokens": 2,
+          "totalTokens": 16407
+        },
+        "sseEventCount": 4,
+        "firstSseDataPreview": "{\"id\":\"9b32c9d690c7453f936b15236bfdc20a\",\"object\":\"chat.completion.chunk\",\"created\":1790435546,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+        "contentPreview": {
+          "first": "OK",
+          "last": "OK",
+          "chars": 2
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "targetTokens": 32768,
+      "salt": "e721cddb-400f-447d-9bba-3e37b90d353d",
+      "promptChars": 131071,
+      "promptSha256": "2b9f639bd815b6e3d57c14005e4c1f8f61ba218649ac83393fae6593a6c90387",
+      "request": {
+        "ttftMs": 5271.84,
+        "ttftContentMs": 5271.84,
+        "reasoningChunks": 0,
+        "decodeMs": 0,
+        "completionTokens": 2,
+        "decodeTokens": 1,
+        "decodeTps": 0,
+        "prefillTokens": 32786,
+        "prefillTps": 6219.08,
+        "totalMs": 5303.1,
+        "t0": 4607.19984,
+        "tFirst": 9879.043737,
+        "tLast": 9879.043737,
+        "model": "deepseek-v41-flash",
+        "error": null,
+        "httpStatus": 200,
+        "responseHeaders": {
+          "content-type": "text/event-stream; charset=utf-8",
+          "date": "Sat, 26 Sep 2026 15:12:26 GMT",
+          "server": "uvicorn"
+        },
+        "completionId": "5b5540d018d948d0808e00c24989151d",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 32786,
+          "completionTokens": 2,
+          "totalTokens": 32788
+        },
+        "sseEventCount": 4,
+        "firstSseDataPreview": "{\"id\":\"5b5540d018d948d0808e00c24989151d\",\"object\":\"chat.completion.chunk\",\"created\":1790435552,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+        "contentPreview": {
+          "first": "OK",
+          "last": "OK",
+          "chars": 2
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "targetTokens": 65536,
+      "salt": "457aa1e4-8cd6-447a-837d-76207588e219",
+      "promptChars": 262143,
+      "promptSha256": "be939da1fd359726859495d8cb2064c4deb677237b3f3380391bb2150c1c6918",
+      "request": {
+        "ttftMs": 10769.09,
+        "ttftContentMs": 10769.09,
+        "reasoningChunks": 0,
+        "decodeMs": 0,
+        "completionTokens": 2,
+        "decodeTokens": 1,
+        "decodeTps": 0,
+        "prefillTokens": 65554,
+        "prefillTps": 6087.23,
+        "totalMs": 10799.31,
+        "t0": 9911.257147,
+        "tFirst": 20680.350604,
+        "tLast": 20680.350604,
+        "model": "deepseek-v41-flash",
+        "error": null,
+        "httpStatus": 200,
+        "responseHeaders": {
+          "content-type": "text/event-stream; charset=utf-8",
+          "date": "Sat, 26 Sep 2026 15:12:31 GMT",
+          "server": "uvicorn"
+        },
+        "completionId": "b383a89cf99f445aabd19b1d79fba4cf",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 65554,
+          "completionTokens": 2,
+          "totalTokens": 65556
+        },
+        "sseEventCount": 4,
+        "firstSseDataPreview": "{\"id\":\"b383a89cf99f445aabd19b1d79fba4cf\",\"object\":\"chat.completion.chunk\",\"created\":1790435563,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+        "contentPreview": {
+          "first": "OK",
+          "last": "OK",
+          "chars": 2
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "targetTokens": 131072,
+      "salt": "16d8062f-bba3-406f-b362-3b4323082e48",
+      "promptChars": 524287,
+      "promptSha256": "5fdd5e569dbb3a944b89b2dc42e21196a00d24092d3c417c5b68e1baa66b0f79",
+      "request": {
+        "ttftMs": 21351.84,
+        "ttftContentMs": 21351.84,
+        "reasoningChunks": 0,
+        "decodeMs": 0,
+        "completionTokens": 2,
+        "decodeTokens": 1,
+        "decodeTps": 0,
+        "prefillTokens": 131090,
+        "prefillTps": 6139.52,
+        "totalMs": 21377.46,
+        "t0": 20711.662174,
+        "tFirst": 42063.498269,
+        "tLast": 42063.498269,
+        "model": "deepseek-v41-flash",
+        "error": null,
+        "httpStatus": 200,
+        "responseHeaders": {
+          "content-type": "text/event-stream; charset=utf-8",
+          "date": "Sat, 26 Sep 2026 15:12:42 GMT",
+          "server": "uvicorn"
+        },
+        "completionId": "cf4f46c9b16a4eae9af630dd73a704ed",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 131090,
+          "completionTokens": 2,
+          "totalTokens": 131092
+        },
+        "sseEventCount": 4,
+        "firstSseDataPreview": "{\"id\":\"cf4f46c9b16a4eae9af630dd73a704ed\",\"object\":\"chat.completion.chunk\",\"created\":1790435584,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+        "contentPreview": {
+          "first": "OK",
+          "last": "OK",
+          "chars": 2
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "targetTokens": 262144,
+      "salt": "a69bd85f-7247-48bb-82a6-fff906f7305a",
+      "promptChars": 1048575,
+      "promptSha256": "40823e504f98f5fdedbf5270dd92d6984cd539ec54071fd65b7e0dbf20dfe312",
+      "request": {
+        "ttftMs": 50721.14,
+        "ttftContentMs": 50721.14,
+        "reasoningChunks": 0,
+        "decodeMs": 0,
+        "completionTokens": 2,
+        "decodeTokens": 1,
+        "decodeTps": 0,
+        "prefillTokens": 262162,
+        "prefillTps": 5168.69,
+        "totalMs": 50748.21,
+        "t0": 42090.185167,
+        "tFirst": 92811.327651,
+        "tLast": 92811.327651,
+        "model": "deepseek-v41-flash",
+        "error": null,
+        "httpStatus": 200,
+        "responseHeaders": {
+          "content-type": "text/event-stream; charset=utf-8",
+          "date": "Sat, 26 Sep 2026 15:13:04 GMT",
+          "server": "uvicorn"
+        },
+        "completionId": "238013b476f94192a0cd488736f8721c",
+        "finishReason": "stop",
+        "usage": {
+          "promptTokens": 262162,
+          "completionTokens": 2,
+          "totalTokens": 262164
+        },
+        "sseEventCount": 4,
+        "firstSseDataPreview": "{\"id\":\"238013b476f94192a0cd488736f8721c\",\"object\":\"chat.completion.chunk\",\"created\":1790435635,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+        "contentPreview": {
+          "first": "OK",
+          "last": "OK",
+          "chars": 2
+        }
+      }
+    }
+  ],
+  "decode": [],
+  "method": "Pinned sparkDash prompts and streaming metrics. Prefill C1, fresh UUID prefix per request, 8-token budget, temperature 0, thinking off. Decode prose, 256 tokens, ascending concurrency per trial; original prompt reuse and warmup. Client timing, no hardware polling. Usage tokens required. Tweet source version unconfirmed.",
+  "finished": "2026-09-26T15:13:55.176Z"
+}

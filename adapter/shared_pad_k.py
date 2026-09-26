@@ -1,4 +1,5 @@
-"""Pad the shared expert's down_proj K from 576 to 640 so the shape goes back to b12x.
+"""Pad the shared expert's down_proj K to a multiple of 128 so the shape goes back to b12x
+(576 -> 640 at TP4, 288 -> 384 at TP8).
 
 DIAGNOSIS. At TP4 the shared expert's `down_proj` is N=5120, K=moe_intermediate_size/4
 = 576. FlashInfer's b12x MXFP8 kernel rejects any K that is not a multiple of 128
@@ -69,16 +70,29 @@ import torch
 logger = logging.getLogger(__name__)
 
 HID = 5120          # hidden_size -- the N of the padded GEMM
-SRC_K = 576         # moe_intermediate_size / TP4
-TGT_K = 640         # 5 * 128, the smallest multiple of 128 above 576
+# The shared expert's K is moe_intermediate_size (2304) over the tensor-parallel size: 576 at
+# TP4, 288 at TP8 (768 at TP3 is already a multiple of 128 and needs no padding).
+# DSV41_SHARED_PAD_SRC_K overrides it.
+_TP = int(os.environ.get("TP_SIZE", "4") or 4)
+SRC_K = int(os.environ.get("DSV41_SHARED_PAD_SRC_K", "") or 2304 // _TP)
+TGT_K = -(-SRC_K // 128) * 128   # smallest multiple of 128 >= SRC_K: 640 at TP4, 384 at TP8
 BLOCK = 32          # weight_block_size from config.json
 
 _bufs = {}          # weight data_ptr -> persistent, zeroed input buffer
-_state = {"padded": 0, "logged_first": False, "logged_accept": False, "warned_big": False}
+_state = {"padded": 0, "logged_first": False, "logged_accept": False, "warned_big": False,
+          "logged_noop": False}
 
 
 def _enabled() -> bool:
-    return os.environ.get("DSV41_SHARED_PAD_K", "0").strip() not in ("0", "off", "false", "")
+    if os.environ.get("DSV41_SHARED_PAD_K", "0").strip() in ("0", "off", "false", ""):
+        return False
+    if TGT_K == SRC_K:
+        if not _state["logged_noop"]:
+            logger.warning("DSV41 shared-expert K padding: K=%d is already a multiple of 128, "
+                           "nothing to pad at this TP size", SRC_K)
+            _state["logged_noop"] = True
+        return False
+    return True
 
 
 def _looks_like_shared_down(layer) -> bool:

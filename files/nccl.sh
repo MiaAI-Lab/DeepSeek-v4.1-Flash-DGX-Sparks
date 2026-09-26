@@ -52,6 +52,12 @@ nccl_validate_config() {
     echo 'NCCL_WORKER_DIR must be absolute' >&2
     return 1
   fi
+  # The routed MoE on b12x_next needs a per-rank expert width that is a multiple of 64. At TP8
+  # EP_SIZE=1 gives 2304/8 = 288 (rejected at load); EP_SIZE=2 gives 576, the TP4/EP1 shape.
+  if [[ "${TP_SIZE:-}" == 8 && "${EP_SIZE:-}" == 1 && " ${EXTRA_CONTAINER_ENV:-} " == *" DSV41_MOE_B12X_NEXT=1 "* ]]; then
+    echo 'TP_SIZE=8 with DSV41_MOE_B12X_NEXT=1 needs EP_SIZE=2 (EP_SIZE=1 gives 288-wide experts b12x cannot run)' >&2
+    return 1
+  fi
   [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == 1 ]] || return 0
   # The ring spans the tensor-parallel group, so NNODES = TP_SIZE = 4. ./start.sh still
   # requires EP_SIZE=4. start-tp4.sh (DSV41_LAUNCHER=tp4) also accepts 2 and 1: EP only

@@ -221,6 +221,29 @@ legacy `WORKER1_IP`/`WORKER2_IP` pairs still work), so 5+ nodes only need a matc
 `TP_SIZE` and `NNODES`. Nothing in the image is TP-specific; the padded-shard repair simply
 finds nothing to repair at TP4.
 
+## Eight Sparks (TP=8)
+
+**TP8 line: [docs/tp8.md](docs/tp8.md).** The TP4 production line on eight Sparks with a switched
+RoCE fabric, through `./start-tp8.sh` and `.env.tp8.example`. Same image, launcher path and adapters;
+TP8 changes only settings (`TP_SIZE=8`, `EP_SIZE=2`, fast-load EP 2, local weights per node) and the
+shared-expert K padding, which now follows `TP_SIZE` (288 → 384 at TP8). Measured 2026-09-26
+(sparkDash 1.8.8, greedy, same method as TP4):
+
+| | c1 | c16 aggregate |
+|---|---:|---:|
+| prose | 111.9 (TP4 87.7) | 386.2 (TP4 342.7) |
+| code | 184.9 (TP4 124.8) | 563.1 (TP4 438.3) |
+| structured | 203.9 (TP4 152.4) | 561.9 (TP4 572.2) |
+| json | 177.2 (TP4 118.9) | 708.9 (TP4 659.9) |
+
+Cold prefill (sparkDash) 6,182 / 6,219 / 6,087 / 6,140 / 5,169 tok/s at 16k / 32k / 64k / 128k / 262k;
+5.6–5.8k tok/s with distinct token sequences at 32k–128k. The capability suite and exact retrieval
+to 299,098 tokens pass.
+
+TP8 is the single-user latency choice. For many concurrent users, two TP4 replicas behind the SGLang
+router serve more: roughly even at 2-8 requests, 20-40 % more at 16, 32 slots instead of 16, and
+~50 % more concurrent prefill (measured side by side in docs/tp8.md, "TP8 or 2 × TP4?").
+
 ## What is in the box
 
 ```
@@ -472,6 +495,10 @@ fails), and the head has little RAM to spare.
   FujitsuPolycom/sparkring and rsync (RoCEnante on a switchless ring), Saolence, kpham-sgl
   (sglang#39187) and the SGLang `dsv4.1` branch; full credits in docs/tp4.md. Third-party
   sources are fetched at build from their pinned commits (`runtime/sources.manifest`).
+- **TP8 line** ([docs/tp8.md](docs/tp8.md)): the eight-Spark profile (`start-tp8.sh`,
+  `.env.tp8.example`), the TP-size-aware shared-expert padding, the TP8 EP guard and the TP8 and
+  2 × TP4 measurements, from [rhys101](https://github.com/rhys101)
+  ([DeepSeek-V4.1-Flash-vLLM-DGX-Spark-8](https://github.com/rhys101/DeepSeek-V4.1-Flash-vLLM-DGX-Spark-8)).
 - **Originally this repository's** (unchanged by the above): TP3 padding (`tp3_pad.py`), the b12x
   MXFP8 route and padded-scale repair (`mxfp8_b12x.py`), the NVMe Engram row store and packed
   shards (`engram_backend.py`, `row_store.cpp`, `scripts/pack_engram.py`, which the prefetch
