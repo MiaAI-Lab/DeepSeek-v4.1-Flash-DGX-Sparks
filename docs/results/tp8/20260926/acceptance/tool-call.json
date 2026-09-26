@@ -1,0 +1,84 @@
+{
+  "request": {
+    "model": "deepseek-v41-flash",
+    "temperature": 0,
+    "max_tokens": 256,
+    "chat_template_kwargs": {
+      "thinking": false
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Use lookup_fixture to retrieve the value for key alpha. Do not guess."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "lookup_fixture",
+          "description": "Retrieve a stored test value.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    ]
+  },
+  "response": {
+    "id": "6ea5c941cfdb4a0cbb030ebb0c2a5e85",
+    "object": "chat.completion",
+    "created": 1790435956,
+    "model": "deepseek-v41-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "I'll retrieve the value for key \"alpha\" using the lookup_fixture tool.",
+          "reasoning_content": null,
+          "tool_calls": [
+            {
+              "id": "call_e82794d112db49c5ab1db399",
+              "index": 0,
+              "type": "function",
+              "function": {
+                "name": "lookup_fixture",
+                "arguments": "{\"key\": \"alpha\"}"
+              }
+            }
+          ]
+        },
+        "logprobs": null,
+        "finish_reason": "tool_calls",
+        "matched_stop": null
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 289,
+      "total_tokens": 347,
+      "completion_tokens": 58,
+      "prompt_tokens_details": null,
+      "reasoning_tokens": 0
+    },
+    "metadata": {
+      "weight_version": "default",
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 58
+        }
+      ]
+    }
+  }
+}
