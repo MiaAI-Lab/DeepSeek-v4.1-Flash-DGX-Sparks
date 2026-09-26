@@ -88,23 +88,33 @@ their outputs are in the results directory. qeval was not run on TP8.
 ## TP8 or 2 × TP4?
 
 With eight Sparks the other layout is two independent TP4 replicas (this repository's TP4 line on
-spark1-4 and spark5-8, `EP_SIZE=1` as shipped) behind the SGLang router. Both were measured on the same
-fleet the same day with the same sparkDash method; 2 × TP4 through `sglang_router` 0.3.2 with
-`--policy round_robin`. Aggregate tok/s at the same total number of concurrent requests (TP8 runs 16
-slots, so it has no c32):
+spark1-4 and spark5-8, `EP_SIZE=1` as shipped, each started with `./start-tp4.sh` from its own head)
+behind the SGLang router that ships in the image: `scripts/router.sh start http://HEAD_A:8888
+http://HEAD_B:8888`. Both layouts were measured on the same fleet the same day with the same sparkDash
+method; the router ran `--policy round_robin`. Aggregate tok/s at the same total number of concurrent
+requests; 2 × TP4 is the median of three trials (per-cell spread 1–3 %, structured up to ±10 %), TP8
+one sweep. TP8 runs 16 slots, so it has no c32.
 
 | requests | prose TP8 / 2×TP4 | code TP8 / 2×TP4 | structured TP8 / 2×TP4 | json TP8 / 2×TP4 |
 |---:|---|---|---|---|
-| 1 | **111.9** / 82.1 | **184.9** / 121.1 | **203.9** / 132.9 | **177.2** / 104.4 |
-| 2 | 149.2 / 152.8 | 250.0 / 243.2 | 225.9 / 228.7 | 253.7 / 228.0 |
-| 4 | 209.7 / 187.7 | 342.6 / 318.5 | 302.2 / 314.6 | 372.5 / 349.6 |
-| 8 | 293.3 / 311.5 | 445.8 / 448.7 | 302.4 / 255.0 | 545.1 / 605.0 |
-| 16 | 386.2 / **478.4** | 563.1 / 585.1 | 561.9 / **793.8** | 708.9 / **949.1** |
-| 32 | — / 646.7 (21.8) | — / 845.4 (28.7) | — / 840.9 (45.2) | — / 1266.1 (42.0) |
+| 1 | **111.9** / 86.0 | **184.9** / 126.8 | **203.9** / 155.2 | **177.2** / 124.3 |
+| 8 | 293.3 / 307.4 | 445.8 / 448.8 | 302.4 / 260.9 | 545.1 / 561.6 |
+| 16 | 386.2 / **469.3** | 563.1 / 607.9 | 561.9 / **730.7** | 708.9 / **884.3** |
+| 32 | — / 673.0 (22.3) | — / 836.3 (28.6) | — / 914.9 (45.2) | — / 1278.1 (42.6) |
 
-(c32 per-stream tok/s in brackets.) One structured stream at 2 × TP4 c16 ended at 97 tokens (stop
-before the 256-token budget); every other stream ran the full 256. Cold prefill with distinct token
-sequences:
+(c32 per-stream tok/s in brackets.) On varied prompts — the 8-category community benchmark
+(coding, json, narrative, prose, math, reasoning, summary, format; a unique tag per request so nothing
+comes from the prefix cache; 150–200-token answers), end to end including prefill, median of three
+runs — 2 × TP4 serves:
+
+| | c1 | c8 | c16 | c32 |
+|---|---:|---:|---:|---:|
+| aggregate tok/s, mean of 8 categories | 83.7 | 362.2 | 559.8 | 809.8 |
+| per-stream decode tok/s | 83.7 | 56.5 | 43.8 | 31.6 |
+| mean time to first token | 0.20 s | 0.33 s | 0.42 s | 0.60 s |
+
+Structured output (coding, format, math) runs 1.1–1.3k tok/s aggregate at c32, free-form writing
+(prose, summary, narrative) 0.43–0.49k. Cold prefill with distinct token sequences:
 
 | | TP8 | 2 × TP4 |
 |---|---:|---:|
@@ -116,15 +126,19 @@ sequences:
 - **One user at a time:** TP8. Decode is 30-50 % faster per request and a long single prefill ~25 %
   faster.
 - **2-8 concurrent requests:** about even (within ~10 % either way, by prompt type).
-- **16 and more, or many prefills at once:** 2 × TP4, which has twice the slots, twice the KV pool
-  and ~50 % more concurrent prefill.
+- **16 and more, or many prefills at once:** 2 × TP4 — 8-30 % more at c16, twice the slots and KV
+  pool, ~50 % more concurrent prefill. At high concurrency a TP8 step pays its fixed per-step costs
+  once for all eight GPUs and its one-shot all-reduces write to seven peers instead of three, so two
+  independent TP4 pipelines do more work per second.
 - **Router policy matters.** With `--policy cache_aware` every sparkDash prose stream (one shared
-  prompt) was routed to the same replica and c32 queued behind its 16 slots (prose c32 296 tok/s,
-  below its c16). `round_robin` / `power_of_two` suit mixed traffic; `cache_aware` pays off when
-  shared prefixes are common and load is spread. Each replica keeps its own prefix cache.
+  prompt) was routed to the same replica and c32 queued behind its 16 slots (prose c32 296 tok/s
+  against 673 with `round_robin`). `round_robin` (the `scripts/router.sh` default) or `power_of_two`
+  suit mixed traffic; `cache_aware` pays off when shared prefixes are common and load is spread. Each
+  replica keeps its own prefix cache.
 
-Raw output: [`results/tp8/20260926-2xtp4/`](results/tp8/20260926-2xtp4/) (`round-robin/` for the table
-above, `cache-aware/` for the first pass and the prefill bursts).
+Raw output: [`results/tp8/20260926-2xtp4/`](results/tp8/20260926-2xtp4/) (`robust/` for the three-trial
+tables and the varied-prompt runs, `round-robin/` and `cache-aware/` for the first passes and the
+prefill bursts).
 
 ## Quick start
 

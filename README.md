@@ -241,8 +241,9 @@ Cold prefill (sparkDash) 6,182 / 6,219 / 6,087 / 6,140 / 5,169 tok/s at 16k / 32
 to 299,098 tokens pass.
 
 TP8 is the single-user latency choice. For many concurrent users, two TP4 replicas behind the SGLang
-router serve more: roughly even at 2-8 requests, 20-40 % more at 16, 32 slots instead of 16, and
-~50 % more concurrent prefill (measured side by side in docs/tp8.md, "TP8 or 2 × TP4?").
+router serve more: roughly even at 2-8 requests, 8-30 % more at 16, 32 slots instead of 16, and
+~50 % more concurrent prefill (measured side by side in docs/tp8.md, "TP8 or 2 × TP4?";
+`scripts/router.sh` starts the router from the serving image).
 
 ## What is in the box
 

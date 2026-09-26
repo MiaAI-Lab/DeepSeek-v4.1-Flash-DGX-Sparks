@@ -1,0 +1,2753 @@
+{
+  "comparison": [
+    {
+      "benchId": "2d266828-0e47-4da3-91f4-da0f1d3a6b91",
+      "sparkId": "comparison",
+      "status": "completed",
+      "startedAt": 1790443269947,
+      "completedAt": 1790443294876,
+      "config": {
+        "port": 8100,
+        "modelId": "deepseek-v41-flash",
+        "concurrencies": [
+          1,
+          8,
+          16,
+          32
+        ],
+        "maxTokens": 256,
+        "promptType": "code",
+        "debug": true
+      },
+      "progress": {
+        "currentConcurrency": null,
+        "completedLevels": 4,
+        "totalLevels": 4,
+        "message": "Done"
+      },
+      "results": [
+        {
+          "concurrency": 1,
+          "streamsOk": 1,
+          "streamsFailed": 0,
+          "meanDecodeTps": 126.81,
+          "medianDecodeTps": 126.81,
+          "minDecodeTps": 126.81,
+          "maxDecodeTps": 126.81,
+          "meanTtftMs": 205.46,
+          "medianTtftMs": 205.46,
+          "aggregateDecodeTps": 126.81,
+          "meanPrefillTps": 287.17,
+          "medianPrefillTps": 287.17,
+          "aggregatePrefillTps": 287.17,
+          "totalPrefillTokens": 59,
+          "totalDecodeTokens": 255,
+          "totalCompletionTokens": 256,
+          "durationMs": 2217.02,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 205.46,
+              "reasoningChunks": 0,
+              "ttftMs": 205.46,
+              "decodeTps": 126.81,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 287.17,
+              "prefillTokens": 59,
+              "totalMs": 2216.47,
+              "error": null,
+              "prompt": "binary_search\ndef binary_search(nums, target) -> int: index of target in a sorted list, or -1.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:09 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-J6w3fxknnh3oYXcebJDjUh5K"
+                },
+                "completionId": "54fa097cd49d4bd9855f04e57405673d",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"54fa097cd49d4bd9855f04e57405673d\",\"object\":\"chat.completion.chunk\",\"created\":1790443270,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 231
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def binary_search(nums, target) -> int:\n    lo, hi = 0, len(nums) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if nums[mid] == target:\n         ",
+                "last": "\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    if lo < len(nums",
+                "chars": 860
+              },
+              "decodeMs": 2010.86
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 8,
+          "streamsOk": 8,
+          "streamsFailed": 0,
+          "meanDecodeTps": 61.27,
+          "medianDecodeTps": 62.33,
+          "minDecodeTps": 56.36,
+          "maxDecodeTps": 64.59,
+          "meanTtftMs": 362.94,
+          "medianTtftMs": 361.92,
+          "aggregateDecodeTps": 450.86,
+          "meanPrefillTps": 171.35,
+          "medianPrefillTps": 168.28,
+          "aggregatePrefillTps": 1113.46,
+          "totalPrefillTokens": 479,
+          "totalDecodeTokens": 2040,
+          "totalCompletionTokens": 2048,
+          "durationMs": 4824.53,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 425.07,
+              "reasoningChunks": 0,
+              "ttftMs": 425.07,
+              "decodeTps": 63.16,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 138.8,
+              "prefillTokens": 59,
+              "totalMs": 4463.09,
+              "error": null,
+              "prompt": "binary_search\ndef binary_search(nums, target) -> int: index of target in a sorted list, or -1.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:12 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-cAbtUXpIVJI70k96t981fc1z"
+                },
+                "completionId": "47addd3c9d4b41d0b900b469b3ab0b1f",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"47addd3c9d4b41d0b900b469b3ab0b1f\",\"object\":\"chat.completion.chunk\",\"created\":1790443273,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 231
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def binary_search(nums, target) -> int:\n    lo, hi = 0, len(nums) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if nums[mid] == target:\n         ",
+                "last": "\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    if lo < len(nums",
+                "chars": 860
+              },
+              "decodeMs": 4037.56
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 428.54,
+              "reasoningChunks": 0,
+              "ttftMs": 428.54,
+              "decodeTps": 64.59,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 137.68,
+              "prefillTokens": 59,
+              "totalMs": 4376.94,
+              "error": null,
+              "prompt": "merge_sort\ndef merge_sort(nums) -> list: stable sort of a list of ints, returning a new list.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:12 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-8wrMxoahIstdXwWmB4QQLDTm"
+                },
+                "completionId": "0ec729ec355f4c5cb1f4693e7fb5999f",
+                "finishReason": "length",
+                "sseEventCount": 51,
+                "firstSseDataPreview": "{\"id\":\"0ec729ec355f4c5cb1f4693e7fb5999f\",\"object\":\"chat.completion.chunk\",\"created\":1790443273,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 230
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def merge_sort(nums) -> list:\n    if len(nums) <= 1:\n        return list(nums)\n    mid = len(nums) // 2\n    left = merge_sort(nums[:mid])\n    right = merge_sort",
+                "last": "  return True\n\n\ndef _is_permutation(a: list, b: list) -> bool:\n    if len(a) != len(b):\n        return False\n    return sorted(a) == sorted(b)\n\n\ndef _test_merge",
+                "chars": 907
+              },
+              "decodeMs": 3948.2
+            },
+            {
+              "index": 2,
+              "ttftContentMs": 298.77,
+              "reasoningChunks": 0,
+              "ttftMs": 298.77,
+              "decodeTps": 63.9,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 217.56,
+              "prefillTokens": 65,
+              "totalMs": 4289.45,
+              "error": null,
+              "prompt": "lru_cache\nclass LRUCache: get(key) and put(key, value) with a fixed capacity, evicting the least recently used.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:11 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-naouZKqcwkXyJSRdfqpTNzUf"
+                },
+                "completionId": "88cdc6a9d0824cd3ac9ad6e72a5fa0fc",
+                "finishReason": "length",
+                "sseEventCount": 51,
+                "firstSseDataPreview": "{\"id\":\"88cdc6a9d0824cd3ac9ad6e72a5fa0fc\",\"object\":\"chat.completion.chunk\",\"created\":1790443272,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 248
+                }
+              },
+              "usage": {
+                "promptTokens": 65,
+                "completionTokens": 256,
+                "totalTokens": 321
+              },
+              "contentPreview": {
+                "first": "from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    ",
+                "last": ".get(2) == -1\n    assert c.get(3) == 3\n\ndef test_lru_cache_update():\n    c = LRUCache(2)\n    c.put(1, 1)\n    c.put(2, 2)\n    c.put(1, 10)\n    assert c.get(1) ==",
+                "chars": 818
+              },
+              "decodeMs": 3990.48
+            },
+            {
+              "index": 3,
+              "ttftContentMs": 298.36,
+              "reasoningChunks": 0,
+              "ttftMs": 298.36,
+              "decodeTps": 58.19,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 197.75,
+              "prefillTokens": 59,
+              "totalMs": 4680.55,
+              "error": null,
+              "prompt": "token_bucket\nclass TokenBucket: allow(n) consumes n tokens refilled at a fixed rate, else returns False.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:11 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-vBMkP3TiepByefuNjm52GP6B"
+                },
+                "completionId": "5af16def2641425cb209dca135a0849a",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"5af16def2641425cb209dca135a0849a\",\"object\":\"chat.completion.chunk\",\"created\":1790443272,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 241
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "import time\nimport threading\n\nclass TokenBucket:\n    def __init__(self, rate, capacity):\n        self.rate = rate\n        self.capacity = capacity\n        self.",
+                "last": "\ndef test_initial_capacity():\n    tb = TokenBucket(rate=1, capacity=5)\n    assert tb.allow(5) is True\n    assert tb.allow(1) is False\n\ndef test_refill():\n    tb",
+                "chars": 989
+              },
+              "decodeMs": 4381.92
+            },
+            {
+              "index": 4,
+              "ttftContentMs": 428.96,
+              "reasoningChunks": 0,
+              "ttftMs": 428.96,
+              "decodeTps": 63.24,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 135.21,
+              "prefillTokens": 58,
+              "totalMs": 4461.65,
+              "error": null,
+              "prompt": "ring_buffer\nclass RingBuffer: push and pop over a fixed-capacity array, raising on overflow and underflow.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:12 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-UOAiBMQnxlp6POSrQDxLC9BX"
+                },
+                "completionId": "4d028ca6a4954a2b9ddf723038f9f020",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"4d028ca6a4954a2b9ddf723038f9f020\",\"object\":\"chat.completion.chunk\",\"created\":1790443273,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 243
+                }
+              },
+              "usage": {
+                "promptTokens": 58,
+                "completionTokens": 256,
+                "totalTokens": 314
+              },
+              "contentPreview": {
+                "first": "class RingBuffer:\n    def __init__(self, capacity):\n        if capacity <= 0:\n            raise ValueError(\"capacity must be positive\")\n        self._data = [No",
+                "last": "self):\n        return self._size\n\n    def __bool__(self):\n        return self._size > 0\n\n    def is_empty(self):\n        return self._size == 0\n\n    def is_full",
+                "chars": 961
+              },
+              "decodeMs": 4032.4
+            },
+            {
+              "index": 5,
+              "ttftContentMs": 298.43,
+              "reasoningChunks": 0,
+              "ttftMs": 298.43,
+              "decodeTps": 56.36,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 204.4,
+              "prefillTokens": 61,
+              "totalMs": 4822.76,
+              "error": null,
+              "prompt": "dijkstra\ndef dijkstra(graph, src) -> dict: shortest path weights from src on a non-negative weighted graph.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:11 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-TVkdqRjR70wi9lsDCGyDng4R"
+                },
+                "completionId": "ddcb3fa0a3874691ac36559c3112b2b3",
+                "finishReason": "length",
+                "sseEventCount": 59,
+                "firstSseDataPreview": "{\"id\":\"ddcb3fa0a3874691ac36559c3112b2b3\",\"object\":\"chat.completion.chunk\",\"created\":1790443272,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 244
+                }
+              },
+              "usage": {
+                "promptTokens": 61,
+                "completionTokens": 256,
+                "totalTokens": 317
+              },
+              "contentPreview": {
+                "first": "import heapq\n\ndef dijkstra(graph, src):\n    dist = {node: float('inf') for node in graph}\n    dist[src] = 0\n    pq = [(0, src)]\n    visited = set()\n    while pq",
+                "last": "\n    graph = build_graph([\n        ('A', 'B', 1),\n        ('B', 'C', 2),\n        ('A', 'C', 4),\n    ])\n    result = dijkstra(graph, 'A')\n    assert result == {'",
+                "chars": 879
+              },
+              "decodeMs": 4524.11
+            },
+            {
+              "index": 6,
+              "ttftContentMs": 428.26,
+              "reasoningChunks": 0,
+              "ttftMs": 428.26,
+              "decodeTps": 61.49,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 130.76,
+              "prefillTokens": 56,
+              "totalMs": 4575.08,
+              "error": null,
+              "prompt": "edit_distance\ndef edit_distance(a, b) -> int: Levenshtein distance between two strings.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:12 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-3W5uYApJXNwAKIpAGJBMGvIM"
+                },
+                "completionId": "f7252d8a8e9d4469acfd432019cd2284",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"f7252d8a8e9d4469acfd432019cd2284\",\"object\":\"chat.completion.chunk\",\"created\":1790443273,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 224
+                }
+              },
+              "usage": {
+                "promptTokens": 56,
+                "completionTokens": 256,
+                "totalTokens": 312
+              },
+              "contentPreview": {
+                "first": "def edit_distance(a, b) -> int:\n    if a == b:\n        return 0\n    if not a:\n        return len(b)\n    if not b:\n        return len(a)\n    prev = list(range(le",
+                "last": "ten\", \"sitting\") == 3\n    assert edit_distance(\"flaw\", \"lawn\") == 2\n    assert edit_distance(\"saturday\", \"sunday\") == 3\n    assert edit_distance(\"a\", \"b\") == 1\n",
+                "chars": 802
+              },
+              "decodeMs": 4146.68
+            },
+            {
+              "index": 7,
+              "ttftContentMs": 297.12,
+              "reasoningChunks": 0,
+              "ttftMs": 297.12,
+              "decodeTps": 59.23,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 208.67,
+              "prefillTokens": 62,
+              "totalMs": 4602.8,
+              "error": null,
+              "prompt": "semver_cmp\ndef semver_cmp(a, b) -> int: compare dotted numeric versions, negative if a < b.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:11 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-cfAloIZSmycAi7A4i41JSFjM"
+                },
+                "completionId": "67311051c0c74e7293c97a5652ca32db",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"67311051c0c74e7293c97a5652ca32db\",\"object\":\"chat.completion.chunk\",\"created\":1790443272,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 228
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "def _parse(v):\n    return [int(x) for x in str(v).split(\".\")]\n\ndef semver_cmp(a, b) -> int:\n    pa = _parse(a)\n    pb = _parse(b)\n    n = max(len(pa), len(pb))\n",
+                "last": " < 0\n    assert semver_cmp(\"1.2.4\", \"1.2.3\") > 0\n    assert semver_cmp(\"1.2\", \"1.2.0\") == 0\n    assert semver_cmp(\"1.2.0\", \"1.2\") == 0\n    assert semver_cmp(\"1.",
+                "chars": 613
+              },
+              "decodeMs": 4305.28
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 16,
+          "streamsOk": 16,
+          "streamsFailed": 0,
+          "meanDecodeTps": 41.21,
+          "medianDecodeTps": 41.13,
+          "minDecodeTps": 38.79,
+          "maxDecodeTps": 44.34,
+          "meanTtftMs": 449.85,
+          "medianTtftMs": 442.91,
+          "aggregateDecodeTps": 607.87,
+          "meanPrefillTps": 137.24,
+          "medianPrefillTps": 133.89,
+          "aggregatePrefillTps": 1855.81,
+          "totalPrefillTokens": 965,
+          "totalDecodeTokens": 4080,
+          "totalCompletionTokens": 4096,
+          "durationMs": 7094.86,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 519.99,
+              "reasoningChunks": 0,
+              "ttftMs": 519.99,
+              "decodeTps": 41.68,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 113.46,
+              "prefillTokens": 59,
+              "totalMs": 6638.37,
+              "error": null,
+              "prompt": "binary_search\ndef binary_search(nums, target) -> int: index of target in a sorted list, or -1.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-Ri6l6DzbtRCzRS3GctoM7Wi9"
+                },
+                "completionId": "3f26175cf982416b9439f0778b5d3706",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"3f26175cf982416b9439f0778b5d3706\",\"object\":\"chat.completion.chunk\",\"created\":1790443278,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 231
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def binary_search(nums, target) -> int:\n    lo, hi = 0, len(nums) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if nums[mid] == target:\n         ",
+                "last": "\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    if lo < len(nums",
+                "chars": 860
+              },
+              "decodeMs": 6118.09
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 519.42,
+              "reasoningChunks": 0,
+              "ttftMs": 519.42,
+              "decodeTps": 41.68,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 113.59,
+              "prefillTokens": 59,
+              "totalMs": 6637.94,
+              "error": null,
+              "prompt": "merge_sort\ndef merge_sort(nums) -> list: stable sort of a list of ints, returning a new list.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-SU8vKXJ5tYjCG84iqFAe2lDM"
+                },
+                "completionId": "48e2824c80a94cde98e2af11baa52465",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"48e2824c80a94cde98e2af11baa52465\",\"object\":\"chat.completion.chunk\",\"created\":1790443278,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 230
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def merge_sort(nums) -> list:\n    if len(nums) <= 1:\n        return list(nums)\n    mid = len(nums) // 2\n    left = merge_sort(nums[:mid])\n    right = merge_sort",
+                "last": "== []\n\ndef test_single():\n    assert merge_sort([5]) == [5]\n\ndef test_two_sorted():\n    assert merge_sort([1, 2]) == [1, 2]\n\ndef test_two_unsorted():\n    assert",
+                "chars": 909
+              },
+              "decodeMs": 6118.28
+            },
+            {
+              "index": 2,
+              "ttftContentMs": 383.27,
+              "reasoningChunks": 0,
+              "ttftMs": 383.27,
+              "decodeTps": 43.12,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 169.59,
+              "prefillTokens": 65,
+              "totalMs": 6297.62,
+              "error": null,
+              "prompt": "lru_cache\nclass LRUCache: get(key) and put(key, value) with a fixed capacity, evicting the least recently used.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-gst0I7Qcfi1SuWp3eaFNnkS2"
+                },
+                "completionId": "75e9ff9509484448a9b6ce7277b70c10",
+                "finishReason": "length",
+                "sseEventCount": 50,
+                "firstSseDataPreview": "{\"id\":\"75e9ff9509484448a9b6ce7277b70c10\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 248
+                }
+              },
+              "usage": {
+                "promptTokens": 65,
+                "completionTokens": 256,
+                "totalTokens": 321
+              },
+              "contentPreview": {
+                "first": "from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    ",
+                "last": " cache.get(3) == 3\n\ndef test_lru_cache_update():\n    cache = LRUCache(2)\n    cache.put(1, 1)\n    cache.put(2, 2)\n    cache.put(1, 10)\n    assert cache.get(1) ==",
+                "chars": 866
+              },
+              "decodeMs": 5914.25
+            },
+            {
+              "index": 3,
+              "ttftContentMs": 382.62,
+              "reasoningChunks": 0,
+              "ttftMs": 382.62,
+              "decodeTps": 39.91,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 154.2,
+              "prefillTokens": 59,
+              "totalMs": 6771.9,
+              "error": null,
+              "prompt": "token_bucket\nclass TokenBucket: allow(n) consumes n tokens refilled at a fixed rate, else returns False.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-gqtnKbtYrgHzHeMTG1RUVUgW"
+                },
+                "completionId": "0d1bb516c8284e4199d1689e3d1e079f",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"0d1bb516c8284e4199d1689e3d1e079f\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 241
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "import time\nimport threading\n\nclass TokenBucket:\n    def __init__(self, rate, capacity):\n        self.rate = rate\n        self.capacity = capacity\n        self.",
+                "last": " n=1, timeout=0.0):\n        deadline = time.monotonic() + timeout\n        while True:\n            with self.lock:\n                self._refill()\n               ",
+                "chars": 1030
+              },
+              "decodeMs": 6389.08
+            },
+            {
+              "index": 4,
+              "ttftContentMs": 502.55,
+              "reasoningChunks": 0,
+              "ttftMs": 502.55,
+              "decodeTps": 44.22,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 115.41,
+              "prefillTokens": 58,
+              "totalMs": 6269.85,
+              "error": null,
+              "prompt": "ring_buffer\nclass RingBuffer: push and pop over a fixed-capacity array, raising on overflow and underflow.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-71LYrzM7UApNOGYV0fEW4vot"
+                },
+                "completionId": "630542d31dd94e69b5ee53c7fb0c2c89",
+                "finishReason": "length",
+                "sseEventCount": 50,
+                "firstSseDataPreview": "{\"id\":\"630542d31dd94e69b5ee53c7fb0c2c89\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 243
+                }
+              },
+              "usage": {
+                "promptTokens": 58,
+                "completionTokens": 256,
+                "totalTokens": 314
+              },
+              "contentPreview": {
+                "first": "class RingBuffer:\n    def __init__(self, capacity):\n        if capacity <= 0:\n            raise ValueError(\"capacity must be positive\")\n        self._data = [No",
+                "last": "__len__(self):\n        return self._size\n\n    def __bool__(self):\n        return self._size > 0\n\n    def is_empty(self):\n        return self._size == 0\n\n    def",
+                "chars": 963
+              },
+              "decodeMs": 5766.91
+            },
+            {
+              "index": 5,
+              "ttftContentMs": 519.44,
+              "reasoningChunks": 0,
+              "ttftMs": 519.44,
+              "decodeTps": 38.79,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 117.43,
+              "prefillTokens": 61,
+              "totalMs": 7094.25,
+              "error": null,
+              "prompt": "dijkstra\ndef dijkstra(graph, src) -> dict: shortest path weights from src on a non-negative weighted graph.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-jf8P06zoTELcwKZcw1sqCC1n"
+                },
+                "completionId": "06131a9fdb3249e0bbfd92f6b25c0988",
+                "finishReason": "length",
+                "sseEventCount": 60,
+                "firstSseDataPreview": "{\"id\":\"06131a9fdb3249e0bbfd92f6b25c0988\",\"object\":\"chat.completion.chunk\",\"created\":1790443278,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 244
+                }
+              },
+              "usage": {
+                "promptTokens": 61,
+                "completionTokens": 256,
+                "totalTokens": 317
+              },
+              "contentPreview": {
+                "first": "import heapq\n\ndef dijkstra(graph, src):\n    dist = {node: float('inf') for node in graph}\n    dist[src] = 0\n    pq = [(0, src)]\n    visited = set()\n    while pq",
+                "last": ":\n            g[v][u] = w\n    return g\n\ndef test_simple():\n    g = build_graph([('A','B',1),('B','C',2),('A','C',4)])\n    d = dijkstra(g, 'A')\n    assert d['A']",
+                "chars": 854
+              },
+              "decodeMs": 6574.71
+            },
+            {
+              "index": 6,
+              "ttftContentMs": 382.62,
+              "reasoningChunks": 0,
+              "ttftMs": 382.62,
+              "decodeTps": 41.34,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 146.36,
+              "prefillTokens": 56,
+              "totalMs": 6552.02,
+              "error": null,
+              "prompt": "edit_distance\ndef edit_distance(a, b) -> int: Levenshtein distance between two strings.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-GtMmOwNSzYY7PJWIWVgyrHfq"
+                },
+                "completionId": "987a92673930490d918b55017096c841",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"987a92673930490d918b55017096c841\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 224
+                }
+              },
+              "usage": {
+                "promptTokens": 56,
+                "completionTokens": 256,
+                "totalTokens": 312
+              },
+              "contentPreview": {
+                "first": "def edit_distance(a, b) -> int:\n    if len(a) < len(b):\n        a, b = b, a\n    previous = list(range(len(b) + 1))\n    for i, ca in enumerate(a, 1):\n        cur",
+                "last": " edit_distance(\"flaw\", \"lawn\") == 2\n    assert edit_distance(\"saturday\", \"sunday\") == 3\n    assert edit_distance(\"a\", \"b\") == 1\n    assert edit_distance(\"ab\", \"",
+                "chars": 857
+              },
+              "decodeMs": 6169.03
+            },
+            {
+              "index": 7,
+              "ttftContentMs": 382.32,
+              "reasoningChunks": 0,
+              "ttftMs": 382.32,
+              "decodeTps": 42.19,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 162.17,
+              "prefillTokens": 62,
+              "totalMs": 6426.77,
+              "error": null,
+              "prompt": "semver_cmp\ndef semver_cmp(a, b) -> int: compare dotted numeric versions, negative if a < b.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-XLnl8rkPGKlfcZb14PoWywUo"
+                },
+                "completionId": "31c6e6f2dd9148549538777823dba289",
+                "finishReason": "length",
+                "sseEventCount": 51,
+                "firstSseDataPreview": "{\"id\":\"31c6e6f2dd9148549538777823dba289\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 228
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "def _parse(v):\n    parts = str(v).split(\".\")\n    out = []\n    for p in parts:\n        n = \"\"\n        for ch in p:\n            if ch.isdigit():\n                n",
+                "last": "er_cmp():\n    assert semver_cmp(\"1.0.0\", \"1.0.0\") == 0\n    assert semver_cmp(\"1.0.0\", \"1.0.1\") == -1\n    assert semver_cmp(\"1.0.1\", \"1.0.0\") == 1\n    assert sem",
+                "chars": 728
+              },
+              "decodeMs": 6044.33
+            },
+            {
+              "index": 8,
+              "ttftContentMs": 382.91,
+              "reasoningChunks": 0,
+              "ttftMs": 382.91,
+              "decodeTps": 39.92,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 164.53,
+              "prefillTokens": 63,
+              "totalMs": 6771.58,
+              "error": null,
+              "prompt": "url_parse\ndef url_parse(url) -> dict: scheme, host, port, path, and query pairs. No extra libraries.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-42uDY4AdYQPf1vufZNQfj6eM"
+                },
+                "completionId": "e83a221931e64055a9fc02dd7f743bbf",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"e83a221931e64055a9fc02dd7f743bbf\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 237
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "def url_parse(url):\n    scheme = \"\"\n    host = \"\"\n    port = None\n    path = \"\"\n    query = {}\n\n    rest = url\n\n    if \"://\" in rest:\n        scheme, rest = res",
+                "last": "ority.find(\"]\")\n        host = authority[1:end]\n        remainder = authority[end + 1:]\n        if remainder.startswith(\":\"):\n            port = int(remainder[1",
+                "chars": 993
+              },
+              "decodeMs": 6388.55
+            },
+            {
+              "index": 9,
+              "ttftContentMs": 518.86,
+              "reasoningChunks": 0,
+              "ttftMs": 518.86,
+              "decodeTps": 40.28,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 121.42,
+              "prefillTokens": 63,
+              "totalMs": 6849.96,
+              "error": null,
+              "prompt": "json_pointer\ndef json_pointer(doc, pointer) -> object: follow an RFC 6901 pointer, or None if missing.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-6gZliEaYbzQNTvclzKJZKen0"
+                },
+                "completionId": "c937e973297d4e578b45712ca5a2f703",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"c937e973297d4e578b45712ca5a2f703\",\"object\":\"chat.completion.chunk\",\"created\":1790443278,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 239
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "def json_pointer(doc, pointer):\n    if pointer == \"\":\n        return doc\n    if not pointer.startswith(\"/\"):\n        return None\n    parts = pointer.split(\"/\")[",
+                "last": "sic():\n    doc = {\"foo\": [\"bar\", \"baz\"], \"\": 0, \"a/b\": 1, \"c%d\": 2, \"e^f\": 3, \"g|h\": 4, \"i\\\\j\": 5, \"k\\\"l\": 6, \" \": 7, \"m~n\": 8}\n    assert json_pointer(doc, \"\")",
+                "chars": 929
+              },
+              "decodeMs": 6330.76
+            },
+            {
+              "index": 10,
+              "ttftContentMs": 518.71,
+              "reasoningChunks": 0,
+              "ttftMs": 518.71,
+              "decodeTps": 44.34,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 109.89,
+              "prefillTokens": 57,
+              "totalMs": 6269.78,
+              "error": null,
+              "prompt": "glob_match\ndef glob_match(pattern, text) -> bool: * and ? wildcards, no character classes.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-CTpYiITxlyvXGlbfluRzDI1L"
+                },
+                "completionId": "a72c991926e2455bb787f56cb9a0968e",
+                "finishReason": "length",
+                "sseEventCount": 50,
+                "firstSseDataPreview": "{\"id\":\"a72c991926e2455bb787f56cb9a0968e\",\"object\":\"chat.completion.chunk\",\"created\":1790443278,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 227
+                }
+              },
+              "usage": {
+                "promptTokens": 57,
+                "completionTokens": 256,
+                "totalTokens": 313
+              },
+              "contentPreview": {
+                "first": "def glob_match(pattern, text) -> bool:\n    p = 0\n    t = 0\n    star = -1\n    match = 0\n    while t < len(text):\n        if p < len(pattern) and (pattern[p] == '",
+                "last": "False\n    assert glob_match('a', 'a') is True\n    assert glob_match('a', 'b') is False\n    assert glob_match('?', 'a') is True\n    assert glob_match('?', '') is",
+                "chars": 868
+              },
+              "decodeMs": 5750.58
+            },
+            {
+              "index": 11,
+              "ttftContentMs": 519.03,
+              "reasoningChunks": 0,
+              "ttftMs": 519.03,
+              "decodeTps": 40.91,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 115.6,
+              "prefillTokens": 60,
+              "totalMs": 6752.25,
+              "error": null,
+              "prompt": "csv_parse\ndef csv_parse(text) -> list: rows of fields, honoring double-quoted commas and escaped quotes.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-ibFuy9FRu2SS2Q56Xvqx0Aea"
+                },
+                "completionId": "b4ee81ebfd6e457eb939e13ba8930f40",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"b4ee81ebfd6e457eb939e13ba8930f40\",\"object\":\"chat.completion.chunk\",\"created\":1790443278,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 241
+                }
+              },
+              "usage": {
+                "promptTokens": 60,
+                "completionTokens": 256,
+                "totalTokens": 316
+              },
+              "contentPreview": {
+                "first": "import csv\nfrom io import StringIO\n\ndef csv_parse(text):\n    if text is None:\n        return []\n    if not isinstance(text, str):\n        raise TypeError(\"text ",
+                "last": "_test_quoted_comma():\n    _assert_eq(csv_parse('a,\"b,c\",d'), [[\"a\", \"b,c\", \"d\"]])\n\ndef _test_escaped_quotes():\n    _assert_eq(csv_parse('a,\"he said \"\"hi\"\"\",b'),",
+                "chars": 803
+              },
+              "decodeMs": 6233.04
+            },
+            {
+              "index": 12,
+              "ttftContentMs": 519.06,
+              "reasoningChunks": 0,
+              "ttftMs": 519.06,
+              "decodeTps": 40.28,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 121.37,
+              "prefillTokens": 63,
+              "totalMs": 6849.67,
+              "error": null,
+              "prompt": "rle\ndef rle_encode(s) -> str and rle_decode(s) -> str: run-length encoding of single-byte runs.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:17 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-tkp24jqmcbToangiakxgXIt5"
+                },
+                "completionId": "759b9a24af594d599a56d6f306d52b9b",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"759b9a24af594d599a56d6f306d52b9b\",\"object\":\"chat.completion.chunk\",\"created\":1790443278,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 232
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "def rle_encode(s: str) -> str:\n    if not s:\n        return \"\"\n    out = []\n    prev = s[0]\n    count = 1\n    for ch in s[1:]:\n        if ch == prev:\n          ",
+                "last": "haracter\")\n        out.append(s[j] * count)\n        i = j + 1\n    return \"\".join(out)\n\n\ndef _emit(ch: str, count: int) -> str:\n    return f\"{count}{ch}\"\n\n\ndef _",
+                "chars": 865
+              },
+              "decodeMs": 6330.41
+            },
+            {
+              "index": 13,
+              "ttftContentMs": 381.86,
+              "reasoningChunks": 0,
+              "ttftMs": 381.86,
+              "decodeTps": 40.55,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 157.12,
+              "prefillTokens": 60,
+              "totalMs": 6671.17,
+              "error": null,
+              "prompt": "top_k\ndef top_k(nums, k) -> list: the k largest ints, unordered, using a bounded heap.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-D7xdOufeWUJAGc3mnB5GkKxE"
+                },
+                "completionId": "7820be9fbf084bf486f117f71864e6b8",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"7820be9fbf084bf486f117f71864e6b8\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 223
+                }
+              },
+              "usage": {
+                "promptTokens": 60,
+                "completionTokens": 256,
+                "totalTokens": 316
+              },
+              "contentPreview": {
+                "first": "import heapq\n\ndef top_k(nums, k):\n    if k <= 0:\n        return []\n    if k >= len(nums):\n        return list(nums)\n    heap = nums[:k]\n    heapq.heapify(heap)\n",
+                "last": " _check([1], 1, [1])\n    _check([1], 5, [1])\n    _check([3, 1, 4, 1, 5, 9, 2, 6], 3, [9, 6, 5])\n    _check([3, 1, 4, 1, 5, 9, 2, 6], 1, [9])\n    _check([3, 1, 4",
+                "chars": 633
+              },
+              "decodeMs": 6289.13
+            },
+            {
+              "index": 14,
+              "ttftContentMs": 382.43,
+              "reasoningChunks": 0,
+              "ttftMs": 382.43,
+              "decodeTps": 38.87,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 149.05,
+              "prefillTokens": 57,
+              "totalMs": 6943.19,
+              "error": null,
+              "prompt": "interval_merge\ndef merge_intervals(spans) -> list: merge overlapping [start, end] pairs.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-sl6zk2NPl6bBDckjZruSlo4F"
+                },
+                "completionId": "eb83d40e1f5641779d0aac4a98c3d164",
+                "finishReason": "length",
+                "sseEventCount": 57,
+                "firstSseDataPreview": "{\"id\":\"eb83d40e1f5641779d0aac4a98c3d164\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 225
+                }
+              },
+              "usage": {
+                "promptTokens": 57,
+                "completionTokens": 256,
+                "totalTokens": 313
+              },
+              "contentPreview": {
+                "first": "def merge_intervals(spans):\n    if not spans:\n        return []\n    ordered = sorted((list(span) for span in spans), key=lambda x: (x[0], x[1]))\n    merged = [o",
+                "last": "  return False\n\n\ndef intersect_intervals(a, b):\n    result = []\n    i = j = 0\n    a = merge_intervals(a)\n    b = merge_intervals(b)\n    while i < len(a) and j <",
+                "chars": 980
+              },
+              "decodeMs": 6560.58
+            },
+            {
+              "index": 15,
+              "ttftContentMs": 382.51,
+              "reasoningChunks": 0,
+              "ttftMs": 382.51,
+              "decodeTps": 41.34,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 164.7,
+              "prefillTokens": 63,
+              "totalMs": 6551.91,
+              "error": null,
+              "prompt": "topo_sort\ndef topo_sort(nodes, edges) -> list: a valid order, or None if the graph has a cycle.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:16 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-ylx4Vr6zU7zIIifvcA2SPwkM"
+                },
+                "completionId": "eb3a3fa5573647ee875769aae0084ba8",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"eb3a3fa5573647ee875769aae0084ba8\",\"object\":\"chat.completion.chunk\",\"created\":1790443277,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 232
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "from collections import deque\n\ndef topo_sort(nodes, edges):\n    graph = {node: [] for node in nodes}\n    indegree = {node: 0 for node in nodes}\n    for u, v in ",
+                "last": "f order is None:\n        return False\n    if len(order) != len(nodes):\n        return False\n    if set(order) != set(nodes):\n        return False\n    position =",
+                "chars": 979
+              },
+              "decodeMs": 6168.83
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 32,
+          "streamsOk": 32,
+          "streamsFailed": 0,
+          "meanDecodeTps": 28.42,
+          "medianDecodeTps": 28.32,
+          "minDecodeTps": 26.58,
+          "maxDecodeTps": 31.4,
+          "meanTtftMs": 618.18,
+          "medianTtftMs": 604.42,
+          "aggregateDecodeTps": 838.43,
+          "meanPrefillTps": 98.6,
+          "medianPrefillTps": 97.02,
+          "aggregatePrefillTps": 2779.27,
+          "totalPrefillTokens": 1925,
+          "totalDecodeTokens": 8160,
+          "totalCompletionTokens": 8192,
+          "durationMs": 10282.73,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 551.47,
+              "reasoningChunks": 0,
+              "ttftMs": 551.47,
+              "decodeTps": 28.76,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 106.99,
+              "prefillTokens": 59,
+              "totalMs": 9419.46,
+              "error": null,
+              "prompt": "binary_search\ndef binary_search(nums, target) -> int: index of target in a sorted list, or -1.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-k3JUFh8WS9uN3ZQ4SKUNLqy9"
+                },
+                "completionId": "5441a7baf0e44f5aa996bcf5d428ea07",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"5441a7baf0e44f5aa996bcf5d428ea07\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 231
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def binary_search(nums, target) -> int:\n    lo, hi = 0, len(nums) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if nums[mid] == target:\n         ",
+                "last": "\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    if lo < len(nums",
+                "chars": 860
+              },
+              "decodeMs": 8867.82
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 689.96,
+              "reasoningChunks": 0,
+              "ttftMs": 689.96,
+              "decodeTps": 29.59,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 85.51,
+              "prefillTokens": 59,
+              "totalMs": 9308.03,
+              "error": null,
+              "prompt": "merge_sort\ndef merge_sort(nums) -> list: stable sort of a list of ints, returning a new list.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-s8wlccrDvDOpfQ74DPNFLuQM"
+                },
+                "completionId": "34c1bdf9c28c4d4db775383dc3e3e995",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"34c1bdf9c28c4d4db775383dc3e3e995\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 230
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def merge_sort(nums) -> list:\n    if len(nums) <= 1:\n        return list(nums)\n    mid = len(nums) // 2\n    left = merge_sort(nums[:mid])\n    right = merge_sort",
+                "last": "5]\n\ndef test_merge_sort_sorted():\n    assert merge_sort([1, 2, 3, 4, 5]) == [1, 2, 3, 4, 5]\n\ndef test_merge_sort_reverse():\n    assert merge_sort([5, 4, 3, 2, 1",
+                "chars": 842
+              },
+              "decodeMs": 8617.57
+            },
+            {
+              "index": 2,
+              "ttftContentMs": 549.87,
+              "reasoningChunks": 0,
+              "ttftMs": 549.87,
+              "decodeTps": 30.67,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 118.21,
+              "prefillTokens": 65,
+              "totalMs": 8864.13,
+              "error": null,
+              "prompt": "lru_cache\nclass LRUCache: get(key) and put(key, value) with a fixed capacity, evicting the least recently used.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-sHM8yEn1OVt7I8JzfHTB7gyZ"
+                },
+                "completionId": "0631a7d41c39459a822cb9303b0bf519",
+                "finishReason": "length",
+                "sseEventCount": 50,
+                "firstSseDataPreview": "{\"id\":\"0631a7d41c39459a822cb9303b0bf519\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 248
+                }
+              },
+              "usage": {
+                "promptTokens": 65,
+                "completionTokens": 256,
+                "totalTokens": 321
+              },
+              "contentPreview": {
+                "first": "from collections import OrderedDict\n\nclass LRUCache:\n    def __init__(self, capacity):\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    ",
+                "last": ".get(2) == -1\n    assert c.get(3) == 3\n\ndef test_lru_cache_update():\n    c = LRUCache(2)\n    c.put(1, 1)\n    c.put(2, 2)\n    c.put(1, 10)\n    assert c.get(1) ==",
+                "chars": 818
+              },
+              "decodeMs": 8313.47
+            },
+            {
+              "index": 3,
+              "ttftContentMs": 691.23,
+              "reasoningChunks": 0,
+              "ttftMs": 691.23,
+              "decodeTps": 28.37,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 85.36,
+              "prefillTokens": 59,
+              "totalMs": 9680.96,
+              "error": null,
+              "prompt": "token_bucket\nclass TokenBucket: allow(n) consumes n tokens refilled at a fixed rate, else returns False.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-ve5l7KLu0PUuJiypCo1IGKWY"
+                },
+                "completionId": "576c40a342e5467580643ee749705d37",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"576c40a342e5467580643ee749705d37\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 241
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "import time\nimport threading\n\nclass TokenBucket:\n    def __init__(self, rate, capacity):\n        self.rate = rate\n        self.capacity = capacity\n        self.",
+                "last": "\n    assert tb.allow(5) is True\n    assert tb.allow(1) is False\n\ndef test_refill():\n    tb = TokenBucket(rate=100, capacity=10)\n    assert tb.allow(10) is True\n",
+                "chars": 998
+              },
+              "decodeMs": 8989.5
+            },
+            {
+              "index": 4,
+              "ttftContentMs": 691.77,
+              "reasoningChunks": 0,
+              "ttftMs": 691.77,
+              "decodeTps": 29.6,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 83.84,
+              "prefillTokens": 58,
+              "totalMs": 9308.06,
+              "error": null,
+              "prompt": "ring_buffer\nclass RingBuffer: push and pop over a fixed-capacity array, raising on overflow and underflow.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-lTr8IvdEG1gmVzmHnOXMD02b"
+                },
+                "completionId": "311954a43b204b3b823475f91a4b57fc",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"311954a43b204b3b823475f91a4b57fc\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 243
+                }
+              },
+              "usage": {
+                "promptTokens": 58,
+                "completionTokens": 256,
+                "totalTokens": 314
+              },
+              "contentPreview": {
+                "first": "class RingBuffer:\n    def __init__(self, capacity):\n        if capacity <= 0:\n            raise ValueError(\"capacity must be positive\")\n        self._data = [No",
+                "last": "__len__(self):\n        return self._size\n\n    def __bool__(self):\n        return self._size > 0\n\n    def is_empty(self):\n        return self._size == 0\n\n    def",
+                "chars": 963
+              },
+              "decodeMs": 8615.65
+            },
+            {
+              "index": 5,
+              "ttftContentMs": 692.12,
+              "reasoningChunks": 0,
+              "ttftMs": 692.12,
+              "decodeTps": 26.59,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 88.13,
+              "prefillTokens": 61,
+              "totalMs": 10282.1,
+              "error": null,
+              "prompt": "dijkstra\ndef dijkstra(graph, src) -> dict: shortest path weights from src on a non-negative weighted graph.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-CUx0bJYbdZflz0TanGO5fzuz"
+                },
+                "completionId": "7cc9629d7f0d497b91d62a194d1d097a",
+                "finishReason": "length",
+                "sseEventCount": 60,
+                "firstSseDataPreview": "{\"id\":\"7cc9629d7f0d497b91d62a194d1d097a\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 244
+                }
+              },
+              "usage": {
+                "promptTokens": 61,
+                "completionTokens": 256,
+                "totalTokens": 317
+              },
+              "contentPreview": {
+                "first": "import heapq\n\ndef dijkstra(graph, src):\n    dist = {node: float('inf') for node in graph}\n    dist[src] = 0\n    pq = [(0, src)]\n    visited = set()\n    while pq",
+                "last": ":\n            g[v][u] = w\n    return g\n\ndef test_simple():\n    g = build_graph([('A','B',1),('B','C',2),('A','C',4)])\n    d = dijkstra(g, 'A')\n    assert d['A']",
+                "chars": 854
+              },
+              "decodeMs": 9589.79
+            },
+            {
+              "index": 6,
+              "ttftContentMs": 551.6,
+              "reasoningChunks": 0,
+              "ttftMs": 551.6,
+              "decodeTps": 28.28,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 101.52,
+              "prefillTokens": 56,
+              "totalMs": 9570.44,
+              "error": null,
+              "prompt": "edit_distance\ndef edit_distance(a, b) -> int: Levenshtein distance between two strings.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-B31aOQkGIUfyNNhFM5Bx0dq8"
+                },
+                "completionId": "febff4142ab1420ba702dd3966d5b7c1",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"febff4142ab1420ba702dd3966d5b7c1\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 224
+                }
+              },
+              "usage": {
+                "promptTokens": 56,
+                "completionTokens": 256,
+                "totalTokens": 312
+              },
+              "contentPreview": {
+                "first": "def edit_distance(a, b) -> int:\n    if a == b:\n        return 0\n    if not a:\n        return len(b)\n    if not b:\n        return len(a)\n    prev = list(range(le",
+                "last": "sitting\") == 3\n    assert edit_distance(\"flaw\", \"lawn\") == 2\n    assert edit_distance(\"intention\", \"execution\") == 5\n    assert edit_distance(\"a\", \"b\") == 1\n   ",
+                "chars": 808
+              },
+              "decodeMs": 9018.22
+            },
+            {
+              "index": 7,
+              "ttftContentMs": 689.19,
+              "reasoningChunks": 0,
+              "ttftMs": 689.19,
+              "decodeTps": 28.36,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 89.96,
+              "prefillTokens": 62,
+              "totalMs": 9680.94,
+              "error": null,
+              "prompt": "semver_cmp\ndef semver_cmp(a, b) -> int: compare dotted numeric versions, negative if a < b.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-jUCHFklZDhGqxAWuek5FaMCK"
+                },
+                "completionId": "35a5cd4b02e94c06831dfc8422de5cc0",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"35a5cd4b02e94c06831dfc8422de5cc0\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 228
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "def _parse(v):\n    return [int(x) for x in str(v).split(\".\")]\n\ndef semver_cmp(a, b) -> int:\n    pa = _parse(a)\n    pb = _parse(b)\n    n = max(len(pa), len(pb))\n",
+                "last": "\") == -1\n    assert semver_cmp(\"1.0.1\", \"1.0.0\") == 1\n    assert semver_cmp(\"1.2\", \"1.2.0\") == 0\n    assert semver_cmp(\"1.2\", \"1.2.1\") == -1\n    assert semver_c",
+                "chars": 621
+              },
+              "decodeMs": 8991.39
+            },
+            {
+              "index": 8,
+              "ttftContentMs": 550.21,
+              "reasoningChunks": 0,
+              "ttftMs": 550.21,
+              "decodeTps": 27.86,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 114.5,
+              "prefillTokens": 63,
+              "totalMs": 9702.4,
+              "error": null,
+              "prompt": "url_parse\ndef url_parse(url) -> dict: scheme, host, port, path, and query pairs. No extra libraries.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-lJp2ZEETn1nhVHljNzEHduA4"
+                },
+                "completionId": "e1024ff660e24c1f84059ac837c118dd",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"e1024ff660e24c1f84059ac837c118dd\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 237
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "def url_parse(url):\n    scheme = \"\"\n    host = \"\"\n    port = None\n    path = \"\"\n    query = {}\n\n    rest = url\n    if \"://\" in rest:\n        scheme, rest = rest",
+                "last": "ority.find(\"]\")\n        host = authority[1:end]\n        remainder = authority[end + 1:]\n        if remainder.startswith(\":\"):\n            port = int(remainder[1",
+                "chars": 1002
+              },
+              "decodeMs": 9152.12
+            },
+            {
+              "index": 9,
+              "ttftContentMs": 657.54,
+              "reasoningChunks": 0,
+              "ttftMs": 657.54,
+              "decodeTps": 28.26,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 95.81,
+              "prefillTokens": 63,
+              "totalMs": 9681.23,
+              "error": null,
+              "prompt": "json_pointer\ndef json_pointer(doc, pointer) -> object: follow an RFC 6901 pointer, or None if missing.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-q3fSWZzaS3OKfAR2brYWkrw2"
+                },
+                "completionId": "813e64e866434ee1bc43dee425a7be20",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"813e64e866434ee1bc43dee425a7be20\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 239
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "def json_pointer(doc, pointer):\n    if pointer == \"\":\n        return doc\n    if not pointer.startswith(\"/\"):\n        return None\n    parts = pointer.split(\"/\")[",
+                "last": "sic():\n    doc = {\"foo\": [\"bar\", \"baz\"], \"\": 0, \"a/b\": 1, \"c%d\": 2, \"e^f\": 3, \"g|h\": 4, \"i\\\\j\": 5, \"k\\\"l\": 6, \" \": 7, \"m~n\": 8}\n    assert json_pointer(doc, \"\")",
+                "chars": 929
+              },
+              "decodeMs": 9022.83
+            },
+            {
+              "index": 10,
+              "ttftContentMs": 690.27,
+              "reasoningChunks": 0,
+              "ttftMs": 690.27,
+              "decodeTps": 28.96,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 82.58,
+              "prefillTokens": 57,
+              "totalMs": 9496.56,
+              "error": null,
+              "prompt": "glob_match\ndef glob_match(pattern, text) -> bool: * and ? wildcards, no character classes.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-3GfZMngdLqUX0Gx0FWWIzSUM"
+                },
+                "completionId": "218b65108fc8421ab989307032fcef66",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"218b65108fc8421ab989307032fcef66\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 227
+                }
+              },
+              "usage": {
+                "promptTokens": 57,
+                "completionTokens": 256,
+                "totalTokens": 313
+              },
+              "contentPreview": {
+                "first": "def glob_match(pattern, text):\n    p = 0\n    t = 0\n    star = -1\n    match = 0\n    while t < len(text):\n        if p < len(pattern) and (pattern[p] == '?' or pa",
+                "last": "\"a\") == True\n    assert glob_match(\"a\", \"b\") == False\n    assert glob_match(\"?\", \"a\") == True\n    assert glob_match(\"?\", \"\") == False\n    assert glob_match(\"?\",",
+                "chars": 892
+              },
+              "decodeMs": 8805.71
+            },
+            {
+              "index": 11,
+              "ttftContentMs": 550.99,
+              "reasoningChunks": 0,
+              "ttftMs": 550.99,
+              "decodeTps": 29.36,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 108.9,
+              "prefillTokens": 60,
+              "totalMs": 9236.38,
+              "error": null,
+              "prompt": "csv_parse\ndef csv_parse(text) -> list: rows of fields, honoring double-quoted commas and escaped quotes.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-tUvL3e447OXEvIvcBZ73KZmA"
+                },
+                "completionId": "c567408c67614c049e88e9146925d0ef",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"c567408c67614c049e88e9146925d0ef\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 241
+                }
+              },
+              "usage": {
+                "promptTokens": 60,
+                "completionTokens": 256,
+                "totalTokens": 316
+              },
+              "contentPreview": {
+                "first": "import csv\nfrom io import StringIO\n\ndef csv_parse(text):\n    if text is None:\n        return []\n    if not isinstance(text, str):\n        raise TypeError(\"text ",
+                "last": "\n\ndef _test_quoted_comma():\n    _assert_eq(csv_parse('a,\"b,c\",d'), [[\"a\", \"b,c\", \"d\"]])\n\ndef _test_escaped_quotes():\n    _assert_eq(csv_parse('a,\"b\"\"c\",d'), [[\"",
+                "chars": 797
+              },
+              "decodeMs": 8685.06
+            },
+            {
+              "index": 12,
+              "ttftContentMs": 549.07,
+              "reasoningChunks": 0,
+              "ttftMs": 549.07,
+              "decodeTps": 27.5,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 114.74,
+              "prefillTokens": 63,
+              "totalMs": 9821.24,
+              "error": null,
+              "prompt": "rle\ndef rle_encode(s) -> str and rle_decode(s) -> str: run-length encoding of single-byte runs.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-Y1h9y82kQDXAsACP1dw7fENR"
+                },
+                "completionId": "4c1b2dc072fb4ad6b951f5d83792c340",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"4c1b2dc072fb4ad6b951f5d83792c340\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 232
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "def rle_encode(s: str) -> str:\n    if not s:\n        return \"\"\n    out = []\n    prev = s[0]\n    count = 1\n    for ch in s[1:]:\n        if ch == prev:\n          ",
+                "last": "\n    return \"\".join(out)\n\n\ndef _emit(ch: str, count: int) -> str:\n    return f\"{count}{ch}\"\n\n\ndef _test():\n    cases = [\n        \"\",\n        \"a\",\n        \"aa\",\n",
+                "chars": 858
+              },
+              "decodeMs": 9272.06
+            },
+            {
+              "index": 13,
+              "ttftContentMs": 657.13,
+              "reasoningChunks": 0,
+              "ttftMs": 657.13,
+              "decodeTps": 28.26,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 91.31,
+              "prefillTokens": 60,
+              "totalMs": 9681.04,
+              "error": null,
+              "prompt": "top_k\ndef top_k(nums, k) -> list: the k largest ints, unordered, using a bounded heap.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-8hgCHe2AWedyxlF0k7JSP0iE"
+                },
+                "completionId": "1d747ca8c2e6444ba0475988d9025ca9",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"1d747ca8c2e6444ba0475988d9025ca9\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 223
+                }
+              },
+              "usage": {
+                "promptTokens": 60,
+                "completionTokens": 256,
+                "totalTokens": 316
+              },
+              "contentPreview": {
+                "first": "import heapq\n\ndef top_k(nums, k):\n    if k <= 0:\n        return []\n    heap = []\n    for x in nums:\n        if len(heap) < k:\n            heapq.heappush(heap, x",
+                "last": "in top_k(nums, k)\n\ndef top_k_index(nums, k, value):\n    result = top_k(nums, k)\n    return result.index(value) if value in result else -1\n\ndef top_k_unique(nums",
+                "chars": 895
+              },
+              "decodeMs": 9023.74
+            },
+            {
+              "index": 14,
+              "ttftContentMs": 549.65,
+              "reasoningChunks": 0,
+              "ttftMs": 549.65,
+              "decodeTps": 26.58,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 103.7,
+              "prefillTokens": 57,
+              "totalMs": 10143.91,
+              "error": null,
+              "prompt": "interval_merge\ndef merge_intervals(spans) -> list: merge overlapping [start, end] pairs.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-9Kj0ATpyhiL7Uk3X0xIiWVAm"
+                },
+                "completionId": "61e4445c86aa494abceb763d58dc22e8",
+                "finishReason": "length",
+                "sseEventCount": 61,
+                "firstSseDataPreview": "{\"id\":\"61e4445c86aa494abceb763d58dc22e8\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 225
+                }
+              },
+              "usage": {
+                "promptTokens": 57,
+                "completionTokens": 256,
+                "totalTokens": 313
+              },
+              "contentPreview": {
+                "first": "def merge_intervals(spans):\n    if not spans:\n        return []\n    ordered = sorted(spans, key=lambda s: (s[0], s[1]))\n    merged = [list(ordered[0])]\n    for ",
+                "last": "al(interval)\n    for s, e in merge_intervals(spans):\n        if s <= start and end <= e:\n            return True\n    return False\n\n\ndef intersect_intervals(a, b",
+                "chars": 985
+              },
+              "decodeMs": 9594.16
+            },
+            {
+              "index": 15,
+              "ttftContentMs": 551.7,
+              "reasoningChunks": 0,
+              "ttftMs": 551.7,
+              "decodeTps": 29.37,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 114.19,
+              "prefillTokens": 63,
+              "totalMs": 9235.46,
+              "error": null,
+              "prompt": "topo_sort\ndef topo_sort(nodes, edges) -> list: a valid order, or None if the graph has a cycle.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-KHpFMUBColbUWVVEVV7t8swl"
+                },
+                "completionId": "ddd05401490849f3872539c1cc9ed361",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"ddd05401490849f3872539c1cc9ed361\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 232
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "from collections import deque\n\ndef topo_sort(nodes, edges):\n    adj = {node: [] for node in nodes}\n    indegree = {node: 0 for node in nodes}\n    for u, v in ed",
+                "last": "= []\n    assert topo_sort([1], []) == [1]\n    assert topo_sort([1, 2, 3], [(1, 2), (2, 3)]) == [1, 2, 3]\n    assert topo_sort([1, 2, 3], [(1, 2), (1, 3)]) in ([",
+                "chars": 805
+              },
+              "decodeMs": 8683.57
+            },
+            {
+              "index": 16,
+              "ttftContentMs": 689.53,
+              "reasoningChunks": 0,
+              "ttftMs": 689.53,
+              "decodeTps": 26.59,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 87.02,
+              "prefillTokens": 60,
+              "totalMs": 10281.36,
+              "error": null,
+              "prompt": "bloom_filter\nclass BloomFilter: add(item) and might_contain(item) with two hash functions over a bit array.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-vu72XYLmT77Ee41YyYWoCbRL"
+                },
+                "completionId": "4ce93ce337af404d83158b1c80d6c87a",
+                "finishReason": "length",
+                "sseEventCount": 60,
+                "firstSseDataPreview": "{\"id\":\"4ce93ce337af404d83158b1c80d6c87a\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 244
+                }
+              },
+              "usage": {
+                "promptTokens": 60,
+                "completionTokens": 256,
+                "totalTokens": 316
+              },
+              "contentPreview": {
+                "first": "import hashlib\n\nclass BloomFilter:\n    def __init__(self, size=1024, hashes=2):\n        self.size = size\n        self.hashes = hashes\n        self.bits = bytear",
+                "last": "\n    def might_contain(self, item):\n        return all(self._get(idx) for idx in self._hashes(item))\n\n\ndef test_empty():\n    bf = BloomFilter()\n    assert not b",
+                "chars": 883
+              },
+              "decodeMs": 9591.68
+            },
+            {
+              "index": 17,
+              "ttftContentMs": 549.75,
+              "reasoningChunks": 0,
+              "ttftMs": 549.75,
+              "decodeTps": 29.36,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 98.23,
+              "prefillTokens": 54,
+              "totalMs": 9235.85,
+              "error": null,
+              "prompt": "moving_average\nclass MovingAverage: next(x) returns the mean of the last window values.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-23H8mQrRZgCiYfzDvjIHSOWt"
+                },
+                "completionId": "a08dfdf84dc84e479d4d9bfb5db0af42",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"a08dfdf84dc84e479d4d9bfb5db0af42\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 224
+                }
+              },
+              "usage": {
+                "promptTokens": 54,
+                "completionTokens": 256,
+                "totalTokens": 310
+              },
+              "contentPreview": {
+                "first": "from collections import deque\n\nclass MovingAverage:\n    def __init__(self, window):\n        self.window = window\n        self.values = deque()\n        self.tota",
+                "last": "   ma = MovingAverage(1)\n    assert approx(ma.next(10), 10.0)\n    assert approx(ma.next(20), 20.0)\n    assert approx(ma.next(30), 30.0)\n\ndef test_window_larger_",
+                "chars": 852
+              },
+              "decodeMs": 8685.67
+            },
+            {
+              "index": 18,
+              "ttftContentMs": 549.1,
+              "reasoningChunks": 0,
+              "ttftMs": 549.1,
+              "decodeTps": 27.86,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 118.38,
+              "prefillTokens": 65,
+              "totalMs": 9701.54,
+              "error": null,
+              "prompt": "retry_backoff\ndef backoff_delays(attempts, base_ms, cap_ms) -> list: exponential delays clipped at the cap.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-ptBJdYdB0QjRsl5VfjmD5uEd"
+                },
+                "completionId": "cce52bb16e834273b9815c9d5cef31fa",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"cce52bb16e834273b9815c9d5cef31fa\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 244
+                }
+              },
+              "usage": {
+                "promptTokens": 65,
+                "completionTokens": 256,
+                "totalTokens": 321
+              },
+              "contentPreview": {
+                "first": "def backoff_delays(attempts, base_ms, cap_ms):\n    return [min(base_ms * (2 ** i), cap_ms) for i in range(attempts)]\n\ndef retry_backoff(fn, attempts, base_ms, c",
+                "last": "5, 100, 10000) == [100, 200, 400, 800, 1600]\n\ndef _test_backoff_delays_cap():\n    assert backoff_delays(6, 100, 1000) == [100, 200, 400, 800, 1000, 1000]\n\ndef _",
+                "chars": 770
+              },
+              "decodeMs": 9152.33
+            },
+            {
+              "index": 19,
+              "ttftContentMs": 689.07,
+              "reasoningChunks": 0,
+              "ttftMs": 689.07,
+              "decodeTps": 30.26,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 89.98,
+              "prefillTokens": 62,
+              "totalMs": 9115.27,
+              "error": null,
+              "prompt": "base64_encode\ndef b64_encode(data) -> str and b64_decode(text) -> bytes: standard base64, no libraries.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-xZtAMFI7PkStunJccfHujUD8"
+                },
+                "completionId": "7b0b16f835b645f48a477d3d125af36c",
+                "finishReason": "length",
+                "sseEventCount": 51,
+                "firstSseDataPreview": "{\"id\":\"7b0b16f835b645f48a477d3d125af36c\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 240
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "def b64_encode(data) -> str:\n    alphabet = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\"\n    if isinstance(data, str):\n        data = data",
+                "last": "3])\n        else:\n            result.append('=')\n    return ''.join(result)\n\ndef b64_decode(text) -> bytes:\n    alphabet = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij",
+                "chars": 790
+              },
+              "decodeMs": 8425.95
+            },
+            {
+              "index": 20,
+              "ttftContentMs": 549.82,
+              "reasoningChunks": 0,
+              "ttftMs": 549.82,
+              "decodeTps": 28.76,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 109.13,
+              "prefillTokens": 60,
+              "totalMs": 9417.65,
+              "error": null,
+              "prompt": "expr_eval\ndef eval_expr(text) -> int: evaluate non-negative ints with + - * / and parentheses.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-Lf0JT3dvrn0EPQzFccYpZF3d"
+                },
+                "completionId": "a66f2452f4fd4b119a98b83b63b39fdb",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"a66f2452f4fd4b119a98b83b63b39fdb\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 231
+                }
+              },
+              "usage": {
+                "promptTokens": 60,
+                "completionTokens": 256,
+                "totalTokens": 316
+              },
+              "contentPreview": {
+                "first": "import re\nfrom typing import List, Tuple\n\nclass _Parser:\n    def __init__(self, text: str):\n        self.tokens = self._tokenize(text)\n        self.pos = 0\n\n   ",
+                "last": "> str:\n        tok = self._peek()\n        self.pos += 1\n        return tok\n\n    def parse(self) -> int:\n        if not self.tokens:\n            raise ValueError",
+                "chars": 1045
+              },
+              "decodeMs": 8867.64
+            },
+            {
+              "index": 21,
+              "ttftContentMs": 690.95,
+              "reasoningChunks": 0,
+              "ttftMs": 690.95,
+              "decodeTps": 27.48,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 85.39,
+              "prefillTokens": 59,
+              "totalMs": 9969.13,
+              "error": null,
+              "prompt": "histogram_percentile\ndef percentile(samples, p) -> float: nearest-rank percentile of a list of numbers.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-DdCHXrNcbZKI9HXTSnIawCsr"
+                },
+                "completionId": "89216be8c14448bf80da3ac57547f568",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"89216be8c14448bf80da3ac57547f568\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 240
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "def percentile(samples, p) -> float:\n    if not samples:\n        raise ValueError(\"samples must not be empty\")\n    if p <= 0:\n        return float(min(samples))",
+                "last": ", len(ordered), 100.0)]\n    width = (hi - lo) / bins\n    counts = [0] * bins\n    for value in ordered:\n        idx = int((value - lo) / width)\n        if idx >=",
+                "chars": 887
+              },
+              "decodeMs": 9278.11
+            },
+            {
+              "index": 22,
+              "ttftContentMs": 551.01,
+              "reasoningChunks": 0,
+              "ttftMs": 551.01,
+              "decodeTps": 26.86,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 112.52,
+              "prefillTokens": 62,
+              "totalMs": 10045.76,
+              "error": null,
+              "prompt": "redact_secrets\ndef redact(text) -> str: replace AWS-looking keys and password= values with ***. Keep the rest.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-PlxjVWmTwopdjQiWsYBHCdzP"
+                },
+                "completionId": "49c4eec398644109b058e07daa39e5d5",
+                "finishReason": "length",
+                "sseEventCount": 59,
+                "firstSseDataPreview": "{\"id\":\"49c4eec398644109b058e07daa39e5d5\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 247
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "import re\n\nAWS_KEY_RE = re.compile(r'(?<![A-Z0-9])(AKIA|ASIA)[0-9A-Z]{16}(?![A-Z0-9])')\nPASSWORD_RE = re.compile(r'(?i)\\bpassword\\s*=\\s*([^\\s,;]+)')\n\ndef redact",
+                "last": "AMPLE\", \"XAKIAIOSFODNN7EXAMPLE\"),\n        (\"AKIAIOSFODNN7EXAMPLEX\", \"AKIAIOSFODNN7EXAMPLEX\"),\n        (\"password=hunter2\", \"password=***\"),\n        (\"Password =",
+                "chars": 698
+              },
+              "decodeMs": 9494.62
+            },
+            {
+              "index": 23,
+              "ttftContentMs": 550.39,
+              "reasoningChunks": 0,
+              "ttftMs": 550.39,
+              "decodeTps": 27.51,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 114.46,
+              "prefillTokens": 63,
+              "totalMs": 9820.33,
+              "error": null,
+              "prompt": "chunk_text\ndef chunk_text(text, size) -> list: split into chunks of at most size chars, breaking on spaces when possible.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-lakRBGP0MtdjQtoMlzmzqxWH"
+                },
+                "completionId": "2113a36a4d8c4f9a81fee7f42492dd74",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"2113a36a4d8c4f9a81fee7f42492dd74\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 258
+                }
+              },
+              "usage": {
+                "promptTokens": 63,
+                "completionTokens": 256,
+                "totalTokens": 319
+              },
+              "contentPreview": {
+                "first": "def chunk_text(text, size) -> list:\n    if size <= 0:\n        raise ValueError(\"size must be positive\")\n    chunks = []\n    remaining = text\n    while len(remai",
+                "last": "_text(\"hello world foo\", 11) == [\"hello world\", \"foo\"]\n\n\ndef test_chunk_text_no_space():\n    assert chunk_text(\"abcdefghij\", 3) == [\"abc\", \"def\", \"ghi\", \"j\"]\n\n\n",
+                "chars": 973
+              },
+              "decodeMs": 9269.74
+            },
+            {
+              "index": 24,
+              "ttftContentMs": 689.8,
+              "reasoningChunks": 0,
+              "ttftMs": 689.8,
+              "decodeTps": 27.16,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 81.18,
+              "prefillTokens": 56,
+              "totalMs": 10080.45,
+              "error": null,
+              "prompt": "route_match\ndef route_match(pattern, path) -> dict or None: /users/:id style params.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-Ru3YMoWBlV4E7887ASUldpDh"
+                },
+                "completionId": "ecc3ef49eeff4b2c83964dafdf5fc8fe",
+                "finishReason": "length",
+                "sseEventCount": 57,
+                "firstSseDataPreview": "{\"id\":\"ecc3ef49eeff4b2c83964dafdf5fc8fe\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 221
+                }
+              },
+              "usage": {
+                "promptTokens": 56,
+                "completionTokens": 256,
+                "totalTokens": 312
+              },
+              "contentPreview": {
+                "first": "def route_match(pattern, path):\n    pattern_parts = [p for p in pattern.split(\"/\") if p != \"\"]\n    path_parts = [p for p in path.split(\"/\") if p != \"\"]\n    if l",
+                "last": "with(\":\"):\n            name = pp[1:]\n            if name not in params:\n                raise KeyError(name)\n            parts.append(str(params[name]))\n       ",
+                "chars": 1083
+              },
+              "decodeMs": 9390.48
+            },
+            {
+              "index": 25,
+              "ttftContentMs": 689.56,
+              "reasoningChunks": 0,
+              "ttftMs": 689.56,
+              "decodeTps": 28.96,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 81.21,
+              "prefillTokens": 56,
+              "totalMs": 9496.01,
+              "error": null,
+              "prompt": "crc32\ndef crc32(data) -> int: IEEE CRC-32 of a bytes object.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-14OCHwXqXVohyomRjdKP3k9k"
+                },
+                "completionId": "96731e4923aa4a89afe77ddf9523c70a",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"96731e4923aa4a89afe77ddf9523c70a\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 197
+                }
+              },
+              "usage": {
+                "promptTokens": 56,
+                "completionTokens": 256,
+                "totalTokens": 312
+              },
+              "contentPreview": {
+                "first": "def crc32(data):\n    crc = 0xFFFFFFFF\n    for byte in data:\n        crc ^= byte\n        for _ in range(8):\n            if crc & 1:\n                crc = (crc >>",
+                "last": "e in data:\n        crc = (crc >> 8) ^ _CRC32_TABLE[(crc ^ byte) & 0xFF]\n    return crc ^ 0xFFFFFFFF\n\ndef _test_crc32():\n    assert crc32(b\"\") == 0\n    assert cr",
+                "chars": 744
+              },
+              "decodeMs": 8805.73
+            },
+            {
+              "index": 26,
+              "ttftContentMs": 551.27,
+              "reasoningChunks": 0,
+              "ttftMs": 551.27,
+              "decodeTps": 28.28,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 101.58,
+              "prefillTokens": 56,
+              "totalMs": 9568.74,
+              "error": null,
+              "prompt": "fixed_window\nclass FixedWindow: allow() is True up to limit events per window_s, else False.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-kU35qKiiP5iDCoTtCbbFUBUO"
+                },
+                "completionId": "5ec154601c5e43f991155204d1935ed9",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"5ec154601c5e43f991155204d1935ed9\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 229
+                }
+              },
+              "usage": {
+                "promptTokens": 56,
+                "completionTokens": 256,
+                "totalTokens": 312
+              },
+              "contentPreview": {
+                "first": "import time\nfrom collections import deque\n\nclass FixedWindow:\n    def __init__(self, limit, window_s, clock=None):\n        self.limit = limit\n        self.windo",
+                "last": "        self.t += dt\n\n\ndef test_allows_up_to_limit():\n    c = FakeClock()\n    fw = FixedWindow(3, 10, clock=c)\n    assert fw.allow() is True\n    assert fw.allow",
+                "chars": 961
+              },
+              "decodeMs": 9017.12
+            },
+            {
+              "index": 27,
+              "ttftContentMs": 550.5,
+              "reasoningChunks": 0,
+              "ttftMs": 550.5,
+              "decodeTps": 29.36,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 112.63,
+              "prefillTokens": 62,
+              "totalMs": 9235.2,
+              "error": null,
+              "prompt": "diff_lines\ndef diff_lines(a, b) -> list: line diff as equal/delete/insert ops using a simple LCS.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-zd3M7cZTbHGxIQTgbwBbrCkL"
+                },
+                "completionId": "41b1469efc95433c8af8f25bc915f757",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"41b1469efc95433c8af8f25bc915f757\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 234
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "from difflib import SequenceMatcher\n\ndef diff_lines(a, b) -> list:\n    result = []\n    matcher = SequenceMatcher(a=a, b=b, autojunk=False)\n    for tag, i1, i2, ",
+                "last": "\"equal\":\n            out.append(line)\n        elif op == \"insert\":\n            out.append(line)\n    return out\n\ndef apply_reverse(ops) -> list:\n    out = []\n   ",
+                "chars": 983
+              },
+              "decodeMs": 8684.13
+            },
+            {
+              "index": 28,
+              "ttftContentMs": 689.95,
+              "reasoningChunks": 0,
+              "ttftMs": 689.95,
+              "decodeTps": 27.48,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 89.86,
+              "prefillTokens": 62,
+              "totalMs": 9968.43,
+              "error": null,
+              "prompt": "infix_postfix\ndef infix_to_postfix(tokens) -> list: shunting-yard for + - * / and parentheses.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-MWCHlldGtIHvXpnYGGEq0KhE"
+                },
+                "completionId": "3a9e44a69c4e416086875cb0260211a0",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"3a9e44a69c4e416086875cb0260211a0\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 231
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "def precedence(op):\n    if op in ('+', '-'):\n        return 1\n    if op in ('*', '/'):\n        return 2\n    return 0\n\ndef is_operator(token):\n    return token i",
+                "last": "      stack.append(a + b)\n            elif token == '-':\n                stack.append(a - b)\n            elif token == '*':\n                stack.append(a * b)\n",
+                "chars": 1164
+              },
+              "decodeMs": 9278.11
+            },
+            {
+              "index": 29,
+              "ttftContentMs": 688.03,
+              "reasoningChunks": 0,
+              "ttftMs": 688.03,
+              "decodeTps": 27.48,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 85.75,
+              "prefillTokens": 59,
+              "totalMs": 9968.48,
+              "error": null,
+              "prompt": "consistent_hash\nclass ConsistentHash: add_node, remove_node, and get_node(key) on a ring of virtual nodes.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-aSyXJ6ngkUmIvkyC5ArQsmCw"
+                },
+                "completionId": "d343981e1ba246dea44aa277e7a30334",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"d343981e1ba246dea44aa277e7a30334\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 243
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "import hashlib\nimport bisect\n\nclass ConsistentHash:\n    def __init__(self, replicas=100):\n        self.replicas = replicas\n        self.ring = []\n        self.n",
+                "last": "elf.ring, h)\n            if idx < len(self.ring) and self.ring[idx] == h:\n                self.ring.pop(idx)\n        del self.nodes[node]\n\n    def get_node(self",
+                "chars": 1003
+              },
+              "decodeMs": 9280.11
+            },
+            {
+              "index": 30,
+              "ttftContentMs": 549.49,
+              "reasoningChunks": 0,
+              "ttftMs": 549.49,
+              "decodeTps": 31.4,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 112.83,
+              "prefillTokens": 62,
+              "totalMs": 8671.95,
+              "error": null,
+              "prompt": "utf8_decode\ndef utf8_decode(data) -> str: decode UTF-8 bytes, replacing invalid sequences with U+FFFD.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:24 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-KvMolLJuAjc5MhXtUAz9ksdU"
+                },
+                "completionId": "0e53ee2b06ee4ba2ad971c2dea342de9",
+                "finishReason": "length",
+                "sseEventCount": 49,
+                "firstSseDataPreview": "{\"id\":\"0e53ee2b06ee4ba2ad971c2dea342de9\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 239
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "def utf8_decode(data) -> str:\n    if isinstance(data, str):\n        data = data.encode(\"latin-1\", \"replace\")\n    out = []\n    i = 0\n    n = len(data)\n    while ",
+                "last": "       elif 0xE0 <= b <= 0xEF:\n            if i + 2 < n and 0x80 <= data[i + 1] <= 0xBF and 0x80 <= data[i + 2] <= 0xBF:\n                cp = ((b & 0x0F) << 12)",
+                "chars": 708
+              },
+              "decodeMs": 8121.5
+            },
+            {
+              "index": 31,
+              "ttftContentMs": 689.79,
+              "reasoningChunks": 0,
+              "ttftMs": 689.79,
+              "decodeTps": 28.37,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 89.88,
+              "prefillTokens": 62,
+              "totalMs": 9679.39,
+              "error": null,
+              "prompt": "dependency_closure\ndef closure(root, deps) -> list: packages reachable from root, each name once, in visit order.\nOutput only Python source. No comments, no docstrings, no markdown fences. Then add tests and the helpers this needs. Keep writing code.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 17:21:23 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-tFpxFF8cGBvNYZKR6ZD00X7C"
+                },
+                "completionId": "60d03939c4bd45d89c714c7e60d8aadc",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"60d03939c4bd45d89c714c7e60d8aadc\",\"object\":\"chat.completion.chunk\",\"created\":1790443285,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 250
+                }
+              },
+              "usage": {
+                "promptTokens": 62,
+                "completionTokens": 256,
+                "totalTokens": 318
+              },
+              "contentPreview": {
+                "first": "from collections import deque\n\ndef closure(root, deps):\n    seen = set()\n    order = []\n    queue = deque([root])\n    while queue:\n        name = queue.popleft(",
+                "last": " deps):\n    return list(dict.fromkeys(closure(root, deps)))\n\ndef closure_count(root, deps):\n    return len(closure(root, deps))\n\ndef closure_contains(root, deps",
+                "chars": 1049
+              },
+              "decodeMs": 8989.22
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        }
+      ],
+      "error": null,
+      "durationMs": 24929,
+      "owner": null
+    }
+  ]
+}
