@@ -220,13 +220,19 @@ ssh_rsync_e() {
 }
 
 ensure_ssh_keys() {
-  local pub host
+  local pub host key_type key_blob
   pub=$(cat "${SSH_IDENTITY}.pub" 2>/dev/null || true)
-  [[ -n "$pub" ]] || die "Missing ${SSH_IDENTITY}.pub"
+  if [[ -z "$pub" ]]; then
+    pub=$(ssh-keygen -y -P '' -f "$SSH_IDENTITY" </dev/null) \
+      || die "Missing or empty ${SSH_IDENTITY}.pub; cannot derive public key from $SSH_IDENTITY non-interactively"
+  fi
+  read -r key_type key_blob _ <<< "$pub"
   for host in "${WORKER_HOSTS[@]}"; do
     remote_on "$host" "mkdir -p ~/.ssh && chmod 700 ~/.ssh
       touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
-      grep -qxF '$pub' ~/.ssh/authorized_keys || echo '$pub' >> ~/.ssh/authorized_keys"
+      awk -v type=$(printf '%q' "$key_type") -v blob=$(printf '%q' "$key_blob") \
+        '\$1 == type && \$2 == blob { found=1 } END { exit !found }' ~/.ssh/authorized_keys ||
+        printf '%s\\n' $(printf '%q' "$pub") >> ~/.ssh/authorized_keys"
   done
 }
 
@@ -769,6 +775,8 @@ cmd_share() {
     if nfs_worker_has_model "$h"; then
       info "$h: $NFS_VOLUME has config.json"
     else
+      remote_ok_on "$h" "docker image inspect $(printf '%q' "$IMAGE")" \
+        || die "Serving image $IMAGE is not on $h yet. Run the build step first (./start${DSV41_LAUNCHER:+-$DSV41_LAUNCHER}.sh build); share probes the NFS volume with that image."
       die "$h cannot see the checkpoint over NFS. Check ACL (10.0.23.0/24 for spark3) and docker logs of the nfs exporter."
     fi
     i=$((i + 1))
