@@ -120,3 +120,37 @@ def install_serving_chat(module):
         'DSV41 chat_template_kwargs: enable_thinking is accepted as an alias for thinking'
         + (f'; omitted max_tokens defaults and caps at {limit}' if limit > 0
            else '; DSV41_MAX_NEW_TOKENS=0 leaves completions uncapped'))
+
+
+def install_anthropic_protocol(module):
+    """Accept Anthropic ``thinking: {"type": "enabled"}`` without ``budget_tokens``.
+
+    SGLang's Messages protocol requires ``budget_tokens`` on ``enabled`` (the SDK's
+    discriminated shape), but its serving layer never enforces a budget: anything other
+    than ``disabled`` turns reasoning on, and ``output_config.effort`` sets the effort.
+    Clients that send ``enabled`` with ``output_config.effort`` and no budget (DeepSeek
+    Harness's DeepSeek provider does) got a 400 on every request. Without a budget,
+    ``enabled`` now passes like ``adaptive``; a budget, when given, is still checked, and
+    ``disabled`` and ``adaptive`` keep their rules.
+    """
+    cls = getattr(module, 'AnthropicThinkingParam', None)
+    validators = getattr(getattr(cls, '__pydantic_decorators__', None), 'model_validators', {})
+    entry = validators.get('_validate_thinking_shape')
+    if entry is None:
+        logger.warning('DSV41 Anthropic thinking: AnthropicThinkingParam shape check not found; unchanged')
+        return
+    original = entry.func
+
+    def _validate_thinking_shape(self):
+        if self.type == 'enabled' and self.budget_tokens is None:
+            return self
+        return original(self)
+
+    entry.func = _validate_thinking_shape
+    cls.model_rebuild(force=True)
+    for name in ('AnthropicMessagesRequest', 'AnthropicCountTokensRequest'):
+        model = getattr(module, name, None)
+        if model is not None:
+            model.model_rebuild(force=True)
+    logger.warning('DSV41 Anthropic thinking: "enabled" is accepted without budget_tokens '
+                   '(effort comes from output_config.effort; budgets are not enforced)')
