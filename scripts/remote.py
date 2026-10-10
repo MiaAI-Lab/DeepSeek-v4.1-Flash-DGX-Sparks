@@ -30,7 +30,7 @@ def ssh_cmd(
     identity: str | None,
     timeout: int,
 ) -> int:
-    dest = f"{user}@{host}"
+    dest = f"{user}@{host}" if user else host  # empty user: ~/.ssh/config picks it
     base = [
         "ssh",
         "-o",
