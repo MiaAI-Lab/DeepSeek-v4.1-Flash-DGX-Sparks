@@ -652,6 +652,54 @@ paths first, forwarded paths after, from 128 KB) only costs once nothing drops:
 Rollback: `DSV41_ROCE_RING=0 SGLANG_ROCE_ALLREDUCE=0` without `DSV41_ROCE_GATHER` in `.env.tp4`, then
 `sudo systemctl disable --now dsv41-mesh` on every node (removes the markers, rules and routes).
 
+## A second ring: four HCAs, NFS weights and the mesh (reproduction, 2026-10-10)
+
+The production line above, reproduced from a clone on another four-Spark ring (DGX OS 7.x, one node on kernel
+7.0 / driver 580.178, the rest 6.17 / 580.173), with three differences from the tested ring setup. Full recipe, raw
+logs and scripts: [colonel-otto/4x-dgx-spark-ring `dsv41-flash/`](https://github.com/colonel-otto/4x-dgx-spark-ring/tree/main/dsv41-flash).
+
+**NCCL on all four functions without the dual-PCI-domain flags.** Instead of sparkring's
+`nccl-2.30.7-dual-pci-domain.patch`, the ring runs alexellis/switchless-nccl v0.0.1 plus
+[ondigo-winder/SWITCHLESS-NCCL-RING-4-GB10](https://github.com/ondigo-winder/SWITCHLESS-NCCL-RING-4-GB10)'s
+`nccl-2.30.7-switchless-4hca.patch`: it packs up to four IPv4-mapped listener GIDs into the handle and spreads
+connections over the matching functions whenever `NCCL_SWITCHLESS_RING_ONLY=1`, so `IB_HCA` lists all four devices and
+no `NCCL_IB_EXTENDED_IPV4_GIDS` / `NCCL_IB_PRESERVE_PCI_DOMAIN` flags are needed. It carries the `SWITCHLESS_RING_ONLY`
+marker, so `doctor`'s preflight accepts it via `NCCL_HOST_DIR`. Host-native np=4 all-reduce at 1 GiB: 105 Gb/s on
+two functions, 186 Gb/s on four (4 channels; 8 channels lost ~40 % at 1 MiB, `NCCL_BUFFSIZE=16M` ~30 Gb/s at 1 GiB).
+Every rank must load the same build.
+
+**Checkpoint over NFS on a ring (no local copies).** `NFS_SHARE=0` with each worker's `NFS_VOLUME` created by hand as a
+`type=nfs` docker volume pointing at the head's checkpoint over the cable it shares with the head. The opposite node
+has no such cable, so it reaches the head through a neighbour with two `/32` routes (worker → head's fabric address via
+the neighbour, and back); the neighbour forwards in the kernel (`ip_forward=1`, fabric ports accepted in `DOCKER-USER`).
+Measured 889 MB/s on the opposite node (vs ~110 MB/s on a 1 GbE management LAN); the fast loader then reads its slice
+in ~120 s per rank. The Engram shards were packed once on the head for all four ranks (`pack_engram.py --rank r --tp 4`,
+~47 GiB each, ~4 min in parallel) and copied to each worker's local NVMe, never read over NFS. Note: the mesh's
+`mesh-down.sh` deletes the same `/32` routes the planner adds, so re-add the NFS routes after it.
+
+**The mesh at the default hairpin queue.** `hairpin_queue_size` stayed at 1024 (no devlink re-init); `plan.py` then
+emits the 81,920-byte cap. `ib_write_lat` 61 KB to the opposite node: 10.0 us, with the neighbour's tc rule forwarding
+every packet in hardware. Units were installed under `/run/systemd/system` (runtime only) instead of enabling
+`dsv41-mesh.service`.
+
+Results, same image and EXTRA_CONTAINER_ENV as the production line (DSpark k=5, EP 1), thinking off, 128-token
+completions, sampled (temp 0.6), two passes each, own harness so per-cell numbers are not sparkDash-comparable; qeval as
+in [tp4.md](tp4.md):
+
+| | NCCL only (`SGLANG_ROCE_ALLREDUCE=0`) | + mesh (`DSV41_ROCE_RING=1`, 80 KB cap) |
+|---|---:|---:|
+| qeval (75 tasks) | 72/75, median 73.0 / 76.9 tok/s | 72/75, median 79.8 tok/s |
+| c1 decode | 114.8 / 115.7 tok/s | 126.7 / 132.0 tok/s |
+| c16 aggregate | 409.7 / 390.9 | 405.1 / 423.6 |
+| TTFT c8 / c16 | 630 / 1168 ms | 790 / 1335 ms |
+| cold prefill 131k (repetitive filler) | 25.1 s | 24.3 s |
+| cold prefill, natural text ~28k / ~110k | | 4.4-4.8k / 4.2-4.7k tok/s |
+| KV pool | 6.65 M | 6.40-6.50 M |
+
+The three qeval misses are the same three as in [tp4.md](tp4.md). `DSV41_CACHE_GIB=0` on the mesh line: KV +3.6 %,
+natural-text prefill and c1 unchanged, c16 aggregate -6 %, repetitive-filler prefill -10-14 %; the profile's 4 GiB was
+kept.
+
 ## Measured on the TP4 profile
 
 The ring without the opposite-node paths (collectives on NCCL): four GB10 Sparks in a ring (`a-b-c-d-a`, no switch), TP4 / EP2, 1M context,
