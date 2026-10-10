@@ -65,7 +65,7 @@ else
 fi
 [[ ${#WORKER_HOSTS[@]} -eq ${#WORKER_IPS[@]} ]] || { echo "WORKER_HOSTS and WORKER_IPS differ in length" >&2; exit 1; }
 WORKER1_IP="${WORKER_IPS[0]}"; WORKER2_IP="${WORKER_IPS[1]:-}"   # legacy names, still read by files/nfs-share.sh
-WORKER_USER="${WORKER_USER:-zurih}"
+WORKER_USER="${WORKER_USER-zurih}"   # set to "" to let ~/.ssh/config pick each worker's user
 SSH_IDENTITY="${SSH_IDENTITY:-$HOME/.ssh/id_ed25519_shared}"
 FABRIC_IFACE="${FABRIC_IFACE:-enp1s0f1np1}"
 GLOO_SOCKET_IFNAME="${GLOO_SOCKET_IFNAME:-enP7s7}"
@@ -428,7 +428,7 @@ push_spec_tables() {
   local name local_path host
   for name in dspark_sps.json dspark_sts.json; do
     local_path="$STATE_DIR/$name"
-    for host in "${WORKER_IPS[@]}"; do
+    for host in "${WORKER_HOSTS[@]}"; do   # host names, so per-host ssh config applies
       if [[ -f "$local_path" ]]; then
         local payload
         payload=$(base64 -w0 <"$local_path")
@@ -739,7 +739,7 @@ cmd_build() {
         --exclude '/logs' --exclude '/logs-tp4' --exclude '/models' \
         --exclude '/engram' --exclude '/runtime/fetched' \
         -e "$(ssh_rsync_e)" \
-        "$ROOT/" "${WORKER_USER}@${h}:${WORKER_DIR}/"
+        "$ROOT/" "${WORKER_USER:+${WORKER_USER}@}${h}:${WORKER_DIR}/"
       # end-rsync-tp4
       info "docker build on $h ..."
       remote_on "$h" --timeout "${BUILD_TIMEOUT:-0}" \
@@ -751,7 +751,7 @@ cmd_build() {
         --exclude 'logs' --exclude 'logs-tp4' --exclude 'models' \
         --exclude 'engram' \
         -e "$(ssh_rsync_e)" \
-        "$ROOT/" "${WORKER_USER}@${h}:${WORKER_DIR}/"
+        "$ROOT/" "${WORKER_USER:+${WORKER_USER}@}${h}:${WORKER_DIR}/"
       # end-rsync-start
       info "docker build on $h ..."
       remote_on "$h" --timeout "${BUILD_TIMEOUT:-0}" \
