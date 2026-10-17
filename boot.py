@@ -259,6 +259,20 @@ def _gpu_lines():
         text=True).strip().splitlines()
 
 
+def with_fp8_gemm_backend(tokens):
+    """The MXFP8 route needs --fp8-gemm-backend flashinfer_*; without it SGLang runs the
+    dense FP8 GEMMs through its 'auto' runner (-25..-45% decode). An EXTRA_SGLANG_ARGS that
+    only adds something unrelated must not drop it, so add the flag unless the user chose one
+    or the MXFP8 route is switched off (DSV41_MXFP8_BACKEND=off)."""
+    if os.environ.get('DSV41_MXFP8_BACKEND', 'b12x').strip().lower() in ('', 'off', '0'):
+        return tokens
+    if any(t == '--fp8-gemm-backend' or t.startswith('--fp8-gemm-backend=') for t in tokens):
+        return tokens
+    print('EXTRA_SGLANG_ARGS has no --fp8-gemm-backend; adding flashinfer_cutlass '
+          '(required by the MXFP8 route)', flush=True)
+    return ['--fp8-gemm-backend', 'flashinfer_cutlass', *tokens]
+
+
 def serve():
     mode = os.environ.get('OFFLOAD_MODE', 'nvme')
     assert mode in ('nvme', 'ram'), 'OFFLOAD_MODE must be nvme or ram'
@@ -343,9 +357,7 @@ def serve():
     if total_tokens and total_tokens != '0':
         args += ['--max-total-tokens', total_tokens]
 
-    extra = os.environ.get('EXTRA_SGLANG_ARGS', '').strip()
-    if extra:
-        args += extra.split()
+    args += with_fp8_gemm_backend(os.environ.get('EXTRA_SGLANG_ARGS', '').split())
 
     save('launch.json', {
         'revision': REVISION, 'offload_mode': mode, 'args': args, 'gpus': gpu,
