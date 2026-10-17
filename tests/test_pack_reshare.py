@@ -30,7 +30,7 @@ remote_on(){{ echo "remote $1" >> "$LOG"; }}
 nfs_worker_has_model(){{ case " {blind_hosts} " in *" $1 "*) return 1;; esac; return 0; }}
 cmd_share(){{ echo share >> "$LOG"; }}
 WORKER_HOSTS=(w1 w2); WORKER_IPS=(w1 w2); ENGRAM_DIR=$TMPD/e; WORKER_ENGRAM_DIR=/x
-NFS_VOLUME=v; IMAGE=i; TP_SIZE=3
+NFS_VOLUME=v; IMAGE=i; TP_SIZE=3; NNODES=3
 mkdir -p "$ENGRAM_DIR"
 {pack_source()}
 cmd_pack
