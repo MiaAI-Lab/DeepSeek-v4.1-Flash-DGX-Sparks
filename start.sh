@@ -1098,7 +1098,7 @@ cmd_pack() {
       || die "pack failed on $host"
     idx=$((idx + 1))
   done
-  info "Engram shards packed on all 3 nodes"
+  info "Engram shards packed on all $NNODES nodes"
 }
 
 case "$CMD" in
