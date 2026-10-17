@@ -276,7 +276,7 @@ benchmarks/, tests/      upstream benchmark, row-store, thinking-alias, encoder-
 | `DSV41_ENGRAM_PREFETCH` | 1 | Engram row lookups on a side stream, -2.3 to -2.9 ms/step; needs packed shards. `DSV41_ENGRAM_PREFETCH_CHECK=1` compares against the synchronous path (validation only) |
 | `DSV41_AUTOTUNE_KEEP` | 1 | keep FlashInfer autotune caches across boots of one launch: same tactics, reproducible greedy output and tok/s |
 | `DSV41_DRAFT_TAU` / `DSV41_FOLDED_FENCE` | 1 / 0 | off: draft temperature 0.8 measured +1.2 % on sampled chat, inside noise |
-| `DSPARK_SPS_TABLE` | /state/dspark_sps.json | profiled cost table; enables compact ragged verify when present |
+| `DSPARK_SPS_TABLE` | /state/dspark_sps.json | profiled cost table; would enable compact ragged verify, but `boot.py` ignores it on the Engram model unless `DSPARK_SPS_ALLOW_ENGRAM=1` (see Still on the table) |
 | `EXTRA_SGLANG_ARGS` | `--fp8-gemm-backend flashinfer_cutlass --watchdog-timeout 1800` | required for the MXFP8 route (below) |
 | `DSV41_MXFP8_BACKEND` | b12x | FlashInfer kernel for the FP8 dense projections: `b12x`, `cudnn`, `cutlass` |
 | `SGLANG_FLASHINFER_MOE_FUSED_FINALIZE` | 0 | keep 0: the fused (atomic) finalize is nondeterministic |
@@ -449,8 +449,12 @@ fails), and the head has little RAM to spare.
 - After the 2026-09-24 changes the bs=1 step is ~59 ms (docs/overnight-results.md): MoE ~21 ms,
   b12x dense FP8 ~17 ms, NCCL ~5.6 ms, `wo_a` twin 3.5 ms, the draft's bf16 `wo_a` 2.4 ms.
 - The MoE cost scales with the 6-token verify window. A profiled SPS table
-  (`python -m sglang.benchmark.dspark_sps_profiler all --base-url ...`, pushed to every rank
-  by `start.sh`) turns on compact ragged verify, which mainly pays at concurrency ≥2.
+  (`python -m sglang.benchmark.dspark_sps_profiler all --base-url ...`) would turn on compact
+  ragged verify, but **it cannot be used on this model**: the Engram hasher asserts one equal
+  verify block per request (`srt/layers/engram.py`, "got 42 tokens for 8 requests of 6", issues
+  #6 and #12, upstream sgl-project/sglang#39173), so the engine dies during CUDA-graph capture.
+  `boot.py` therefore ignores `DSPARK_SPS_TABLE` with a log line unless
+  `DSPARK_SPS_ALLOW_ENGRAM=1` is set in the container environment (for a fixed engine).
 - Fewer, fused small kernels (~2000 per step) and the 13-16 ms of cross-node latency are the
   remaining floor at TP=3.
 
