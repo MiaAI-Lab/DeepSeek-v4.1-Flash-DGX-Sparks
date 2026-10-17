@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checks": [
+    "arithmetic",
+    "C8 arithmetic twice",
+    "single image",
+    "four images",
+    "structured JSON",
+    "tool round trip"
+  ],
+  "limitation": "Capability smoke only; not a broad quality evaluation or long-context validation"
+}

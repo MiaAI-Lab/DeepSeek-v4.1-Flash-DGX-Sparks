@@ -1,0 +1,3119 @@
+{
+  "status": "FAIL",
+  "label": "decode-structured",
+  "started": "2026-09-26T15:50:18.384Z",
+  "source": {
+    "repo": "https://github.com/MiaAI-Lab/sparkDash",
+    "commit": "754f40a7454fed1d26d47d1d68dd7bef930ce5ca",
+    "files_sha256": {
+      "server/collectors/DecodeBench.js": "65fc472092b6c577f05efe7498c938d5522a784a5762480f71d17abe47a3f8ea",
+      "server/collectors/PrefillBench.js": "6b14c4eb3fb510806024c4a6ccb01d5c4e011014ebc40919a306a1519f1d67d4",
+      "server/collectors/LlmStreaming.js": "77e117688dc67c4405188795aedab25d4a7ecea124c1974c8f5f1393e554b0cb",
+      "server/util/atomicWrite.js": "e4caf1065209d085561fa28a91e6af6c29857f40f8809b3554869e3815d28654",
+      "src/shared/llmPrompts.js": "f930fcfa13a041fcfe1ff6cfbf882f2c946293dc1ac29aba9f3768fd1ad327aa",
+      "src/shared/llmTarget.js": "74913ffd206454f31743d8bba76892f12d1204eae21055173bdde3796c793443",
+      "src/shared/prefillBench.js": "2b1c076c92ff491892f414fa733eb9c180914bee75b9ce6df2203a698654207f",
+      "LICENSE": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685"
+    },
+    "unchanged_upstream_files": true,
+    "source_version_is_known_tweet_version": false,
+    "release": "1.8.8"
+  },
+  "node": "v22.23.2",
+  "config": {
+    "base": "http://127.0.0.1:8100/v1",
+    "out": "/r/decode-structured",
+    "label": "decode-structured",
+    "trials": "1",
+    "levels": "1,2,4,8,16,32",
+    "decode-only": true,
+    "prompt-type": "structured",
+    "model": "deepseek-v41-flash",
+    "sizes": "4096,16384,32768,65536,131072",
+    "prefill-only": false,
+    "extended-concurrency": false
+  },
+  "prefill": [],
+  "decode": [
+    {
+      "trial": 1,
+      "job": {
+        "benchId": "3c35a05d-b6aa-4b1a-8aed-be986db32254",
+        "sparkId": "comparison",
+        "status": "completed",
+        "startedAt": 1790437818384,
+        "completedAt": 1790437863798,
+        "config": {
+          "port": 8100,
+          "modelId": "deepseek-v41-flash",
+          "concurrencies": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            32
+          ],
+          "maxTokens": 256,
+          "promptType": "structured",
+          "debug": true
+        },
+        "progress": {
+          "currentConcurrency": null,
+          "completedLevels": 6,
+          "totalLevels": 6,
+          "message": "Done"
+        },
+        "results": [
+          {
+            "concurrency": 1,
+            "streamsOk": 1,
+            "streamsFailed": 0,
+            "meanDecodeTps": 149.15,
+            "medianDecodeTps": 149.15,
+            "minDecodeTps": 149.15,
+            "maxDecodeTps": 149.15,
+            "meanTtftMs": 220.01,
+            "medianTtftMs": 220.01,
+            "aggregateDecodeTps": 149.15,
+            "meanPrefillTps": 113.63,
+            "medianPrefillTps": 113.63,
+            "aggregatePrefillTps": 113.63,
+            "totalPrefillTokens": 25,
+            "totalDecodeTokens": 255,
+            "totalCompletionTokens": 256,
+            "durationMs": 1930.13,
+            "error": null,
+            "streams": [
+              {
+                "index": 0,
+                "ttftContentMs": 220.01,
+                "reasoningChunks": 0,
+                "ttftMs": 220.01,
+                "decodeTps": 149.15,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 113.63,
+                "prefillTokens": 25,
+                "totalMs": 1929.84,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text.",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:18 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Vbe7fAJJ216Y1qXoTnmenCtG"
+                  },
+                  "completionId": "af26a65acd5f4e6391f1b684231bbec0",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"af26a65acd5f4e6391f1b684231bbec0\",\"object\":\"chat.completion.chunk\",\"created\":1790437819,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 81
+                  }
+                },
+                "usage": {
+                  "promptTokens": 25,
+                  "completionTokens": 256,
+                  "totalTokens": 281
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 1709.64
+              }
+            ],
+            "model": "deepseek-v41-flash",
+            "hardwareSamples": []
+          },
+          {
+            "concurrency": 2,
+            "streamsOk": 2,
+            "streamsFailed": 0,
+            "meanDecodeTps": 102.18,
+            "medianDecodeTps": 102.18,
+            "minDecodeTps": 87.65,
+            "maxDecodeTps": 116.71,
+            "meanTtftMs": 223.34,
+            "medianTtftMs": 223.34,
+            "aggregateDecodeTps": 175.29,
+            "meanPrefillTps": 143.28,
+            "medianPrefillTps": 143.28,
+            "aggregatePrefillTps": 286.2,
+            "totalPrefillTokens": 64,
+            "totalDecodeTokens": 510,
+            "totalCompletionTokens": 512,
+            "durationMs": 3133.36,
+            "error": null,
+            "streams": [
+              {
+                "index": 0,
+                "ttftContentMs": 223.62,
+                "reasoningChunks": 0,
+                "ttftMs": 223.62,
+                "decodeTps": 116.71,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 143.1,
+                "prefillTokens": 32,
+                "totalMs": 2408.79,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 1/2)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:20 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-GZPFaOvmbIXBC7kINYBW9l8i"
+                  },
+                  "completionId": "79a5385009ba4a8cb92e01f57f787133",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"79a5385009ba4a8cb92e01f57f787133\",\"object\":\"chat.completion.chunk\",\"created\":1790437821,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 2184.96
+              },
+              {
+                "index": 1,
+                "ttftContentMs": 223.06,
+                "reasoningChunks": 0,
+                "ttftMs": 223.06,
+                "decodeTps": 87.65,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 143.46,
+                "prefillTokens": 32,
+                "totalMs": 3132.61,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 2/2)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:20 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-WKIgdGApVIumRFluqShs19ZH"
+                  },
+                  "completionId": "b2c12643dbbd4d17a92144365d3083df",
+                  "finishReason": "length",
+                  "sseEventCount": 67,
+                  "firstSseDataPreview": "{\"id\":\"b2c12643dbbd4d17a92144365d3083df\",\"object\":\"chat.completion.chunk\",\"created\":1790437821,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": " 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200# 2026年1月1日AI新闻速递\n\n本期新闻主要内容： 1. 月之暗面Kimi完成5亿美元C轮融资，估值达43亿美元，现金储备超100亿元，计划2026年发布K2.5",
+                  "chars": 483
+                },
+                "decodeMs": 2909.39
+              }
+            ],
+            "model": "deepseek-v41-flash",
+            "hardwareSamples": []
+          },
+          {
+            "concurrency": 4,
+            "streamsOk": 4,
+            "streamsFailed": 0,
+            "meanDecodeTps": 69.55,
+            "medianDecodeTps": 66.85,
+            "minDecodeTps": 59.36,
+            "maxDecodeTps": 85.16,
+            "meanTtftMs": 225.57,
+            "medianTtftMs": 225.38,
+            "aggregateDecodeTps": 237.43,
+            "meanPrefillTps": 141.86,
+            "medianPrefillTps": 141.99,
+            "aggregatePrefillTps": 565.4,
+            "totalPrefillTokens": 128,
+            "totalDecodeTokens": 1020,
+            "totalCompletionTokens": 1024,
+            "durationMs": 4522.34,
+            "error": null,
+            "streams": [
+              {
+                "index": 0,
+                "ttftContentMs": 226.39,
+                "reasoningChunks": 0,
+                "ttftMs": 226.39,
+                "decodeTps": 85.16,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 141.35,
+                "prefillTokens": 32,
+                "totalMs": 3220.91,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 1/4)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:23 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-rGYS3holWJfds5CFEQVl4H85"
+                  },
+                  "completionId": "7ca2bcf7043d436dbef7c2ec9a13b82f",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"7ca2bcf7043d436dbef7c2ec9a13b82f\",\"object\":\"chat.completion.chunk\",\"created\":1790437824,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 2994.35
+              },
+              {
+                "index": 1,
+                "ttftContentMs": 225.45,
+                "reasoningChunks": 0,
+                "ttftMs": 225.45,
+                "decodeTps": 65.13,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 141.94,
+                "prefillTokens": 32,
+                "totalMs": 4141.07,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 2/4)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:23 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-KjKUvfqjKxpQuyRFKwln3pni"
+                  },
+                  "completionId": "4bd2c20e074f4707888f1650eb3c7036",
+                  "finishReason": "length",
+                  "sseEventCount": 57,
+                  "firstSseDataPreview": "{\"id\":\"4bd2c20e074f4707888f1650eb3c7036\",\"object\":\"chat.completion.chunk\",\"created\":1790437824,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "84 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200# 1/4 of stream.<ds_safety>[用户未成年]否\n[分类]其他\n[判定]模型仅输出数字序列，内容为纯计数，不涉及任何政治或色情元素。\n[规则]无</ds_safety",
+                  "chars": 493
+                },
+                "decodeMs": 3915.43
+              },
+              {
+                "index": 2,
+                "ttftContentMs": 225.14,
+                "reasoningChunks": 0,
+                "ttftMs": 225.14,
+                "decodeTps": 68.56,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 142.14,
+                "prefillTokens": 32,
+                "totalMs": 3944.69,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 3/4)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:23 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-X6rtqABrMOIlvXzrU4Tk0gve"
+                  },
+                  "completionId": "1f34a1ba7f8c4ba3858b3781e93a01b9",
+                  "finishReason": "length",
+                  "sseEventCount": 55,
+                  "firstSseDataPreview": "{\"id\":\"1f34a1ba7f8c4ba3858b3781e93a01b9\",\"object\":\"chat.completion.chunk\",\"created\":1790437824,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200@@##\n151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 ",
+                  "chars": 501
+                },
+                "decodeMs": 3719.33
+              },
+              {
+                "index": 3,
+                "ttftContentMs": 225.3,
+                "reasoningChunks": 0,
+                "ttftMs": 225.3,
+                "decodeTps": 59.36,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 142.03,
+                "prefillTokens": 32,
+                "totalMs": 4521.15,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 4/4)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:23 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-VRhHqN7NAv4ewcktBDo4nJF2"
+                  },
+                  "completionId": "55634742d33a4fc788cfd2665d09b3d3",
+                  "finishReason": "length",
+                  "sseEventCount": 69,
+                  "firstSseDataPreview": "{\"id\":\"55634742d33a4fc788cfd2665d09b3d3\",\"object\":\"chat.completion.chunk\",\"created\":1790437824,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 ",
+                  "last": "00, stream 3: 101-150, stream 4: 151-200. So my response should be exactly the numbers 151 to 200 separated by spaces. I did that. But I need to ensure no extra",
+                  "chars": 708
+                },
+                "decodeMs": 4295.48
+              }
+            ],
+            "model": "deepseek-v41-flash",
+            "hardwareSamples": []
+          },
+          {
+            "concurrency": 8,
+            "streamsOk": 8,
+            "streamsFailed": 0,
+            "meanDecodeTps": 43.98,
+            "medianDecodeTps": 45.06,
+            "minDecodeTps": 21.96,
+            "maxDecodeTps": 63.44,
+            "meanTtftMs": 229.75,
+            "medianTtftMs": 229.8,
+            "aggregateDecodeTps": 293.92,
+            "meanPrefillTps": 139.29,
+            "medianPrefillTps": 139.26,
+            "aggregatePrefillTps": 1101.33,
+            "totalPrefillTokens": 256,
+            "totalDecodeTokens": 1889,
+            "totalCompletionTokens": 1897,
+            "durationMs": 6659.06,
+            "error": null,
+            "streams": [
+              {
+                "index": 0,
+                "ttftContentMs": 231.75,
+                "reasoningChunks": 0,
+                "ttftMs": 231.75,
+                "decodeTps": 63.44,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 138.08,
+                "prefillTokens": 32,
+                "totalMs": 4251.95,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 1/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Sn3O0pM7t725bCDcdUIBNg8n"
+                  },
+                  "completionId": "bcbedba966154249bfa136fb473ff0ce",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"bcbedba966154249bfa136fb473ff0ce\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 4019.6
+              },
+              {
+                "index": 1,
+                "ttftContentMs": 230.45,
+                "reasoningChunks": 0,
+                "ttftMs": 230.45,
+                "decodeTps": 21.96,
+                "decodeTokens": 104,
+                "completionTokens": 105,
+                "prefillTps": 138.86,
+                "prefillTokens": 32,
+                "totalMs": 5081.72,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 2/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-DlLz2VuU4ZaJRfZsvtQVzxCv"
+                  },
+                  "completionId": "b05e9a4091204940b1f46ff0e46e370c",
+                  "finishReason": "stop",
+                  "sseEventCount": 52,
+                  "firstSseDataPreview": "{\"id\":\"b05e9a4091204940b1f46ff0e46e370c\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 105,
+                  "totalTokens": 137
+                },
+                "contentPreview": {
+                  "first": "26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50# 26 to 500d6d0b5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a",
+                  "last": "50# 26 to 500d6d0b5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a1a5d0a",
+                  "chars": 232
+                },
+                "decodeMs": 4735.9
+              },
+              {
+                "index": 2,
+                "ttftContentMs": 229.89,
+                "reasoningChunks": 0,
+                "ttftMs": 229.89,
+                "decodeTps": 47.17,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 139.19,
+                "prefillTokens": 32,
+                "totalMs": 5636.03,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 3/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-3M7FuCtKOgFTu7yP9boPs3Uu"
+                  },
+                  "completionId": "e414190b1dd64d1ab5ee7122e4c92292",
+                  "finishReason": "length",
+                  "sseEventCount": 55,
+                  "firstSseDataPreview": "{\"id\":\"e414190b1dd64d1ab5ee7122e4c92292\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "24 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150<｜end▁of▁thinking｜>151 152 153 154 155 156 157 158 159",
+                  "chars": 493
+                },
+                "decodeMs": 5405.91
+              },
+              {
+                "index": 3,
+                "ttftContentMs": 229.86,
+                "reasoningChunks": 0,
+                "ttftMs": 229.86,
+                "decodeTps": 45.66,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 139.22,
+                "prefillTokens": 32,
+                "totalMs": 5814.94,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 4/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-onkKoGBNps3L3FcluLK6tJKW"
+                  },
+                  "completionId": "9dcf0517985d4477901ecdd2a74cbbb1",
+                  "finishReason": "length",
+                  "sseEventCount": 56,
+                  "firstSseDataPreview": "{\"id\":\"9dcf0517985d4477901ecdd2a74cbbb1\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100<|endoftext|>#<|endoftext|>Assistant: 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91",
+                  "last": "8 89 90 91 92 93 94 95 96 97 98 99 100<|endoftext|>Assistant: 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100<|endoftext|>Assistant:",
+                  "chars": 422
+                },
+                "decodeMs": 5584.93
+              },
+              {
+                "index": 4,
+                "ttftContentMs": 229.73,
+                "reasoningChunks": 0,
+                "ttftMs": 229.73,
+                "decodeTps": 47.18,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 139.3,
+                "prefillTokens": 32,
+                "totalMs": 5635.15,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 5/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Jwl5tTkwDbHwVEmBOBapmoNj"
+                  },
+                  "completionId": "f99a3db6bcd64e859939d30b1f76534d",
+                  "finishReason": "length",
+                  "sseEventCount": 56,
+                  "firstSseDataPreview": "{\"id\":\"f99a3db6bcd64e859939d30b1f76534d\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200' 5/8 (stream 5/8)<ds_safety>[用户未成年]否\n[分类]其他\n[判定]模型仅输出数字序列，内容中性，无任何政治或色情元素。\n[规则]无</ds",
+                  "chars": 484
+                },
+                "decodeMs": 5405.36
+              },
+              {
+                "index": 5,
+                "ttftContentMs": 229.13,
+                "reasoningChunks": 0,
+                "ttftMs": 229.13,
+                "decodeTps": 42.28,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 139.66,
+                "prefillTokens": 32,
+                "totalMs": 6260.76,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 6/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-4tbINNjMz1yGhcQZvldKnqPI"
+                  },
+                  "completionId": "5c828d7bab3c418a80d719affa4cf758",
+                  "finishReason": "length",
+                  "sseEventCount": 66,
+                  "firstSseDataPreview": "{\"id\":\"5c828d7bab3c418a80d719affa4cf758\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "90 191 192 193 194 195 196 197 198 199 200# 1-100 was stream 5/8, so this is 6/8\nShowing 101-200# 1-100 was stream 6/8, then this is 7/8. Wait, let me recount: ",
+                  "chars": 517
+                },
+                "decodeMs": 6031.34
+              },
+              {
+                "index": 6,
+                "ttftContentMs": 228.98,
+                "reasoningChunks": 0,
+                "ttftMs": 228.98,
+                "decodeTps": 39.68,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 139.75,
+                "prefillTokens": 32,
+                "totalMs": 6655.52,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 7/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-3W6UrO0YZqM3ZcATccHwqp4F"
+                  },
+                  "completionId": "bb31345a6fa94a4ebd2f598dbc1e5702",
+                  "finishReason": "length",
+                  "sseEventCount": 75,
+                  "firstSseDataPreview": "{\"id\":\"bb31345a6fa94a4ebd2f598dbc1e5702\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 ",
+                  "last": "put the 7th stream out of 8. That means divide 1..200 into 8 roughly equal parts. 200/8=25. So each stream 25 numbers. Stream 1: 1-25, stream 2: 26-50, stream 3",
+                  "chars": 643
+                },
+                "decodeMs": 6426.36
+              },
+              {
+                "index": 7,
+                "ttftContentMs": 228.17,
+                "reasoningChunks": 0,
+                "ttftMs": 228.17,
+                "decodeTps": 44.45,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 140.25,
+                "prefillTokens": 32,
+                "totalMs": 5965.08,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 8/8)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:28 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-RToHQcJVSCS4RPgHDvM3pEj5"
+                  },
+                  "completionId": "5ad1f766daa240419675eaecaa62eef5",
+                  "finishReason": "length",
+                  "sseEventCount": 59,
+                  "firstSseDataPreview": "{\"id\":\"5ad1f766daa240419675eaecaa62eef5\",\"object\":\"chat.completion.chunk\",\"created\":1790437828,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 94
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 ",
+                  "last": "73 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200<|im_end|>|im_end|>|im_end|><|im_end|><|im_end|><|",
+                  "chars": 481
+                },
+                "decodeMs": 5736.78
+              }
+            ],
+            "model": "deepseek-v41-flash",
+            "hardwareSamples": []
+          },
+          {
+            "concurrency": 16,
+            "streamsOk": 16,
+            "streamsFailed": 0,
+            "meanDecodeTps": 39.81,
+            "medianDecodeTps": 43.29,
+            "minDecodeTps": 25.31,
+            "maxDecodeTps": 46.89,
+            "meanTtftMs": 317.54,
+            "medianTtftMs": 317.43,
+            "aggregateDecodeTps": 404.93,
+            "meanPrefillTps": 100.78,
+            "medianPrefillTps": 100.81,
+            "aggregatePrefillTps": 1597.52,
+            "totalPrefillTokens": 512,
+            "totalDecodeTokens": 4080,
+            "totalCompletionTokens": 4096,
+            "durationMs": 10393.41,
+            "error": null,
+            "streams": [
+              {
+                "index": 0,
+                "ttftContentMs": 319.78,
+                "reasoningChunks": 0,
+                "ttftMs": 319.78,
+                "decodeTps": 46.89,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.07,
+                "prefillTokens": 32,
+                "totalMs": 5759.02,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 1/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-qFA8sEL0w7qnjpiwhynpZOXx"
+                  },
+                  "completionId": "177de062a630477587830d8c7c39c08e",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"177de062a630477587830d8c7c39c08e\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5438.56
+              },
+              {
+                "index": 1,
+                "ttftContentMs": 317.45,
+                "reasoningChunks": 0,
+                "ttftMs": 317.45,
+                "decodeTps": 37.1,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.8,
+                "prefillTokens": 32,
+                "totalMs": 7191.55,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 2/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-tHkAaSXhEV0zyp0td0ISHPeM"
+                  },
+                  "completionId": "ecf1b18567a14e5c95b90b44479acac6",
+                  "finishReason": "length",
+                  "sseEventCount": 55,
+                  "firstSseDataPreview": "{\"id\":\"ecf1b18567a14e5c95b90b44479acac6\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "4 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200# 200\n200<ds_safety>[用户未成年]否\n[分类]其他\n[判定]模型回答仅为从101到200的数字序列，内容中性，不涉及任何政治或色情元素。\n[规则]无</ds_safety",
+                  "chars": 494
+                },
+                "decodeMs": 6874.01
+              },
+              {
+                "index": 2,
+                "ttftContentMs": 319.02,
+                "reasoningChunks": 0,
+                "ttftMs": 319.02,
+                "decodeTps": 46.88,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.31,
+                "prefillTokens": 32,
+                "totalMs": 5759.66,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 3/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-rqUIUXhCCCwnON0s9LiHvw2q"
+                  },
+                  "completionId": "f1b8905a8f764fd2b77c23b03acb05fe",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"f1b8905a8f764fd2b77c23b03acb05fe\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5439.99
+              },
+              {
+                "index": 3,
+                "ttftContentMs": 316.88,
+                "reasoningChunks": 0,
+                "ttftMs": 316.88,
+                "decodeTps": 33.24,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.99,
+                "prefillTokens": 32,
+                "totalMs": 7989.07,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 4/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Z0fGplyr272pLqnhfB8vFFpK"
+                  },
+                  "completionId": "845bb5d06b134566a4f0a9d236f1c242",
+                  "finishReason": "length",
+                  "sseEventCount": 62,
+                  "firstSseDataPreview": "{\"id\":\"845bb5d06b134566a4f0a9d236f1c242\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 ",
+                  "last": " 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200</answer># 2025-04-27, 12:00:38 PM 201# 2025-04-27 12:00",
+                  "chars": 485
+                },
+                "decodeMs": 7672.17
+              },
+              {
+                "index": 4,
+                "ttftContentMs": 318.5,
+                "reasoningChunks": 0,
+                "ttftMs": 318.5,
+                "decodeTps": 39.71,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.47,
+                "prefillTokens": 32,
+                "totalMs": 6739.75,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 5/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-oVLV65t5P14mZMmeq8us8oP3"
+                  },
+                  "completionId": "7ebdc84201e84c2fb5f353fa94830db7",
+                  "finishReason": "length",
+                  "sseEventCount": 54,
+                  "firstSseDataPreview": "{\"id\":\"7ebdc84201e84c2fb5f353fa94830db7\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125",
+                  "last": "5 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200# 2026年1月1日 天气：晴 今天",
+                  "chars": 479
+                },
+                "decodeMs": 6421.22
+              },
+              {
+                "index": 5,
+                "ttftContentMs": 317.41,
+                "reasoningChunks": 0,
+                "ttftMs": 317.41,
+                "decodeTps": 25.31,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.82,
+                "prefillTokens": 32,
+                "totalMs": 10392.1,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 6/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-hWzgDP8TTLtOUDzmCVNKN5Lq"
+                  },
+                  "completionId": "96de60f36e324870957b43a9b06544ac",
+                  "finishReason": "length",
+                  "sseEventCount": 83,
+                  "firstSseDataPreview": "{\"id\":\"96de60f36e324870957b43a9b06544ac\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120# Journal\n\n## Answer\n\n101 102 103 104 105 106 107 108 109 110 111 112 113 114 115",
+                  "last": "Temperature: 0.7\n- Top-p: 0.9\n- Max tokens: 8000\n- Stream: True **Assistant**\n1## User##### Assistant## Response from OpenAI API (gpt-4o)## User## Response from",
+                  "chars": 518
+                },
+                "decodeMs": 10074.59
+              },
+              {
+                "index": 6,
+                "ttftContentMs": 319.33,
+                "reasoningChunks": 0,
+                "ttftMs": 319.33,
+                "decodeTps": 46.88,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.21,
+                "prefillTokens": 32,
+                "totalMs": 5759.17,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 7/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-J2Th8wUMqY1jHzw2Ip4qKHJv"
+                  },
+                  "completionId": "cd9c2d8ea00c4bdd9883e7232aaaae1b",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"cd9c2d8ea00c4bdd9883e7232aaaae1b\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5439.16
+              },
+              {
+                "index": 7,
+                "ttftContentMs": 316.93,
+                "reasoningChunks": 0,
+                "ttftMs": 316.93,
+                "decodeTps": 46.88,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.97,
+                "prefillTokens": 32,
+                "totalMs": 5758.51,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 8/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-5xAyRTp4BbxLHZDskSesUjMj"
+                  },
+                  "completionId": "777fa55961fa468caed9336aebe042e1",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"777fa55961fa468caed9336aebe042e1\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5439.87
+              },
+              {
+                "index": 8,
+                "ttftContentMs": 318.51,
+                "reasoningChunks": 0,
+                "ttftMs": 318.51,
+                "decodeTps": 33.25,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.47,
+                "prefillTokens": 32,
+                "totalMs": 7988.44,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 9/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-F0thuIMYsVcHgae4oCQEVD6o"
+                  },
+                  "completionId": "707fbea2f54349408f0498ae96a7a926",
+                  "finishReason": "length",
+                  "sseEventCount": 63,
+                  "firstSseDataPreview": "{\"id\":\"707fbea2f54349408f0498ae96a7a926\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "96 197 198 199 200# 200# 200 is the last number in this stream. The stream contains numbers from 101 to 200.# 1-100 was stream 8/16, so this is stream 9/16.▼▼▼\n",
+                  "chars": 541
+                },
+                "decodeMs": 7669.92
+              },
+              {
+                "index": 9,
+                "ttftContentMs": 317.57,
+                "reasoningChunks": 0,
+                "ttftMs": 317.57,
+                "decodeTps": 33.24,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.77,
+                "prefillTokens": 32,
+                "totalMs": 7988.37,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 10/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Kls17iLwlUfPTgJQJTDhsL7i"
+                  },
+                  "completionId": "4377b32806954aaa81598a8cc3e452da",
+                  "finishReason": "length",
+                  "sseEventCount": 62,
+                  "firstSseDataPreview": "{\"id\":\"4377b32806954aaa81598a8cc3e452da\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "96 197 198 199 200# 10/16<｜begin▁of▁sentence｜># 10/16 (10 out of 16) is the fraction of the stream. I need to output numbers 101 to 200. Wait, let me reconsider",
+                  "chars": 541
+                },
+                "decodeMs": 7670.78
+              },
+              {
+                "index": 10,
+                "ttftContentMs": 317.05,
+                "reasoningChunks": 0,
+                "ttftMs": 317.05,
+                "decodeTps": 30.5,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.93,
+                "prefillTokens": 32,
+                "totalMs": 8676.96,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 11/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-3iqnxQMbM6GuApUiV9Vbh6ya"
+                  },
+                  "completionId": "a94a26f50e9f4d49aed3139938f35e58",
+                  "finishReason": "length",
+                  "sseEventCount": 71,
+                  "firstSseDataPreview": "{\"id\":\"a94a26f50e9f4d49aed3139938f35e58\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "95 196 197 198 199 200# 101 to 200#satisfying #counting #123 #1234 #12345 #ginti #countingnumbers #numbersong #numbers #1to100 #1to200<|endoftext|><|endoftext|>",
+                  "chars": 537
+                },
+                "decodeMs": 8359.79
+              },
+              {
+                "index": 11,
+                "ttftContentMs": 315.43,
+                "reasoningChunks": 0,
+                "ttftMs": 315.43,
+                "decodeTps": 29.62,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 101.45,
+                "prefillTokens": 32,
+                "totalMs": 8925.56,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 12/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-udlkIIagg4JYld5W0g7LO27e"
+                  },
+                  "completionId": "e77e878b366a498cb649618d3adfb35c",
+                  "finishReason": "length",
+                  "sseEventCount": 70,
+                  "firstSseDataPreview": "{\"id\":\"e77e878b366a498cb649618d3adfb35c\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "133 134 135 136 137 138 139 140 141 142 143 144# 134 135 136 137 138 139 140 141 142 143 144 145# 134 135 136 137 138 139 140 141 142 143 144 145<ds_safety>[用户未",
+                  "last": "134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 ",
+                  "chars": 485
+                },
+                "decodeMs": 8610.02
+              },
+              {
+                "index": 12,
+                "ttftContentMs": 316.95,
+                "reasoningChunks": 0,
+                "ttftMs": 316.95,
+                "decodeTps": 46.87,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.96,
+                "prefillTokens": 32,
+                "totalMs": 5758.06,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 13/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-DrvrbHyBGXWCyzUnOrhLTJG3"
+                  },
+                  "completionId": "c3118d21de8a4c4f84f1a1346b5adf2d",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"c3118d21de8a4c4f84f1a1346b5adf2d\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5440.53
+              },
+              {
+                "index": 13,
+                "ttftContentMs": 316.44,
+                "reasoningChunks": 0,
+                "ttftMs": 316.44,
+                "decodeTps": 46.87,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 101.13,
+                "prefillTokens": 32,
+                "totalMs": 5757.76,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 14/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-shigddkA4iU6TxVbNHn18OC2"
+                  },
+                  "completionId": "b09bc1736a6b4dc19c113dd68aaf6196",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"b09bc1736a6b4dc19c113dd68aaf6196\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5440.85
+              },
+              {
+                "index": 14,
+                "ttftContentMs": 317.81,
+                "reasoningChunks": 0,
+                "ttftMs": 317.81,
+                "decodeTps": 46.89,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 100.69,
+                "prefillTokens": 32,
+                "totalMs": 5756.49,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 15/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-f8PRFZdBltAikztWFxn9znng"
+                  },
+                  "completionId": "0e76b3f82ad44255b79f9e56339867b4",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"0e76b3f82ad44255b79f9e56339867b4\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5438.13
+              },
+              {
+                "index": 15,
+                "ttftContentMs": 315.5,
+                "reasoningChunks": 0,
+                "ttftMs": 315.5,
+                "decodeTps": 46.87,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 101.43,
+                "prefillTokens": 32,
+                "totalMs": 5756.64,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 16/16)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:34 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-1jswAkdKiCySi8LWXItzAjFp"
+                  },
+                  "completionId": "9a2bd4e2182f424aa68920fe541d07cb",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"9a2bd4e2182f424aa68920fe541d07cb\",\"object\":\"chat.completion.chunk\",\"created\":1790437835,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5440.36
+              }
+            ],
+            "model": "deepseek-v41-flash",
+            "hardwareSamples": []
+          },
+          {
+            "concurrency": 32,
+            "streamsOk": 32,
+            "streamsFailed": 0,
+            "meanDecodeTps": 36.16,
+            "medianDecodeTps": 36.67,
+            "minDecodeTps": 13.04,
+            "maxDecodeTps": 51.23,
+            "meanTtftMs": 3924.86,
+            "medianTtftMs": 3420.11,
+            "aggregateDecodeTps": 446.33,
+            "meanPrefillTps": 54.24,
+            "medianPrefillTps": 54.3,
+            "aggregatePrefillTps": 79.44,
+            "totalPrefillTokens": 1024,
+            "totalDecodeTokens": 8013,
+            "totalCompletionTokens": 8045,
+            "durationMs": 18261.11,
+            "error": null,
+            "streams": [
+              {
+                "index": 0,
+                "ttftContentMs": 308.16,
+                "reasoningChunks": 0,
+                "ttftMs": 308.16,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 103.84,
+                "prefillTokens": 32,
+                "totalMs": 6044.19,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 1/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-m6pKp7uqTbluMz7DSpiqyK42"
+                  },
+                  "completionId": "7f5726fe6b524d03b7c5b3295b0c767b",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"7f5726fe6b524d03b7c5b3295b0c767b\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5735.73
+              },
+              {
+                "index": 1,
+                "ttftContentMs": 308.6,
+                "reasoningChunks": 0,
+                "ttftMs": 308.6,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 103.69,
+                "prefillTokens": 32,
+                "totalMs": 6043.95,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 2/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-3K3EAd6Z9XgYFvE8KHARyNzX"
+                  },
+                  "completionId": "3c4720f479a64e92aedae0dbea4414ee",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"3c4720f479a64e92aedae0dbea4414ee\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5735.04
+              },
+              {
+                "index": 2,
+                "ttftContentMs": 307.51,
+                "reasoningChunks": 0,
+                "ttftMs": 307.51,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.06,
+                "prefillTokens": 32,
+                "totalMs": 6043.79,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 3/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Rz6OE5zKy4EZOPJ9xMdr0SmT"
+                  },
+                  "completionId": "61d0ced781574405ac70b423837452a8",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"61d0ced781574405ac70b423837452a8\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5736.03
+              },
+              {
+                "index": 3,
+                "ttftContentMs": 307.37,
+                "reasoningChunks": 0,
+                "ttftMs": 307.37,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.11,
+                "prefillTokens": 32,
+                "totalMs": 6043.72,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 4/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-rXsv2fGyTgVWJSiwpBULVRm4"
+                  },
+                  "completionId": "c5e4267aea98447e953d00aa3d213a71",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"c5e4267aea98447e953d00aa3d213a71\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5736.12
+              },
+              {
+                "index": 4,
+                "ttftContentMs": 307.2,
+                "reasoningChunks": 0,
+                "ttftMs": 307.2,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.17,
+                "prefillTokens": 32,
+                "totalMs": 6043.35,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 5/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-swkpeMoXl6bFmYDIr4PLiuDI"
+                  },
+                  "completionId": "b9dc06d85e064644bc16d9cf899b22ff",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"b9dc06d85e064644bc16d9cf899b22ff\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5735.9
+              },
+              {
+                "index": 5,
+                "ttftContentMs": 307.59,
+                "reasoningChunks": 0,
+                "ttftMs": 307.59,
+                "decodeTps": 13.04,
+                "decodeTokens": 108,
+                "completionTokens": 109,
+                "prefillTps": 104.04,
+                "prefillTokens": 32,
+                "totalMs": 8732.65,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 6/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-KqNRjGoXqquoCCHXfF48cc5F"
+                  },
+                  "completionId": "9c8d48cb3e5944a58ce1802a1b414c41",
+                  "finishReason": "stop",
+                  "sseEventCount": 58,
+                  "firstSseDataPreview": "{\"id\":\"9c8d48cb3e5944a58ce1802a1b414c41\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 109,
+                  "totalTokens": 141
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120<|endoftext|># 1 to 200 stream 6/32<|endoftext|>101 102 103 104 105 106 107 108 1",
+                  "last": " 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120<|endoftext|>101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119",
+                  "chars": 478
+                },
+                "decodeMs": 8279.58
+              },
+              {
+                "index": 6,
+                "ttftContentMs": 307.6,
+                "reasoningChunks": 0,
+                "ttftMs": 307.6,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.03,
+                "prefillTokens": 32,
+                "totalMs": 6043.71,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 7/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-XmEnGrPZr9bHsR1coCDw8GhI"
+                  },
+                  "completionId": "e57e3810e7364236b8e12bd9ff46d9b5",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"e57e3810e7364236b8e12bd9ff46d9b5\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5735.82
+              },
+              {
+                "index": 7,
+                "ttftContentMs": 307.28,
+                "reasoningChunks": 0,
+                "ttftMs": 307.28,
+                "decodeTps": 28.72,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.14,
+                "prefillTokens": 32,
+                "totalMs": 9185.54,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 8/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-SYv5wt1cFz85Sve5Bu4pnFvB"
+                  },
+                  "completionId": "3ed90ad31c2b4cb8ac2bd4e072f9192d",
+                  "finishReason": "length",
+                  "sseEventCount": 55,
+                  "firstSseDataPreview": "{\"id\":\"3ed90ad31c2b4cb8ac2bd4e072f9192d\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200<|im_end|><|im_end|>#<|im_end|>##<|im_end|> 176 177 178 179 1",
+                  "last": "78 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200<|im_end|><|im_end|><|im_end|>#<|im_end|>##<|im_end|> 176 177 178 179 ",
+                  "chars": 465
+                },
+                "decodeMs": 8878.23
+              },
+              {
+                "index": 8,
+                "ttftContentMs": 307.4,
+                "reasoningChunks": 0,
+                "ttftMs": 307.4,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.1,
+                "prefillTokens": 32,
+                "totalMs": 6043.61,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 9/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-ZFDvX0kboXg6uCgjBvFSJrVG"
+                  },
+                  "completionId": "14b23fa475f54504983ee0c6d77aa909",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"14b23fa475f54504983ee0c6d77aa909\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 95
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107",
+                  "last": "145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 ",
+                  "chars": 469
+                },
+                "decodeMs": 5735.95
+              },
+              {
+                "index": 9,
+                "ttftContentMs": 307.55,
+                "reasoningChunks": 0,
+                "ttftMs": 307.55,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.05,
+                "prefillTokens": 32,
+                "totalMs": 6043.71,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 10/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Ousf0ekMsJy5aWffqnHU3RV7"
+                  },
+                  "completionId": "1daa9199a5f3402f882ede1c36be1d1d",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"1daa9199a5f3402f882ede1c36be1d1d\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5735.84
+              },
+              {
+                "index": 10,
+                "ttftContentMs": 307.07,
+                "reasoningChunks": 0,
+                "ttftMs": 307.07,
+                "decodeTps": 29.76,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.21,
+                "prefillTokens": 32,
+                "totalMs": 8874.49,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 11/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-WmFqqR8h6AaKfILluvXkB8oH"
+                  },
+                  "completionId": "0c5a079dde4f4881bbf4b219add9afb3",
+                  "finishReason": "length",
+                  "sseEventCount": 61,
+                  "firstSseDataPreview": "{\"id\":\"0c5a079dde4f4881bbf4b219add9afb3\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 ",
+                  "last": "only numbers from 101 to 200, separated by spaces, with no other text. It correctly continues the sequence for stream 11/32.@@##@@##\n101 102 103 104 105 106 107",
+                  "chars": 584
+                },
+                "decodeMs": 8567.39
+              },
+              {
+                "index": 11,
+                "ttftContentMs": 306.95,
+                "reasoningChunks": 0,
+                "ttftMs": 306.95,
+                "decodeTps": 44.45,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.25,
+                "prefillTokens": 32,
+                "totalMs": 6043.41,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 12/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-iREZzm7TbqsdvKus3O2UnJLa"
+                  },
+                  "completionId": "3e2c41778878468199ec350768515300",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"3e2c41778878468199ec350768515300\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5736.25
+              },
+              {
+                "index": 12,
+                "ttftContentMs": 308.26,
+                "reasoningChunks": 0,
+                "ttftMs": 308.26,
+                "decodeTps": 44.47,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 103.81,
+                "prefillTokens": 32,
+                "totalMs": 6042.97,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 13/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-mViju1jyppdmfX0xISoOqr2A"
+                  },
+                  "completionId": "c4cbc2f76a064918bcdb74b3123487e9",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"c4cbc2f76a064918bcdb74b3123487e9\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5734.53
+              },
+              {
+                "index": 13,
+                "ttftContentMs": 307.17,
+                "reasoningChunks": 0,
+                "ttftMs": 307.17,
+                "decodeTps": 44.46,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.18,
+                "prefillTokens": 32,
+                "totalMs": 6043.09,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 14/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-3n7rKgToSTmUjWUsXOe271fA"
+                  },
+                  "completionId": "08844a270b7649a0ae936f3c19453fe6",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"08844a270b7649a0ae936f3c19453fe6\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 5735.66
+              },
+              {
+                "index": 14,
+                "ttftContentMs": 6533.03,
+                "reasoningChunks": 0,
+                "ttftMs": 6533.03,
+                "decodeTps": 24.81,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 16812.15,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 15/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-FRDdQXGajMNInLbTsuhKb2mA"
+                  },
+                  "completionId": "b7cd5781bb834ae5be671cb5f1af8182",
+                  "finishReason": "length",
+                  "sseEventCount": 73,
+                  "firstSseDataPreview": "{\"id\":\"b7cd5781bb834ae5be671cb5f1af8182\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 1",
+                  "last": "5年AI大模型技术全景：从架构革新到应用落地\n\n## 2025年AI大模型技术全景：从架构革新到应用落地\n\n### 引言：大模型进入\"深水区\"\n\n2025年，人工智能大模型技术已从早期的\"参数竞赛\"转向了更加务实的发展阶段。回顾过去两年，我们见证了GPT-4、Claude 3、Gemini等模型的迭代升级，也看到了开源",
+                  "chars": 455
+                },
+                "decodeMs": 10279.01
+              },
+              {
+                "index": 15,
+                "ttftContentMs": 6532.28,
+                "reasoningChunks": 0,
+                "ttftMs": 6532.28,
+                "decodeTps": 24.03,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 17143.54,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 16/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-QqkRYIFK6OrFun5iWlc57OZ5"
+                  },
+                  "completionId": "bd6bc364896041148c15187fdcc00c86",
+                  "finishReason": "length",
+                  "sseEventCount": 76,
+                  "firstSseDataPreview": "{\"id\":\"bd6bc364896041148c15187fdcc00c86\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 ",
+                  "last": "革新到应用落地的深度解析\n\n## 2025年AI大模型技术全景：从架构革新到应用落地的深度解析\n\n### 引言：大模型进入\"深水区\"\n\n2025年，人工智能大模型领域已从早期的\"参数竞赛\"转向更为务实的\"效能革命\"。经过2023-2024年的爆发式增长，行业逐渐认识到：单纯扩大模型规模带来的边际收益正在递减，而架构创新",
+                  "chars": 455
+                },
+                "decodeMs": 10611.12
+              },
+              {
+                "index": 16,
+                "ttftContentMs": 307.36,
+                "reasoningChunks": 0,
+                "ttftMs": 307.36,
+                "decodeTps": 21.07,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.11,
+                "prefillTokens": 32,
+                "totalMs": 12412.68,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 17/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-PQCfNdrFzJQpZ7gXkihPSPIP"
+                  },
+                  "completionId": "eb733a92c7b94387b6acf4b51c102bb9",
+                  "finishReason": "length",
+                  "sseEventCount": 84,
+                  "firstSseDataPreview": "{\"id\":\"eb733a92c7b94387b6acf4b51c102bb9\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113",
+                  "last": "任务的智能体系统。本文将全面梳理当前主流AI编程工具的技术架构、能力边界与选型策略，帮助开发者在快速迭代的生态中做出明智决策。\n\n## 一、工具分类与核心能力\n\n当前AI编程工具大致可分为四个层次：\n\n**第一层：代码补全与建议**。以GitHub Copilot、Tabnine为代表，基于上下文预测下一行或下一段代码",
+                  "chars": 449
+                },
+                "decodeMs": 12105.15
+              },
+              {
+                "index": 17,
+                "ttftContentMs": 307.11,
+                "reasoningChunks": 0,
+                "ttftMs": 307.11,
+                "decodeTps": 36.65,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 104.2,
+                "prefillTokens": 32,
+                "totalMs": 7264.64,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 18/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-JMHRhXMVtT2JRYLcfG7cLljk"
+                  },
+                  "completionId": "c1ea04d0c74b4ae798040a039f3355e5",
+                  "finishReason": "length",
+                  "sseEventCount": 50,
+                  "firstSseDataPreview": "{\"id\":\"c1ea04d0c74b4ae798040a039f3355e5\",\"object\":\"chat.completion.chunk\",\"created\":1790437845,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 12",
+                  "last": " 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200# 200\n200<ds_safety>[用户未成年]否\n[分类]其他\n[判定]",
+                  "chars": 485
+                },
+                "decodeMs": 6957.49
+              },
+              {
+                "index": 18,
+                "ttftContentMs": 9506.47,
+                "reasoningChunks": 0,
+                "ttftMs": 9506.47,
+                "decodeTps": 41.21,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 3.37,
+                "prefillTokens": 32,
+                "totalMs": 15694,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 19/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-lWf6s7mFKZFcnKLSXP2vcSal"
+                  },
+                  "completionId": "7759bb76621c4cd88a0e6f25cd969825",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"7759bb76621c4cd88a0e6f25cd969825\",\"object\":\"chat.completion.chunk\",\"created\":1790437855,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6187.41
+              },
+              {
+                "index": 19,
+                "ttftContentMs": 6532.74,
+                "reasoningChunks": 0,
+                "ttftMs": 6532.74,
+                "decodeTps": 36.66,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 13487.9,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 20/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-GQzyOhlMBk1aJJhD7JDjdwoc"
+                  },
+                  "completionId": "c4fb137949384c1db0a0afa048e7d1c7",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"c4fb137949384c1db0a0afa048e7d1c7\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6955.15
+              },
+              {
+                "index": 20,
+                "ttftContentMs": 6532.38,
+                "reasoningChunks": 0,
+                "ttftMs": 6532.38,
+                "decodeTps": 36.67,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 13486.94,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 21/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-yNeYzRl4L6ajb1tZ14RElMkr"
+                  },
+                  "completionId": "b3bd1750bd6a496fbfa1da227494c170",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"b3bd1750bd6a496fbfa1da227494c170\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6954.52
+              },
+              {
+                "index": 21,
+                "ttftContentMs": 6532.26,
+                "reasoningChunks": 0,
+                "ttftMs": 6532.26,
+                "decodeTps": 23.78,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 17254.16,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 22/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-tdQJSYEl8xPeIHnpeS7X0x5o"
+                  },
+                  "completionId": "6b8bd1873aac4e429a79a4a86ed08071",
+                  "finishReason": "length",
+                  "sseEventCount": 78,
+                  "firstSseDataPreview": "{\"id\":\"6b8bd1873aac4e429a79a4a86ed08071\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 ",
+                  "last": "架构革新到应用落地\n\n### 引言\n\n2025年，人工智能大模型技术已从实验室走向千行百业，成为推动数字经济发展的核心引擎。从GPT-5到Claude 4，从Gemini Ultra到国产大模型百花齐放，技术迭代速度令人目不暇接。本文将全面梳理2025年AI大模型的技术演进、架构创新、应用落地与产业格局，为读者呈现一幅",
+                  "chars": 479
+                },
+                "decodeMs": 10721.55
+              },
+              {
+                "index": 22,
+                "ttftContentMs": 6532.51,
+                "reasoningChunks": 0,
+                "ttftMs": 6532.51,
+                "decodeTps": 22.5,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 17866.84,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 23/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-QnhOqYZ19v2uV6O8emInK6kd"
+                  },
+                  "completionId": "c17fddb489034ddd8cf07f01e8f8a103",
+                  "finishReason": "length",
+                  "sseEventCount": 81,
+                  "firstSseDataPreview": "{\"id\":\"c17fddb489034ddd8cf07f01e8f8a103\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 ",
+                  "last": "幕，全国1335万考生完成考试，迎来人生新阶段。各地考场秩序井然，考生们走出考场时神情轻松，家长和老师纷纷送上祝福。接下来，考生将进入志愿填报和录取阶段，开启人生新篇章。<|im_end|><|im_end|><|im_end|># 2025年高考落幕，1335万考生迎来人生新起点\n\n2025年高考落下帷幕，全国133",
+                  "chars": 457
+                },
+                "decodeMs": 11334.27
+              },
+              {
+                "index": 23,
+                "ttftContentMs": 6532.33,
+                "reasoningChunks": 0,
+                "ttftMs": 6532.33,
+                "decodeTps": 36.66,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 13487.5,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 24/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-sQvSEk7DBYAZD6CSki1zDhC6"
+                  },
+                  "completionId": "dc181680cef84b3c87d77317dfc4fcc3",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"dc181680cef84b3c87d77317dfc4fcc3\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6955.14
+              },
+              {
+                "index": 24,
+                "ttftContentMs": 6532.33,
+                "reasoningChunks": 0,
+                "ttftMs": 6532.33,
+                "decodeTps": 36.67,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 13486.91,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 25/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-7hpKXWfWpNdmIEvdAJAO7C50"
+                  },
+                  "completionId": "5cd6022bac86469c83aef0491b87b72d",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"5cd6022bac86469c83aef0491b87b72d\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6954.56
+              },
+              {
+                "index": 25,
+                "ttftContentMs": 9190.12,
+                "reasoningChunks": 0,
+                "ttftMs": 9190.12,
+                "decodeTps": 28.12,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 3.48,
+                "prefillTokens": 32,
+                "totalMs": 18259.79,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 26/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-YcLWsde1jzu0BN2BOyzypx8Z"
+                  },
+                  "completionId": "f3d266e7d8624cec90a633a7aa9ff692",
+                  "finishReason": "length",
+                  "sseEventCount": 75,
+                  "firstSseDataPreview": "{\"id\":\"f3d266e7d8624cec90a633a7aa9ff692\",\"object\":\"chat.completion.chunk\",\"created\":1790437854,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 ",
+                  "last": "stream would have 200/32 = 6.25 numbers. But that doesn't work evenly. Let me think about this differently.\n\nActually, the user says \"stream 26/32\" which likely",
+                  "chars": 680
+                },
+                "decodeMs": 9069.25
+              },
+              {
+                "index": 26,
+                "ttftContentMs": 7729.33,
+                "reasoningChunks": 0,
+                "ttftMs": 7729.33,
+                "decodeTps": 38.23,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.14,
+                "prefillTokens": 32,
+                "totalMs": 14399.87,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 27/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-Hfm0qIjhmyfKXuNbEmsRZXqq"
+                  },
+                  "completionId": "1082bb16806543939a62bc1e1b155556",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"1082bb16806543939a62bc1e1b155556\",\"object\":\"chat.completion.chunk\",\"created\":1790437853,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6670.5
+              },
+              {
+                "index": 27,
+                "ttftContentMs": 6531.61,
+                "reasoningChunks": 0,
+                "ttftMs": 6531.61,
+                "decodeTps": 36.67,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 13486.41,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 28/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-y1qt4mjEJXznQD9fIwaUxhMe"
+                  },
+                  "completionId": "9f7810dc35044ebea9047175c96c2f09",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"9f7810dc35044ebea9047175c96c2f09\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6954.78
+              },
+              {
+                "index": 28,
+                "ttftContentMs": 6531.72,
+                "reasoningChunks": 0,
+                "ttftMs": 6531.72,
+                "decodeTps": 36.67,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 13486.5,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 29/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-QZA0ScsysswY1Z20qWYLjwCN"
+                  },
+                  "completionId": "cc2ed81517794893b1700a0eedfd878c",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"cc2ed81517794893b1700a0eedfd878c\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6954.75
+              },
+              {
+                "index": 29,
+                "ttftContentMs": 6531.79,
+                "reasoningChunks": 0,
+                "ttftMs": 6531.79,
+                "decodeTps": 23.79,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 4.9,
+                "prefillTokens": 32,
+                "totalMs": 17253.08,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 30/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-HIZyjEmUGDUJKaulIXNNWRHn"
+                  },
+                  "completionId": "7a50b530be5245b0a14523aa8f648bdf",
+                  "finishReason": "length",
+                  "sseEventCount": 66,
+                  "firstSseDataPreview": "{\"id\":\"7a50b530be5245b0a14523aa8f648bdf\",\"object\":\"chat.completion.chunk\",\"created\":1790437852,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 ",
+                  "last": " 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 151 151 152 155 156 157 158 159 160 161 162 163 164 155 156 157 158 159 160 161 162 163 164 165 166",
+                  "chars": 519
+                },
+                "decodeMs": 10721.01
+              },
+              {
+                "index": 30,
+                "ttftContentMs": 9505.49,
+                "reasoningChunks": 0,
+                "ttftMs": 9505.49,
+                "decodeTps": 41.21,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 3.37,
+                "prefillTokens": 32,
+                "totalMs": 15693.03,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 31/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-o3X80uDq75Qmgtlf2oVpZ92w"
+                  },
+                  "completionId": "eb60e80623214ba89e2bb0778091a394",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"eb60e80623214ba89e2bb0778091a394\",\"object\":\"chat.completion.chunk\",\"created\":1790437855,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 6187.34
+              },
+              {
+                "index": 31,
+                "ttftContentMs": 12888.91,
+                "reasoningChunks": 0,
+                "ttftMs": 12888.91,
+                "decodeTps": 51.23,
+                "decodeTokens": 255,
+                "completionTokens": 256,
+                "prefillTps": 2.48,
+                "prefillTokens": 32,
+                "totalMs": 17866.19,
+                "error": null,
+                "prompt": "Count from 1 to 200. Output only the numbers, separated by spaces. No other text. (stream 32/32)",
+                "http": {
+                  "url": "http://127.0.0.1:8100/v1/chat/completions",
+                  "status": 200,
+                  "headers": {
+                    "content-type": "text/event-stream",
+                    "date": "Sat, 26 Sep 2026 15:50:45 GMT",
+                    "server": "uvicorn",
+                    "x-request-id": "chatcmpl-mylxEMgjvu7pYDoGA6egxP1d"
+                  },
+                  "completionId": "e6b1fe3b1cff4f99b664acb107264463",
+                  "finishReason": "length",
+                  "sseEventCount": 47,
+                  "firstSseDataPreview": "{\"id\":\"e6b1fe3b1cff4f99b664acb107264463\",\"object\":\"chat.completion.chunk\",\"created\":1790437858,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                  "request": {
+                    "model": "deepseek-v41-flash",
+                    "maxTokens": 256,
+                    "temperature": 0,
+                    "stream": true,
+                    "promptChars": 96
+                  }
+                },
+                "usage": {
+                  "promptTokens": 32,
+                  "completionTokens": 256,
+                  "totalTokens": 288
+                },
+                "contentPreview": {
+                  "first": "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 5",
+                  "last": "5 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 ",
+                  "chars": 404
+                },
+                "decodeMs": 4977.14
+              }
+            ],
+            "model": "deepseek-v41-flash",
+            "hardwareSamples": []
+          }
+        ],
+        "error": null,
+        "durationMs": 45414,
+        "owner": null
+      }
+    }
+  ],
+  "method": "Pinned sparkDash prompts and streaming metrics. Prefill C1, fresh UUID prefix per request, 8-token budget, temperature 0, thinking off. Decode structured, 256 tokens, ascending concurrency per trial; original prompt reuse and warmup. Client timing, no hardware polling. Usage tokens required. Tweet source version unconfirmed.",
+  "error": "Error: Decode job failed or missing usage / 256-token completion"
+}

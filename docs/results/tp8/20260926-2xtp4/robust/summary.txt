@@ -1,0 +1,43 @@
+== switching to 2xTP4 Sat Sep 26 06:12:51 PM BST 2026
+== 2xTP4 robust Sat Sep 26 06:16:50 PM BST 2026
+{"status":"PASS","output":"/r/warm1"}
+{"status":"PASS","output":"/r/warm2"}
+{"status":"PASS","output":"/r/sd-prose-t1"}
+{"status":"PASS","output":"/r/sd-code-t1"}
+{"status":"PASS","output":"/r/sd-structured-t1"}
+{"status":"PASS","output":"/r/sd-json-t1"}
+{"status":"PASS","output":"/r/sd-prose-t2"}
+{"status":"PASS","output":"/r/sd-code-t2"}
+Node.js v22.23.2
+{"status":"PASS","output":"/r/sd-json-t2"}
+{"status":"PASS","output":"/r/sd-prose-t3"}
+{"status":"PASS","output":"/r/sd-code-t3"}
+Node.js v22.23.2
+{"status":"PASS","output":"/r/sd-json-t3"}
+v41 run 1 exit 0
+v41 run 2 exit 0
+v41 run 3 exit 0
+ALLDONE
+== ALL COMPLETE Sat Sep 26 06:29:40 PM BST 2026
+## sparkDash, median (min–max) of 3 trials — aggregate tok/s / per-stream tok/s  [robust-tp4x2]
+| type | C1 | C8 | C16 | C32 |
+|---|---:|---:|---:|---:|
+| prose | 86.0 (86–86) | 307.4 (292–312) / 41.8 | 469.3 (460–482) / 31.6 | 673.0 (664–673) / 22.3 |
+| code | 126.8 (127–127) | 448.8 (442–451) / 61.3 | 607.9 (604–612) / 41.2 | 836.3 (822–838) / 28.6 |
+| structured | 155.2 (150–156) | 260.9 (256–261) / 52.4 | 730.7 (652–759) / 62.5 | 914.9 (817–959) / 45.2 |
+| json | 124.3 (120–124) | 561.6 (560–567) / 76.1 | 884.3 (851–898) / 58.9 | 1278.1 (1260–1281) / 42.6 |
+
+
+## 8-category community benchmark, median of 3 runs — end-to-end aggregate tok/s (incl. prefill) / per-stream decode tok/s
+| category | C1 | C8 | C16 | C32 |
+|---|---:|---:|---:|---:|
+| coding | 112.0 | 514.5 / 76.6 | 864.9 / 62.5 | 1328.8 / 47.4 |
+| json | 81.3 | 322.1 / 56.4 | 476.4 / 42.3 | 715.3 / 31.2 |
+| narrative | 58.8 | 228.9 / 32.4 | 332.8 / 24.1 | 426.1 / 15.1 |
+| prose | 54.6 | 234.2 / 34.3 | 362.2 / 26.0 | 485.3 / 17.4 |
+| math | 113.8 | 483.5 / 71.6 | 755.6 / 59.0 | 1103.4 / 41.9 |
+| reasoning | 84.8 | 364.5 / 55.0 | 555.5 / 39.7 | 794.7 / 28.9 |
+| summary | 58.4 | 223.8 / 35.5 | 338.3 / 27.7 | 449.2 / 19.0 |
+| format | 105.2 | 491.3 / 88.4 | 772.8 / 69.4 | 1168.2 / 51.3 |
+| **mean of 8** | **83.7** | **362.2** / 56.5 | **559.8** / 43.8 | **809.8** / 31.6 |
+| mean TTFT (s) | 0.20 | 0.33 | 0.42 | 0.60 |

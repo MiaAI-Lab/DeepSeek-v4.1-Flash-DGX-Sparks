@@ -1,0 +1,53 @@
+{
+  "request": {
+    "model": "deepseek-v41-flash",
+    "temperature": 0,
+    "max_tokens": 256,
+    "chat_template_kwargs": {
+      "thinking": false
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is 24 times 19? Return only the integer."
+      }
+    ]
+  },
+  "response": {
+    "id": "340a75f5ec70426085dcafeba24c033a",
+    "object": "chat.completion",
+    "created": 1790435953,
+    "model": "deepseek-v41-flash",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "456",
+          "reasoning_content": null,
+          "tool_calls": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "matched_stop": 1
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 17,
+      "total_tokens": 19,
+      "completion_tokens": 2,
+      "prompt_tokens_details": null,
+      "reasoning_tokens": 0
+    },
+    "metadata": {
+      "weight_version": "default",
+      "weight_versions": [
+        {
+          "version": "default",
+          "start": 0,
+          "end": 2
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,3079 @@
+{
+  "comparison": [
+    {
+      "benchId": "d753bc63-80f4-477b-85e9-b7e08b44261f",
+      "sparkId": "comparison",
+      "status": "completed",
+      "startedAt": 1790437864200,
+      "completedAt": 1790437899768,
+      "config": {
+        "port": 8100,
+        "modelId": "deepseek-v41-flash",
+        "concurrencies": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32
+        ],
+        "maxTokens": 256,
+        "promptType": "json",
+        "debug": true
+      },
+      "progress": {
+        "currentConcurrency": null,
+        "completedLevels": 6,
+        "totalLevels": 6,
+        "message": "Done"
+      },
+      "results": [
+        {
+          "concurrency": 1,
+          "streamsOk": 1,
+          "streamsFailed": 0,
+          "meanDecodeTps": 117.81,
+          "medianDecodeTps": 117.81,
+          "minDecodeTps": 117.81,
+          "maxDecodeTps": 117.81,
+          "meanTtftMs": 227.34,
+          "medianTtftMs": 227.34,
+          "aggregateDecodeTps": 117.81,
+          "meanPrefillTps": 228.73,
+          "medianPrefillTps": 228.73,
+          "aggregatePrefillTps": 228.73,
+          "totalPrefillTokens": 52,
+          "totalDecodeTokens": 255,
+          "totalCompletionTokens": 256,
+          "durationMs": 2392.28,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 227.34,
+              "reasoningChunks": 0,
+              "ttftMs": 227.34,
+              "decodeTps": 117.81,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 228.73,
+              "prefillTokens": 52,
+              "totalMs": 2391.94,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array.",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:04 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-wvsuJBOqtLvZEfAzCjvMilRj"
+                },
+                "completionId": "4849abe9d47d465199cb9a90a3bbf456",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"4849abe9d47d465199cb9a90a3bbf456\",\"object\":\"chat.completion.chunk\",\"created\":1790437864,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 174
+                }
+              },
+              "usage": {
+                "promptTokens": 52,
+                "completionTokens": 256,
+                "totalTokens": 308
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":44,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 2164.43
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 2,
+          "streamsOk": 2,
+          "streamsFailed": 0,
+          "meanDecodeTps": 88.47,
+          "medianDecodeTps": 88.47,
+          "minDecodeTps": 85.77,
+          "maxDecodeTps": 91.17,
+          "meanTtftMs": 226.07,
+          "medianTtftMs": 226.07,
+          "aggregateDecodeTps": 171.52,
+          "meanPrefillTps": 260.99,
+          "medianPrefillTps": 260.99,
+          "aggregatePrefillTps": 521.11,
+          "totalPrefillTokens": 118,
+          "totalDecodeTokens": 510,
+          "totalCompletionTokens": 512,
+          "durationMs": 3200.03,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 226.24,
+              "reasoningChunks": 0,
+              "ttftMs": 226.24,
+              "decodeTps": 91.17,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 260.78,
+              "prefillTokens": 59,
+              "totalMs": 3023.29,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 1/2)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:06 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-NMzHVOJG2ARyzTusTFzn9BTn"
+                },
+                "completionId": "ab6d109d10274cec9ed9f4f8e2d5721c",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"ab6d109d10274cec9ed9f4f8e2d5721c\",\"object\":\"chat.completion.chunk\",\"created\":1790437867,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "u-node-02\",\"gpuIndex\":1,\"utilPct\":58,\"tempC\":61,\"powerW\":228,\"memUsedMb\":11264},{\"host\":\"gpu-node-02\",\"gpuIndex\":2,\"utilPct\":72,\"tempC\":66,\"powerW\":263,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 2796.93
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 225.89,
+              "reasoningChunks": 0,
+              "ttftMs": 225.89,
+              "decodeTps": 85.77,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 261.19,
+              "prefillTokens": 59,
+              "totalMs": 3199.19,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 2/2)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:06 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-gBuZMCFWhUgiyWnIEojKoobH"
+                },
+                "completionId": "7ee5ce97aa12451e815bd09d2a1ddfaf",
+                "finishReason": "length",
+                "sseEventCount": 57,
+                "firstSseDataPreview": "{\"id\":\"7ee5ce97aa12451e815bd09d2a1ddfaf\",\"object\":\"chat.completion.chunk\",\"created\":1790437867,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-17\",\"gpuIndex\":0,\"utilPct\":83,\"tempC\":71,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-17\",\"gpuIndex\":1,\"utilPct\":77,\"tempC\":69,\"powerW\":",
+                "last": "u-node-18\",\"gpuIndex\":1,\"utilPct\":95,\"tempC\":76,\"powerW\":342,\"memUsedMb\":19712},{\"host\":\"gpu-node-18\",\"gpuIndex\":2,\"utilPct\":59,\"tempC\":63,\"powerW\":254,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 2973.16
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 4,
+          "streamsOk": 4,
+          "streamsFailed": 0,
+          "meanDecodeTps": 75.96,
+          "medianDecodeTps": 75.96,
+          "minDecodeTps": 75.14,
+          "maxDecodeTps": 76.77,
+          "meanTtftMs": 259.62,
+          "medianTtftMs": 259.63,
+          "aggregateDecodeTps": 300.47,
+          "meanPrefillTps": 227.26,
+          "medianPrefillTps": 227.25,
+          "aggregatePrefillTps": 904.98,
+          "totalPrefillTokens": 236,
+          "totalDecodeTokens": 1020,
+          "totalCompletionTokens": 1024,
+          "durationMs": 3654.5,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 259.41,
+              "reasoningChunks": 0,
+              "ttftMs": 259.41,
+              "decodeTps": 76.76,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 227.44,
+              "prefillTokens": 59,
+              "totalMs": 3581.72,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 1/4)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:09 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-WZOGNKKHmOSs7nxLyMHqhgdl"
+                },
+                "completionId": "97e5ce1787a04d9d93e9e8a544b908aa",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"97e5ce1787a04d9d93e9e8a544b908aa\",\"object\":\"chat.completion.chunk\",\"created\":1790437870,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "u-node-02\",\"gpuIndex\":1,\"utilPct\":59,\"tempC\":63,\"powerW\":241,\"memUsedMb\":13876},{\"host\":\"gpu-node-02\",\"gpuIndex\":2,\"utilPct\":72,\"tempC\":68,\"powerW\":276,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 3321.91
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 260.3,
+              "reasoningChunks": 0,
+              "ttftMs": 260.3,
+              "decodeTps": 75.15,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 226.66,
+              "prefillTokens": 59,
+              "totalMs": 3653.78,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 2/4)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:09 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-pXRiEaR6oyyhXsoHI8TnL5BH"
+                },
+                "completionId": "5d942eb0d64d4db7abbfabdbe7a23826",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"5d942eb0d64d4db7abbfabdbe7a23826\",\"object\":\"chat.completion.chunk\",\"created\":1790437870,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 3393.32
+            },
+            {
+              "index": 2,
+              "ttftContentMs": 259.85,
+              "reasoningChunks": 0,
+              "ttftMs": 259.85,
+              "decodeTps": 75.14,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 227.06,
+              "prefillTokens": 59,
+              "totalMs": 3653.8,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 3/4)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:09 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-40QGoZqAUUw1jZw5tO1eZOfp"
+                },
+                "completionId": "47648d398c1145c69ca3142cc072314b",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"47648d398c1145c69ca3142cc072314b\",\"object\":\"chat.completion.chunk\",\"created\":1790437870,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-17\",\"gpuIndex\":0,\"utilPct\":91,\"tempC\":74,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-17\",\"gpuIndex\":1,\"utilPct\":88,\"tempC\":71,\"powerW\":",
+                "last": "u-node-18\",\"gpuIndex\":1,\"utilPct\":81,\"tempC\":68,\"powerW\":279,\"memUsedMb\":16128},{\"host\":\"gpu-node-18\",\"gpuIndex\":2,\"utilPct\":79,\"tempC\":67,\"powerW\":271,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 3393.7
+            },
+            {
+              "index": 3,
+              "ttftContentMs": 258.9,
+              "reasoningChunks": 0,
+              "ttftMs": 258.9,
+              "decodeTps": 76.77,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 227.88,
+              "prefillTokens": 59,
+              "totalMs": 3580.59,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 4/4)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:09 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-E1KwO14YawY9XPRghTnWbDPt"
+                },
+                "completionId": "ce272c81f1c245e6b2bacb15e9ac8f18",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"ce272c81f1c245e6b2bacb15e9ac8f18\",\"object\":\"chat.completion.chunk\",\"created\":1790437870,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":289,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 3321.47
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 8,
+          "streamsOk": 8,
+          "streamsFailed": 0,
+          "meanDecodeTps": 55.06,
+          "medianDecodeTps": 54.79,
+          "minDecodeTps": 53.9,
+          "maxDecodeTps": 56.86,
+          "meanTtftMs": 335.73,
+          "medianTtftMs": 335.72,
+          "aggregateDecodeTps": 431.01,
+          "meanPrefillTps": 175.74,
+          "medianPrefillTps": 175.75,
+          "aggregatePrefillTps": 1396.73,
+          "totalPrefillTokens": 472,
+          "totalDecodeTokens": 2040,
+          "totalCompletionTokens": 2048,
+          "durationMs": 5069.05,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 336.58,
+              "reasoningChunks": 0,
+              "ttftMs": 336.58,
+              "decodeTps": 54.79,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 175.29,
+              "prefillTokens": 59,
+              "totalMs": 4991.26,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 1/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-SBvajlaBpHYmBz71Qz0rA4qK"
+                },
+                "completionId": "1912c895e6744e4fac40522b97f9bb52",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"1912c895e6744e4fac40522b97f9bb52\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-02\",\"gpuIndex\":1,\"utilPct\":72,\"tempC\":68,\"powerW\":214,\"memUsedMb\":9216},{\"host\":\"gpu-node-02\",\"gpuIndex\":2,\"utilPct\":58,\"tempC\":62,\"powerW\":187,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 4654.31
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 334.72,
+              "reasoningChunks": 0,
+              "ttftMs": 334.72,
+              "decodeTps": 54.78,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 176.27,
+              "prefillTokens": 59,
+              "totalMs": 4990.84,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 2/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-5GMNDNWsbK2MiQWnTn32yeQJ"
+                },
+                "completionId": "5119131375d84c809d6c35fd8ba2e742",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"5119131375d84c809d6c35fd8ba2e742\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":22880},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 4655.07
+            },
+            {
+              "index": 2,
+              "ttftContentMs": 335.04,
+              "reasoningChunks": 0,
+              "ttftMs": 335.04,
+              "decodeTps": 54.78,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 176.1,
+              "prefillTokens": 59,
+              "totalMs": 4990.41,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 3/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-AaR9iJlg2B5D9o0szWM1KThk"
+                },
+                "completionId": "6ab020aa79554fc48342c9b95f186632",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"6ab020aa79554fc48342c9b95f186632\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":349,\"memUsedMb\":20112},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 4654.78
+            },
+            {
+              "index": 3,
+              "ttftContentMs": 336.68,
+              "reasoningChunks": 0,
+              "ttftMs": 336.68,
+              "decodeTps": 53.9,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 175.24,
+              "prefillTokens": 59,
+              "totalMs": 5067.66,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 4/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-PXcivjZoQ4HpMMgwzFc5iIOG"
+                },
+                "completionId": "89b8d392944043a7973746d74e1e9f65",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"89b8d392944043a7973746d74e1e9f65\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-17\",\"gpuIndex\":0,\"utilPct\":73,\"tempC\":68,\"powerW\":241,\"memUsedMb\":14210},{\"host\":\"gpu-node-17\",\"gpuIndex\":1,\"utilPct\":81,\"tempC\":71,\"powerW\":",
+                "last": "u-node-18\",\"gpuIndex\":1,\"utilPct\":58,\"tempC\":63,\"powerW\":198,\"memUsedMb\":11040},{\"host\":\"gpu-node-18\",\"gpuIndex\":2,\"utilPct\":37,\"tempC\":55,\"powerW\":152,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 4730.85
+            },
+            {
+              "index": 4,
+              "ttftContentMs": 335.54,
+              "reasoningChunks": 0,
+              "ttftMs": 335.54,
+              "decodeTps": 56.86,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 175.84,
+              "prefillTokens": 59,
+              "totalMs": 4821,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 5/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-ztLGXpnHTLQD0c0fY06nkwlV"
+                },
+                "completionId": "ad1433f5cab44386be7daf73f84e94db",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"ad1433f5cab44386be7daf73f84e94db\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":310,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":342,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":95,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 4484.95
+            },
+            {
+              "index": 5,
+              "ttftContentMs": 335.9,
+              "reasoningChunks": 0,
+              "ttftMs": 335.9,
+              "decodeTps": 54.79,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 175.65,
+              "prefillTokens": 59,
+              "totalMs": 4990.52,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 6/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-vdY2QbXa6G2QFQakzEo1RfiN"
+                },
+                "completionId": "6c4b8d62dadf49cd85b1f931d14d27a0",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"6c4b8d62dadf49cd85b1f931d14d27a0\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":349,\"memUsedMb\":20116},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 4654.33
+            },
+            {
+              "index": 6,
+              "ttftContentMs": 335.96,
+              "reasoningChunks": 0,
+              "ttftMs": 335.96,
+              "decodeTps": 55.78,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 175.62,
+              "prefillTokens": 59,
+              "totalMs": 4907.92,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 7/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-4KBVQjwBtH5NtY9e0Awkohf7"
+                },
+                "completionId": "485754432236448cabd8365c0b70684b",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"485754432236448cabd8365c0b70684b\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":349,\"memUsedMb\":20116},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 4571.58
+            },
+            {
+              "index": 7,
+              "ttftContentMs": 335.39,
+              "reasoningChunks": 0,
+              "ttftMs": 335.39,
+              "decodeTps": 54.79,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 175.92,
+              "prefillTokens": 59,
+              "totalMs": 4989.71,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 8/8)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:13 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-QtJpznWZrOVtjohf997zpYlL"
+                },
+                "completionId": "a71622f29abf412faf7412ade2e199e9",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"a71622f29abf412faf7412ade2e199e9\",\"object\":\"chat.completion.chunk\",\"created\":1790437874,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 187
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":92,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 4653.83
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 16,
+          "streamsOk": 16,
+          "streamsFailed": 0,
+          "meanDecodeTps": 42.18,
+          "medianDecodeTps": 42,
+          "minDecodeTps": 40.88,
+          "maxDecodeTps": 43.85,
+          "meanTtftMs": 458.24,
+          "medianTtftMs": 458.17,
+          "aggregateDecodeTps": 653.96,
+          "meanPrefillTps": 128.75,
+          "medianPrefillTps": 128.77,
+          "aggregatePrefillTps": 2051.57,
+          "totalPrefillTokens": 944,
+          "totalDecodeTokens": 4080,
+          "totalCompletionTokens": 4096,
+          "durationMs": 6698.48,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 459.99,
+              "reasoningChunks": 0,
+              "ttftMs": 459.99,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.26,
+              "prefillTokens": 59,
+              "totalMs": 6533.25,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 1/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-6xztVSTQg9Xvxee8Qoei1TDT"
+                },
+                "completionId": "b6b89b43d48942788cd3074e1b698bc7",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"b6b89b43d48942788cd3074e1b698bc7\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":20116},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6071.95
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 459.1,
+              "reasoningChunks": 0,
+              "ttftMs": 459.1,
+              "decodeTps": 42.95,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.51,
+              "prefillTokens": 59,
+              "totalMs": 6396.5,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 2/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-xSZ2IRYpjZuhriReIT6H6ZHj"
+                },
+                "completionId": "9484dcb81143489a87642490c9159883",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"9484dcb81143489a87642490c9159883\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":20116},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 5937.28
+            },
+            {
+              "index": 2,
+              "ttftContentMs": 459.32,
+              "reasoningChunks": 0,
+              "ttftMs": 459.32,
+              "decodeTps": 43.85,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.45,
+              "prefillTokens": 59,
+              "totalMs": 6275.17,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 3/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-jFso9Fhd4aihtGGIKokbVjDr"
+                },
+                "completionId": "aa770c230cf142cca20514854f1a0611",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"aa770c230cf142cca20514854f1a0611\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "u-node-03\",\"gpuIndex\":1,\"utilPct\":98,\"tempC\":80,\"powerW\":351,\"memUsedMb\":22016},{\"host\":\"gpu-node-03\",\"gpuIndex\":2,\"utilPct\":96,\"tempC\":79,\"powerW\":344,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 5815.67
+            },
+            {
+              "index": 3,
+              "ttftContentMs": 459.05,
+              "reasoningChunks": 0,
+              "ttftMs": 459.05,
+              "decodeTps": 40.88,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.53,
+              "prefillTokens": 59,
+              "totalMs": 6697.52,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 4/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-0HUPDDyhvuxjdNtYc7DjksaI"
+                },
+                "completionId": "70b4252eeedc497f83dd9822088b1011",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"70b4252eeedc497f83dd9822088b1011\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-07\",\"gpuIndex\":0,\"utilPct\":83,\"tempC\":71,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-07\",\"gpuIndex\":1,\"utilPct\":79,\"tempC\":69,\"powerW\":",
+                "last": "u-node-08\",\"gpuIndex\":1,\"utilPct\":95,\"tempC\":77,\"powerW\":356,\"memUsedMb\":21056},{\"host\":\"gpu-node-08\",\"gpuIndex\":2,\"utilPct\":57,\"tempC\":61,\"powerW\":218,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6238.38
+            },
+            {
+              "index": 4,
+              "ttftContentMs": 458.9,
+              "reasoningChunks": 0,
+              "ttftMs": 458.9,
+              "decodeTps": 42.95,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.57,
+              "prefillTokens": 59,
+              "totalMs": 6396.21,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 5/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-RBgOse31YmzakD9rfEB5vjuu"
+                },
+                "completionId": "37ddfae6b9904f51adbf027abaf3fab7",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"37ddfae6b9904f51adbf027abaf3fab7\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":310,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":98,\"tempC\":80,\"powerW\":348,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":95,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 5937.14
+            },
+            {
+              "index": 5,
+              "ttftContentMs": 458.57,
+              "reasoningChunks": 0,
+              "ttftMs": 458.57,
+              "decodeTps": 41.25,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.66,
+              "prefillTokens": 59,
+              "totalMs": 6639.74,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 6/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-7riqzznQaT0sjaMAev0frfiE"
+                },
+                "completionId": "511fbc3663bd483ebb29f400b3ef5777",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"511fbc3663bd483ebb29f400b3ef5777\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":289,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":44,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 6181.09
+            },
+            {
+              "index": 6,
+              "ttftContentMs": 458.15,
+              "reasoningChunks": 0,
+              "ttftMs": 458.15,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.78,
+              "prefillTokens": 59,
+              "totalMs": 6530.99,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 7/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-UaCuYMAQA7pA2zX6FzbW5vxd"
+                },
+                "completionId": "efa296f6f79c48e79c4a9b252827f4b1",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"efa296f6f79c48e79c4a9b252827f4b1\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":23112},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6072.01
+            },
+            {
+              "index": 7,
+              "ttftContentMs": 458.17,
+              "reasoningChunks": 0,
+              "ttftMs": 458.17,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.77,
+              "prefillTokens": 59,
+              "totalMs": 6530.98,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 8/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-Xcs6Xq5X0nytgOmM03LiSMq5"
+                },
+                "completionId": "5637d063a3f34aee945adfad7f2f831a",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"5637d063a3f34aee945adfad7f2f831a\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":98,\"tempC\":80,\"powerW\":348,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":95,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6071.89
+            },
+            {
+              "index": 8,
+              "ttftContentMs": 457.69,
+              "reasoningChunks": 0,
+              "ttftMs": 457.69,
+              "decodeTps": 41.98,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.91,
+              "prefillTokens": 59,
+              "totalMs": 6531.92,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 9/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-SeKO1dRgMA66MK29ikL1kKR0"
+                },
+                "completionId": "7aa4f640f3214ae68e6cfc415cb3345f",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"7aa4f640f3214ae68e6cfc415cb3345f\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":23112},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6073.77
+            },
+            {
+              "index": 9,
+              "ttftContentMs": 458.41,
+              "reasoningChunks": 0,
+              "ttftMs": 458.41,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.71,
+              "prefillTokens": 59,
+              "totalMs": 6531.2,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 10/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-fzHmeWVFhaKHQ9ynDfkpziwt"
+                },
+                "completionId": "10498e94ac2945348eba72ee22e04493",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"10498e94ac2945348eba72ee22e04493\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-07\",\"gpuIndex\":0,\"utilPct\":83,\"tempC\":71,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-07\",\"gpuIndex\":1,\"utilPct\":77,\"tempC\":69,\"powerW\":",
+                "last": "u-node-08\",\"gpuIndex\":1,\"utilPct\":95,\"tempC\":76,\"powerW\":342,\"memUsedMb\":19712},{\"host\":\"gpu-node-08\",\"gpuIndex\":2,\"utilPct\":59,\"tempC\":64,\"powerW\":263,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6071.66
+            },
+            {
+              "index": 10,
+              "ttftContentMs": 458.17,
+              "reasoningChunks": 0,
+              "ttftMs": 458.17,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.77,
+              "prefillTokens": 59,
+              "totalMs": 6530.64,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 11/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-BVvU6GWLi3UzYUofwcvYZdHa"
+                },
+                "completionId": "a087dbb943334b19a0509e8dcb87bfd7",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"a087dbb943334b19a0509e8dcb87bfd7\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 6071.53
+            },
+            {
+              "index": 11,
+              "ttftContentMs": 457.68,
+              "reasoningChunks": 0,
+              "ttftMs": 457.68,
+              "decodeTps": 42.95,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.91,
+              "prefillTokens": 59,
+              "totalMs": 6395.16,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 12/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-EqWqnjSI1YyfotHkve6hSpmF"
+                },
+                "completionId": "563f264a2bb2438eb7f6cf3c756852c6",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"563f264a2bb2438eb7f6cf3c756852c6\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":78,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 5937.37
+            },
+            {
+              "index": 12,
+              "ttftContentMs": 457.78,
+              "reasoningChunks": 0,
+              "ttftMs": 457.78,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.88,
+              "prefillTokens": 59,
+              "totalMs": 6531.13,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 13/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-zlaVGz07wvIpNx2Y7kLqLWwl"
+                },
+                "completionId": "9c133c4bdc984353a2ece22f511e1bf3",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"9c133c4bdc984353a2ece22f511e1bf3\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":19968},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6071.95
+            },
+            {
+              "index": 13,
+              "ttftContentMs": 457.15,
+              "reasoningChunks": 0,
+              "ttftMs": 457.15,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 129.06,
+              "prefillTokens": 59,
+              "totalMs": 6529.7,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 14/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-Aq5ch748BfQfzL43TzOKT97c"
+                },
+                "completionId": "281f39c7f9f4489db5987469564658c6",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"281f39c7f9f4489db5987469564658c6\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":20116},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6071.8
+            },
+            {
+              "index": 14,
+              "ttftContentMs": 457.1,
+              "reasoningChunks": 0,
+              "ttftMs": 457.1,
+              "decodeTps": 42,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 129.07,
+              "prefillTokens": 59,
+              "totalMs": 6530.22,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 15/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-4yvOrRJbMpHCQos5dM0fzYju"
+                },
+                "completionId": "418b52e7e40842f2a14529d1c5171a53",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"418b52e7e40842f2a14529d1c5171a53\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":44,\"powerW\":72,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 6072.06
+            },
+            {
+              "index": 15,
+              "ttftContentMs": 456.65,
+              "reasoningChunks": 0,
+              "ttftMs": 456.65,
+              "decodeTps": 41.99,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 129.2,
+              "prefillTokens": 59,
+              "totalMs": 6529.94,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 16/16)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:18 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-yb9bASFLxrxI1WdoizD3Aolo"
+                },
+                "completionId": "bbc3ab5b209c4d45ab564d8c10ed3549",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"bbc3ab5b209c4d45ab564d8c10ed3549\",\"object\":\"chat.completion.chunk\",\"created\":1790437879,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":98,\"tempC\":80,\"powerW\":344,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":44,\"powerW\":78,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6072.31
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        },
+        {
+          "concurrency": 32,
+          "streamsOk": 32,
+          "streamsFailed": 0,
+          "meanDecodeTps": 39.98,
+          "medianDecodeTps": 39.47,
+          "minDecodeTps": 36.75,
+          "maxDecodeTps": 44.58,
+          "meanTtftMs": 3808.8,
+          "medianTtftMs": 3548.47,
+          "aggregateDecodeTps": 603.13,
+          "meanPrefillTps": 68.17,
+          "medianPrefillTps": 68.36,
+          "aggregatePrefillTps": 245.92,
+          "totalPrefillTokens": 1888,
+          "totalDecodeTokens": 8160,
+          "totalCompletionTokens": 8192,
+          "durationMs": 13990.45,
+          "error": null,
+          "streams": [
+            {
+              "index": 0,
+              "ttftContentMs": 461.56,
+              "reasoningChunks": 0,
+              "ttftMs": 461.56,
+              "decodeTps": 43.63,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 127.83,
+              "prefillTokens": 59,
+              "totalMs": 6306.43,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 1/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-CxgUG2RGUYWdyCcdDTXCACew"
+                },
+                "completionId": "a879388816a34e28bf76d93b4fd929e1",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"a879388816a34e28bf76d93b4fd929e1\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":14200},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":15600},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":78,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 5844.68
+            },
+            {
+              "index": 1,
+              "ttftContentMs": 460.58,
+              "reasoningChunks": 0,
+              "ttftMs": 460.58,
+              "decodeTps": 38.89,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.1,
+              "prefillTokens": 59,
+              "totalMs": 7017.6,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 2/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-aESkQvEr214krSuONxJrE4Ca"
+                },
+                "completionId": "715ad7569d454f4e85bb6024c2882443",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"715ad7569d454f4e85bb6024c2882443\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-07\",\"gpuIndex\":0,\"utilPct\":83,\"tempC\":71,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-07\",\"gpuIndex\":1,\"utilPct\":77,\"tempC\":69,\"powerW\":",
+                "last": "u-node-12\",\"gpuIndex\":1,\"utilPct\":95,\"tempC\":76,\"powerW\":352,\"memUsedMb\":20992},{\"host\":\"gpu-node-12\",\"gpuIndex\":2,\"utilPct\":42,\"tempC\":58,\"powerW\":187,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6556.99
+            },
+            {
+              "index": 2,
+              "ttftContentMs": 460.73,
+              "reasoningChunks": 0,
+              "ttftMs": 460.73,
+              "decodeTps": 41.31,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.06,
+              "prefillTokens": 59,
+              "totalMs": 6634.3,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 3/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-saRPYixXcpi2uCTDT3CW5tt4"
+                },
+                "completionId": "9fa3c143b3d94cfbb2aa004e07aa8fb1",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"9fa3c143b3d94cfbb2aa004e07aa8fb1\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":22880},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6173.53
+            },
+            {
+              "index": 3,
+              "ttftContentMs": 460.82,
+              "reasoningChunks": 0,
+              "ttftMs": 460.82,
+              "decodeTps": 41.3,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.03,
+              "prefillTokens": 59,
+              "totalMs": 6634.69,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 4/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-mb2cZAbIEuYdl83Y7ITZwm0r"
+                },
+                "completionId": "0fe089097b4f4465971567c809f2af0a",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"0fe089097b4f4465971567c809f2af0a\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":22880},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6173.85
+            },
+            {
+              "index": 4,
+              "ttftContentMs": 7035.86,
+              "reasoningChunks": 0,
+              "ttftMs": 7035.86,
+              "decodeTps": 38.31,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13692.22,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 5/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-jvUuahtrZwbRuyoAe8FWPNCE"
+                },
+                "completionId": "e102c60804ba4b518ba61f2bcf9aff1c",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"e102c60804ba4b518ba61f2bcf9aff1c\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-17\",\"gpuIndex\":0,\"utilPct\":73,\"tempC\":68,\"powerW\":241,\"memUsedMb\":14208},{\"host\":\"gpu-node-17\",\"gpuIndex\":1,\"utilPct\":81,\"tempC\":71,\"powerW\":",
+                "last": "u-node-18\",\"gpuIndex\":1,\"utilPct\":58,\"tempC\":63,\"powerW\":198,\"memUsedMb\":11008},{\"host\":\"gpu-node-18\",\"gpuIndex\":2,\"utilPct\":37,\"tempC\":55,\"powerW\":152,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6656.18
+            },
+            {
+              "index": 5,
+              "ttftContentMs": 460.59,
+              "reasoningChunks": 0,
+              "ttftMs": 460.59,
+              "decodeTps": 41.3,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.1,
+              "prefillTokens": 59,
+              "totalMs": 6634.35,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 6/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-T6bTg1T0DDlAd45h9B3HVKjB"
+                },
+                "completionId": "1781d80289074414913b0487cb2e4975",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"1781d80289074414913b0487cb2e4975\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":310,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":342,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":95,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6173.76
+            },
+            {
+              "index": 6,
+              "ttftContentMs": 461.12,
+              "reasoningChunks": 0,
+              "ttftMs": 461.12,
+              "decodeTps": 41.31,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 127.95,
+              "prefillTokens": 59,
+              "totalMs": 6634.27,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 7/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-9FqWEdQt3yxtgu7M6s3CSDTy"
+                },
+                "completionId": "aac77668009f4506a7c5d5a2aac5271f",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"aac77668009f4506a7c5d5a2aac5271f\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-07\",\"gpuIndex\":0,\"utilPct\":83,\"tempC\":71,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-07\",\"gpuIndex\":1,\"utilPct\":77,\"tempC\":68,\"powerW\":",
+                "last": "u-node-08\",\"gpuIndex\":1,\"utilPct\":95,\"tempC\":76,\"powerW\":342,\"memUsedMb\":19456},{\"host\":\"gpu-node-08\",\"gpuIndex\":2,\"utilPct\":59,\"tempC\":61,\"powerW\":241,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6173.15
+            },
+            {
+              "index": 7,
+              "ttftContentMs": 460.47,
+              "reasoningChunks": 0,
+              "ttftMs": 460.47,
+              "decodeTps": 43.63,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.13,
+              "prefillTokens": 59,
+              "totalMs": 6305.9,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 8/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-LdYv3bA65ODD8xINkGOoS9zl"
+                },
+                "completionId": "c5759ec76de641f482a6adad84875bcf",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"c5759ec76de641f482a6adad84875bcf\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":96,\"tempC\":79,\"powerW\":341,\"memUsedMb\":21888},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":92,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 5845.16
+            },
+            {
+              "index": 8,
+              "ttftContentMs": 460.67,
+              "reasoningChunks": 0,
+              "ttftMs": 460.67,
+              "decodeTps": 38.89,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.08,
+              "prefillTokens": 59,
+              "totalMs": 7017.07,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 9/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-j0IifSzrxNS3qReHpO4Mqa5f"
+                },
+                "completionId": "cfa28955e2624ad39513e2ffabc173f3",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"cfa28955e2624ad39513e2ffabc173f3\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 188
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":52,\"tempC\":63,\"powerW\":172,\"memUsedMb\":6912},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":98,\"tempC\":81,\"powerW\":289,\"memUsed",
+                "chars": 623
+              },
+              "decodeMs": 6556.37
+            },
+            {
+              "index": 9,
+              "ttftContentMs": 460.78,
+              "reasoningChunks": 0,
+              "ttftMs": 460.78,
+              "decodeTps": 44.58,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.04,
+              "prefillTokens": 59,
+              "totalMs": 6181.49,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 10/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-FWjjvFhz7Nh3tA3ldwVB19co"
+                },
+                "completionId": "75dff106b4fc4254859bcb3e533bd0d6",
+                "finishReason": "length",
+                "sseEventCount": 52,
+                "firstSseDataPreview": "{\"id\":\"75dff106b4fc4254859bcb3e533bd0d6\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[\n  {\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},\n  {\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"po",
+                "last": "mUsedMb\":22528},\n  {\"host\":\"gpu-node-03\",\"gpuIndex\":1,\"utilPct\":96,\"tempC\":79,\"powerW\":344,\"memUsedMb\":21504},\n  {\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12",
+                "chars": 614
+              },
+              "decodeMs": 5720.58
+            },
+            {
+              "index": 10,
+              "ttftContentMs": 460.51,
+              "reasoningChunks": 0,
+              "ttftMs": 460.51,
+              "decodeTps": 38.9,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.12,
+              "prefillTokens": 59,
+              "totalMs": 7016.43,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 11/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-BG0RF01f6pTl83cs9394hL0Q"
+                },
+                "completionId": "b4f3ef4bffcb468f881f295bba531877",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"b4f3ef4bffcb468f881f295bba531877\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-07\",\"gpuIndex\":0,\"utilPct\":83,\"tempC\":71,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-07\",\"gpuIndex\":1,\"utilPct\":77,\"tempC\":68,\"powerW\":",
+                "last": "u-node-12\",\"gpuIndex\":1,\"utilPct\":95,\"tempC\":76,\"powerW\":342,\"memUsedMb\":19456},{\"host\":\"gpu-node-12\",\"gpuIndex\":2,\"utilPct\":59,\"tempC\":61,\"powerW\":241,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6555.87
+            },
+            {
+              "index": 11,
+              "ttftContentMs": 460.75,
+              "reasoningChunks": 0,
+              "ttftMs": 460.75,
+              "decodeTps": 41.31,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.05,
+              "prefillTokens": 59,
+              "totalMs": 6633.97,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 12/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-WEsPsdampRdvR10RYwfPj1aB"
+                },
+                "completionId": "602b9cd9500741858e33415cb929ff61",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"602b9cd9500741858e33415cb929ff61\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":14200},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":81,\"powerW\":305,\"memUsedMb\":17400},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":65,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 6173.21
+            },
+            {
+              "index": 12,
+              "ttftContentMs": 460.18,
+              "reasoningChunks": 0,
+              "ttftMs": 460.18,
+              "decodeTps": 38.89,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.21,
+              "prefillTokens": 59,
+              "totalMs": 7016.55,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 13/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-o9QUi89eeX13AGUCB2KDacyD"
+                },
+                "completionId": "04543eaabf4541fdbb0a8206015721f7",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"04543eaabf4541fdbb0a8206015721f7\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-07\",\"gpuIndex\":0,\"utilPct\":83,\"tempC\":71,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-07\",\"gpuIndex\":1,\"utilPct\":77,\"tempC\":68,\"powerW\":",
+                "last": "u-node-12\",\"gpuIndex\":1,\"utilPct\":95,\"tempC\":76,\"powerW\":352,\"memUsedMb\":20864},{\"host\":\"gpu-node-12\",\"gpuIndex\":2,\"utilPct\":59,\"tempC\":61,\"powerW\":241,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6556.34
+            },
+            {
+              "index": 13,
+              "ttftContentMs": 460.09,
+              "reasoningChunks": 0,
+              "ttftMs": 460.09,
+              "decodeTps": 43.62,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.24,
+              "prefillTokens": 59,
+              "totalMs": 6305.74,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 14/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-OUIqZLvee6EBQhy0yaHinSSc"
+                },
+                "completionId": "7dc6877095884360b425e502541a5a1e",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"7dc6877095884360b425e502541a5a1e\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":96,\"tempC\":79,\"powerW\":287,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 5845.44
+            },
+            {
+              "index": 14,
+              "ttftContentMs": 7035.36,
+              "reasoningChunks": 0,
+              "ttftMs": 7035.36,
+              "decodeTps": 37.68,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13803.39,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 15/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-gLJtPH1Mqi2Xtlxe273wUCf4"
+                },
+                "completionId": "4cbd79e71b64425187a68d043f52ea42",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"4cbd79e71b64425187a68d043f52ea42\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":349,\"memUsedMb\":23808},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6767.87
+            },
+            {
+              "index": 15,
+              "ttftContentMs": 460.48,
+              "reasoningChunks": 0,
+              "ttftMs": 460.48,
+              "decodeTps": 41.31,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.13,
+              "prefillTokens": 59,
+              "totalMs": 6633.92,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 16/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-nbm4UTNe13Hr5B5xLu2VR9ft"
+                },
+                "completionId": "3eadb3f71bb5465fa76d4e71cfe81b6e",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"3eadb3f71bb5465fa76d4e71cfe81b6e\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":92,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6173.42
+            },
+            {
+              "index": 16,
+              "ttftContentMs": 460.49,
+              "reasoningChunks": 0,
+              "ttftMs": 460.49,
+              "decodeTps": 38.89,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.12,
+              "prefillTokens": 59,
+              "totalMs": 7016.67,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 17/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-2Hhmbbmm5MAgAR9gmCk6NZIo"
+                },
+                "completionId": "92c07445e36748858ccb205f6becbf9f",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"92c07445e36748858ccb205f6becbf9f\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-17\",\"gpuIndex\":0,\"utilPct\":73,\"tempC\":68,\"powerW\":241,\"memUsedMb\":14210},{\"host\":\"gpu-node-17\",\"gpuIndex\":1,\"utilPct\":81,\"tempC\":71,\"powerW\":",
+                "last": "u-node-18\",\"gpuIndex\":1,\"utilPct\":77,\"tempC\":69,\"powerW\":254,\"memUsedMb\":14870},{\"host\":\"gpu-node-18\",\"gpuIndex\":2,\"utilPct\":85,\"tempC\":73,\"powerW\":279,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6556.15
+            },
+            {
+              "index": 17,
+              "ttftContentMs": 460.3,
+              "reasoningChunks": 0,
+              "ttftMs": 460.3,
+              "decodeTps": 36.91,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 128.18,
+              "prefillTokens": 59,
+              "totalMs": 7369.17,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 18/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-iKWBaVffUdUOsqJHkHzE5Lkc"
+                },
+                "completionId": "bfa1a0d0aa964a2190c945ff9a30a1af",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"bfa1a0d0aa964a2190c945ff9a30a1af\",\"object\":\"chat.completion.chunk\",\"created\":1790437886,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":18342},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":305,\"memUsedMb\":22410},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":72,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6908.83
+            },
+            {
+              "index": 18,
+              "ttftContentMs": 7035,
+              "reasoningChunks": 0,
+              "ttftMs": 7035,
+              "decodeTps": 39,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13574.28,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 19/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-gWS2DHiIkFwk9A1Qhab3Fr4s"
+                },
+                "completionId": "8eaaaa2b059e40a5a7cdca6594ea53ea",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"8eaaaa2b059e40a5a7cdca6594ea53ea\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":78,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 6538.76
+            },
+            {
+              "index": 19,
+              "ttftContentMs": 6635.37,
+              "reasoningChunks": 0,
+              "ttftMs": 6635.37,
+              "decodeTps": 36.75,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.89,
+              "prefillTokens": 59,
+              "totalMs": 13574.09,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 20/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-yj1x3uJat6T9pcguWgHOaWc4"
+                },
+                "completionId": "ca51c2b3fe8d45d4a8d57990b7145250",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"ca51c2b3fe8d45d4a8d57990b7145250\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":289,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":44,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 6938.31
+            },
+            {
+              "index": 20,
+              "ttftContentMs": 7034.55,
+              "reasoningChunks": 0,
+              "ttftMs": 7034.55,
+              "decodeTps": 39,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13573.75,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 21/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-cTAzlBoaicupYg9OHCmutatc"
+                },
+                "completionId": "536e4acdd1d445e187f1c9b7ea3ef2f3",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"536e4acdd1d445e187f1c9b7ea3ef2f3\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":92,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6539
+            },
+            {
+              "index": 21,
+              "ttftContentMs": 7034.34,
+              "reasoningChunks": 0,
+              "ttftMs": 7034.34,
+              "decodeTps": 38.3,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13692.27,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 22/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-TrJVC2BRtHxcKyw0KIIewuh5"
+                },
+                "completionId": "7ab354c157ee45eb814bdad4a1bac6ce",
+                "finishReason": "length",
+                "sseEventCount": 55,
+                "firstSseDataPreview": "{\"id\":\"7ab354c157ee45eb814bdad4a1bac6ce\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "u-node-03\",\"gpuIndex\":1,\"utilPct\":88,\"tempC\":76,\"powerW\":263,\"memUsedMb\":12544},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":42,\"tempC\":61,\"powerW\":154,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6657.71
+            },
+            {
+              "index": 22,
+              "ttftContentMs": 7379.17,
+              "reasoningChunks": 0,
+              "ttftMs": 7379.17,
+              "decodeTps": 40.4,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8,
+              "prefillTokens": 59,
+              "totalMs": 13691.7,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 23/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-du9qIQYt4HUO3zRomhnDoVd8"
+                },
+                "completionId": "c06ee4f5757440779612159f0fdd6d63",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"c06ee4f5757440779612159f0fdd6d63\",\"object\":\"chat.completion.chunk\",\"created\":1790437893,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":96,\"tempC\":79,\"powerW\":341,\"memUsedMb\":21888},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":44,\"powerW\":78,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6312.26
+            },
+            {
+              "index": 23,
+              "ttftContentMs": 7378.59,
+              "reasoningChunks": 0,
+              "ttftMs": 7378.59,
+              "decodeTps": 39.19,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8,
+              "prefillTokens": 59,
+              "totalMs": 13885.54,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 24/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-PthnFKltIJeqa6LuSKG0AWJ8"
+                },
+                "completionId": "59201fd0401943c696b0f4cdfe21bd42",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"59201fd0401943c696b0f4cdfe21bd42\",\"object\":\"chat.completion.chunk\",\"created\":1790437893,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":341,\"memUsedMb\":23890},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6506.74
+            },
+            {
+              "index": 24,
+              "ttftContentMs": 7034.07,
+              "reasoningChunks": 0,
+              "ttftMs": 7034.07,
+              "decodeTps": 37.67,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13803.11,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 25/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-RdpGW3uWzneNwYcdKCDbLGjQ"
+                },
+                "completionId": "f352d42f4b5449e19ca7e6500b09d392",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"f352d42f4b5449e19ca7e6500b09d392\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":241,\"memUsedMb\":14203},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "u-node-03\",\"gpuIndex\":1,\"utilPct\":88,\"tempC\":76,\"powerW\":249,\"memUsedMb\":14760},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":42,\"tempC\":61,\"powerW\":154,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6768.82
+            },
+            {
+              "index": 25,
+              "ttftContentMs": 7378.07,
+              "reasoningChunks": 0,
+              "ttftMs": 7378.07,
+              "decodeTps": 40.39,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8,
+              "prefillTokens": 59,
+              "totalMs": 13691.37,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 26/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-WhwWbIB1v5EDjrZRDBXEZBYt"
+                },
+                "completionId": "3b6dd3dd46964ddd99d1c89d54a5b5db",
+                "finishReason": "length",
+                "sseEventCount": 54,
+                "firstSseDataPreview": "{\"id\":\"3b6dd3dd46964ddd99d1c89d54a5b5db\",\"object\":\"chat.completion.chunk\",\"created\":1790437893,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "u-node-03\",\"gpuIndex\":1,\"utilPct\":88,\"tempC\":76,\"powerW\":263,\"memUsedMb\":12544},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":42,\"tempC\":61,\"powerW\":156,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6313.12
+            },
+            {
+              "index": 26,
+              "ttftContentMs": 7378.56,
+              "reasoningChunks": 0,
+              "ttftMs": 7378.56,
+              "decodeTps": 41.17,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8,
+              "prefillTokens": 59,
+              "totalMs": 13573.01,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 27/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-MBUS4SsKXultpb25Wwcd6Zxq"
+                },
+                "completionId": "b0bc0b5f83934e42a658892494dc03cb",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"b0bc0b5f83934e42a658892494dc03cb\",\"object\":\"chat.completion.chunk\",\"created\":1790437893,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":245,\"memUsedMb\":11264},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":291,\"memUsedMb\":14848},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":68,\"memUsed",
+                "chars": 624
+              },
+              "decodeMs": 6194.13
+            },
+            {
+              "index": 27,
+              "ttftContentMs": 7378.13,
+              "reasoningChunks": 0,
+              "ttftMs": 7378.13,
+              "decodeTps": 39.19,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8,
+              "prefillTokens": 59,
+              "totalMs": 13884.58,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 28/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-dt81zuDxWl4HJUzqJK0XVRJL"
+                },
+                "completionId": "1f9c88f6f6e94d0c85a32235c36402b8",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"1f9c88f6f6e94d0c85a32235c36402b8\",\"object\":\"chat.completion.chunk\",\"created\":1790437893,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "u-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":349,\"memUsedMb\":20116},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":42,\"tempC\":61,\"powerW\":187,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6506.28
+            },
+            {
+              "index": 28,
+              "ttftContentMs": 7675.13,
+              "reasoningChunks": 0,
+              "ttftMs": 7675.13,
+              "decodeTps": 40.39,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 7.69,
+              "prefillTokens": 59,
+              "totalMs": 13988.23,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 29/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-i3NbQI0n8Rl0M3vnZ1ULBW9q"
+                },
+                "completionId": "d117ccc150a74b46ac286be94b41c293",
+                "finishReason": "length",
+                "sseEventCount": 57,
+                "firstSseDataPreview": "{\"id\":\"d117ccc150a74b46ac286be94b41c293\",\"object\":\"chat.completion.chunk\",\"created\":1790437893,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":241,\"memUsedMb\":18342},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":295,\"memUsedMb\":21876},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":44,\"powerW\":68,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6313
+            },
+            {
+              "index": 29,
+              "ttftContentMs": 7033,
+              "reasoningChunks": 0,
+              "ttftMs": 7033,
+              "decodeTps": 37.67,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13801.72,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 30/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-WL5cM7c1zZwMFuuQggtm4AtW"
+                },
+                "completionId": "fb09abe51368494096a03b12c62b31d4",
+                "finishReason": "length",
+                "sseEventCount": 56,
+                "firstSseDataPreview": "{\"id\":\"fb09abe51368494096a03b12c62b31d4\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-17\",\"gpuIndex\":0,\"utilPct\":73,\"tempC\":68,\"powerW\":241,\"memUsedMb\":14203},{\"host\":\"gpu-node-17\",\"gpuIndex\":1,\"utilPct\":81,\"tempC\":71,\"powerW\":",
+                "last": "u-node-18\",\"gpuIndex\":1,\"utilPct\":88,\"tempC\":74,\"powerW\":271,\"memUsedMb\":16611},{\"host\":\"gpu-node-18\",\"gpuIndex\":2,\"utilPct\":47,\"tempC\":58,\"powerW\":182,\"memUsed",
+                "chars": 627
+              },
+              "decodeMs": 6768.59
+            },
+            {
+              "index": 30,
+              "ttftContentMs": 7032.73,
+              "reasoningChunks": 0,
+              "ttftMs": 7032.73,
+              "decodeTps": 39.76,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13446.16,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 31/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-aBqs6cmXRuDEwTc8ScXMmHSe"
+                },
+                "completionId": "a571e02d7cff420db5632146a8632602",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"a571e02d7cff420db5632146a8632602\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":75,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":97,\"tempC\":79,\"powerW\":349,\"memUsedMb\":20112},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":45,\"powerW\":88,\"memUsed",
+                "chars": 626
+              },
+              "decodeMs": 6413.26
+            },
+            {
+              "index": 31,
+              "ttftContentMs": 7033.61,
+              "reasoningChunks": 0,
+              "ttftMs": 7033.61,
+              "decodeTps": 39.76,
+              "decodeTokens": 255,
+              "completionTokens": 256,
+              "prefillTps": 8.39,
+              "prefillTokens": 59,
+              "totalMs": 13446.72,
+              "error": null,
+              "prompt": "Emit only a JSON array of fake GPU metrics rows. Each object needs host, gpuIndex, utilPct, tempC, powerW, memUsedMb. Invent many rows. No markdown. Keep expanding the array. (stream 32/32)",
+              "http": {
+                "url": "http://127.0.0.1:8100/v1/chat/completions",
+                "status": 200,
+                "headers": {
+                  "content-type": "text/event-stream",
+                  "date": "Sat, 26 Sep 2026 15:51:25 GMT",
+                  "server": "uvicorn",
+                  "x-request-id": "chatcmpl-IgeokU0NkiXXyZVaihorPDOc"
+                },
+                "completionId": "6aeb426f02e04471a4775218feaba2df",
+                "finishReason": "length",
+                "sseEventCount": 53,
+                "firstSseDataPreview": "{\"id\":\"6aeb426f02e04471a4775218feaba2df\",\"object\":\"chat.completion.chunk\",\"created\":1790437892,\"model\":\"deepseek-v41-flash\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":null,\"role\":\"assistant\",\"content\":\"\"},\"logprobs\":null,\"finish_rea",
+                "request": {
+                  "model": "deepseek-v41-flash",
+                  "maxTokens": 256,
+                  "temperature": 0,
+                  "stream": true,
+                  "promptChars": 189
+                }
+              },
+              "usage": {
+                "promptTokens": 59,
+                "completionTokens": 256,
+                "totalTokens": 315
+              },
+              "contentPreview": {
+                "first": "[{\"host\":\"gpu-node-01\",\"gpuIndex\":0,\"utilPct\":87,\"tempC\":72,\"powerW\":312,\"memUsedMb\":18432},{\"host\":\"gpu-node-01\",\"gpuIndex\":1,\"utilPct\":91,\"tempC\":74,\"powerW\":",
+                "last": "pu-node-03\",\"gpuIndex\":1,\"utilPct\":98,\"tempC\":80,\"powerW\":348,\"memUsedMb\":22016},{\"host\":\"gpu-node-04\",\"gpuIndex\":0,\"utilPct\":12,\"tempC\":48,\"powerW\":95,\"memUsed",
+                "chars": 625
+              },
+              "decodeMs": 6412.8
+            }
+          ],
+          "model": "deepseek-v41-flash",
+          "hardwareSamples": []
+        }
+      ],
+      "error": null,
+      "durationMs": 35568,
+      "owner": null
+    }
+  ]
+}

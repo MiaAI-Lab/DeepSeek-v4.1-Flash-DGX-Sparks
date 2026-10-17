@@ -1,0 +1,32 @@
+{"status":"PASS","output":"/r/warm1"}
+{"status":"PASS","output":"/r/warm2"}
+{"status":"PASS","output":"/r/decode-prose"}
+{"status":"PASS","output":"/r/decode-code"}
+{"status":"PASS","output":"/r/decode-structured"}
+{"status":"PASS","output":"/r/decode-json"}
+{"status":"PASS","output":"/r/prose-c1"}
+{"status":"PASS","output":"/r/prefill"}
+{"concurrency": 1, "tokens": 4096, "seconds": [0.83, 0.697, 1.254], "mean_s": 0.927, "tok_s": 4419.4}
+{"concurrency": 1, "tokens": 32768, "seconds": [6.275, 5.311, 5.317], "mean_s": 5.634, "tok_s": 5815.7}
+{"concurrency": 1, "tokens": 131072, "seconds": [22.984, 23.19, 23.799], "mean_s": 23.324, "tok_s": 5619.5}
+{"concurrency": 8, "tokens": 32768, "seconds": [43.324, 43.734, 42.938], "mean_s": 43.332, "tok_s": 6049.6}
+PASS: text, C8, vision, structured JSON and tool round trip
+ACCEPTANCE_PASS
+"filler_units": 32768	"total_s": 5.4411461353302	"passed": true
+"filler_units": 131072	"total_s": 21.978464126586914	"passed": true
+"filler_units": 299000	"total_s": 58.78338265419006	"passed": true
+ALLDONE
+
+## summary
+decode aggregate tok/s (per stream)
+| type | c1 | c2 | c4 | c8 | c16 |
+| prose | 113.4 | 149.2 (79.2) | 209.7 (55.4) | 293.3 (38.2) | 386.2 (25.7) |
+| code | 184.9 | 250.0 (125.0) | 342.6 (86.9) | 445.8 (61.1) | 563.1 (36.8) |
+| structured | 203.9 | 225.9 (124.4) | 302.2 (94.5) | 302.4 (54.1) | 561.9 (48.1) |
+| json | 177.2 | 253.7 (128.2) | 372.5 (96.0) | 545.1 (71.5) | 708.9 (45.7) |
+prose c1 runs [100.05, 112.53, 112.48, 111.23] median 111.86
+sparkDash prefill: {4096: 2715, 16384: 6182, 32768: 6219, 65536: 6087, 131072: 6140, 262144: 5169}
+distinct cold prefill 1 4096 4419.4 [0.83, 0.697, 1.254]
+distinct cold prefill 1 32768 5815.7 [6.275, 5.311, 5.317]
+distinct cold prefill 1 131072 5619.5 [22.984, 23.19, 23.799]
+distinct cold prefill 8 32768 6049.6 [43.324, 43.734, 42.938]
