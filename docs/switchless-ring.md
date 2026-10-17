@@ -482,6 +482,19 @@ NCCL_DEBUG_SUBSYS=INIT,ENV,NET    # add NET while validating; drop it afterwards
 * **A wrong GID index is the usual failure.** All ports listed in `IB_HCA` must
   share one nonzero IPv4-mapped RoCE v2 GID; the preflight finds it or validates
   your `NCCL_IB_GID_INDEX` override. Management IPs need not appear in the GID table.
+* **The RoCE v2 GID index can move.** Index 3 is what the tested fleet used, but repeated
+  `netplan apply` runs or a physical cable re-seat have moved the IPv4-mapped GID to index 4
+  with index 3 left empty (two independent reports, #40 and #41). The preflight then stops with
+  "no common IPv4 RoCE v2 GID", or `plan.py` refuses its index-3 check. A link bounce does not
+  restore index 3; reloading the driver does (`modprobe -r mlx5_ib && modprobe mlx5_ib` with the
+  engine stopped). Otherwise let the preflight pick the index, or set `NCCL_IB_GID_INDEX` to the
+  index that carries the ring address.
+* **After a cable or power event, check `carrier`, not only the IB port state.** A link can read
+  `4 (ACTIVE)` on the IB port while the netdev carrier drops every few seconds (`cat
+  /sys/class/net/<if>/carrier` sampled repeatedly); the symptoms are `Got non-fatal async event`
+  warnings, `ibv_modify_qp` timeouts and boots that die in collective setup. Also address every
+  ring link in the same scheme (a single legacy subnet among 10.0.x links broke plan.py in #40),
+  and check a weight mount by shard count behind a `timeout`, not with `mountpoint`.
 * **Do not also set `NCCL_SWITCHLESS_RING_ONLY=1` with a switched fabric.** The ring
   skips the tree, which is a performance loss when the tree is reachable.
 * **A ring is not a non-blocking fabric.** Opposite ranks talk through a transit
@@ -637,6 +650,19 @@ paths first, forwarded paths after, from 128 KB) only costs once nothing drops:
   Opposite-node traffic stops, and a re-init drops every RDMA queue pair on that function; the RoCE
   health check then fails the step. `hairpin.sh` skips functions already at the value, so re-running
   it with the same value is safe.
+- **A TX collapse that survives restarts.** One report (#40) saw two nodes fall to ~13-14 Gb/s
+  TX on every fabric function (RX and the other nodes full speed, error counters zero) after
+  experimenting with the mesh; it persisted through `systemctl stop dsv41-mesh`, `pkill` of the
+  markers and link bounces, and cleared only with a reboot or `modprobe -r mlx5_core && modprobe
+  mlx5_core`. It did not recur after reboots and the cause was never isolated (a marker killed
+  with `pkill` instead of `systemctl stop` is a suspect, not a finding). Stop markers only with
+  `systemctl stop dsv41-mesh-marker@...` / `disable --now dsv41-mesh` with the engine down, and
+  re-measure every link with `ib_write_bw -x <gid>` after any mesh change; a single hop near
+  14 Gb/s shows up as cold prefill near 1,100-1,400 tok/s instead of ~2,000 (4,000+ at chunk 4096).
+- `DSV41_MOE_B12X_NEXT=1` needs `EP_SIZE=1` (per-rank N=576). At EP_SIZE=4 (N=2304) both
+  fast paths in `adapter/moe_b12x_next.py` (`N % 128 == 64`) are skipped and b12x's own planner
+  fails at boot with "planned dynamic direct routing is unsupported for this launch shape"
+  (#40); EP_SIZE=2 is an A/B setup only.
 - The marker rewrites every RDMA packet with UDP source port 65535 on its device, whatever the
   destination: keep that port reserved on the fabric.
 - Without the mesh neither package has a path to the opposite node (`DSV41_ROCE_RING=1` or not): a
