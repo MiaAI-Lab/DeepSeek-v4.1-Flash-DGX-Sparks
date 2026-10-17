@@ -10,12 +10,12 @@
 # Keeps:
 #   - checkpoint on spark1
 #   - overlay image dsv41-3x-spark:local
-#   - shared NFSv4 exporter (vllm-fn-nfs) — Qwen/GLM still use it
+#   - shared NFSv4 exporter (vllm-fn-nfs) — Qwen/GLM still use it (dropped by --unmount)
 #   - docker volume dsv41-weights unless you pass --unmount
 #
 # Usage:
 #   ./stop.sh              stop serve on all 3 nodes
-#   ./stop.sh --unmount    also drop worker NFS volumes (weights stay on spark1)
+#   ./stop.sh --unmount    also drop worker NFS volumes and the shared NFSv4 exporter (weights stay on spark1)
 #   ./start.sh stop        same
 #
 set -uo pipefail
@@ -118,8 +118,12 @@ pkill -f "docker logs -f ${HEAD_CTN}" >/dev/null 2>&1 || true
 info "head: SIGTERM sglang in $HEAD_CTN, then remove"
 _stop_sglang_in "$HEAD_CTN"
 _rm_ctn "$HEAD_CTN"
-# anything else this recipe named
-ids=$(docker ps -aq --filter "name=dsv41-" 2>/dev/null || true)
+# anything else this recipe named, except the NFS exporter: ./start.sh share reuses it (it runs with
+# --restart unless-stopped). Removing it while the workers still have the volume mounted takes minutes
+# in the kernel, and a serve started meanwhile reuses the dying exporter and hangs on the hard mounts.
+# (--unmount removes it below, once the workers' volumes are gone.)
+ids=$(docker ps -a --filter "name=dsv41-" --format '{{.ID}} {{.Names}}' 2>/dev/null \
+  | awk -v keep="${NFS_CONTAINER:-dsv41-nfs}" '$2 != keep {print $1}' || true)
 if [[ -n "$ids" ]]; then
   # shellcheck disable=SC2086
   timeout "$RM_TIMEOUT" docker rm -f $ids >/dev/null 2>&1 || true
@@ -150,6 +154,15 @@ for h in "${WORKER_HOSTS[@]}"; do
   fi
 done
 
+if [[ "$UNMOUNT" == "1" ]]; then
+  # Opt-in teardown: by default the exporter is kept (Qwen/GLM recipes reuse it), but --unmount
+  # means "leave nothing of this recipe behind" — and it runs here, after the worker volumes above,
+  # so no client is holding the export when it goes.
+  info "head: remove NFS exporter ${NFS_CONTAINER:-dsv41-nfs} (--unmount)"
+  timeout "$RM_TIMEOUT" docker rm -f "${NFS_CONTAINER:-dsv41-nfs}" >/dev/null 2>&1 \
+    || warn "  ${NFS_CONTAINER:-dsv41-nfs}: docker rm -f failed or timed out (other recipes may still use it)"
+fi
+
 echo
 if curl -sf --max-time 2 "http://127.0.0.1:${PORT}/v1/models" >/dev/null 2>&1 \
    || curl -sf --max-time 2 "http://127.0.0.1:${PORT}/health" >/dev/null 2>&1; then
@@ -158,13 +171,22 @@ else
   info "API down on :${PORT}"
 fi
 
+_nfs_name="${NFS_CONTAINER:-dsv41-nfs}"
 left=$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E '^dsv41-' || true)
+if [[ "$UNMOUNT" != "1" && -n "$left" ]]; then
+  # kept on purpose: leaving it in `left` would warn about a container stop is supposed to keep
+  left=$(printf '%s\n' "$left" | grep -vx "$_nfs_name" || true)
+fi
 if [[ -n "$left" ]]; then
   warn "still running on head: $left"
 else
   info "no dsv41-* containers on head"
 fi
 
-info "kept: spark1 weights, $IMAGE overlay, vllm-fn-nfs exporter"
+if [[ "$UNMOUNT" == "1" ]]; then
+  info "kept: spark1 weights, $IMAGE overlay"
+else
+  info "kept: spark1 weights, $IMAGE overlay, $_nfs_name exporter"
+fi
 [[ "$UNMOUNT" == "1" ]] || info "worker NFS volume $NFS_VOLUME kept (./stop.sh --unmount to drop it)"
 info "start again with: ./start.sh"
