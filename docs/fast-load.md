@@ -226,3 +226,24 @@ with pinned buffers on a *serving* worker it pushed the node into a state where 
 answering and the fleet went down. It now compares tensor by tensor and holds nothing, and it
 must only be run with the fleet stopped. The pinned-buffer boot ran the next morning
 (`fastload-verify-v13-pinned.txt`, control `control-boot-observe3.txt`).
+
+## Host-memory fragmentation after a load (issue #23)
+
+Two independent reports (a 2-node EXL3 pack and a 4-node FP4 pack) saw a node wedge hard after a
+model load: SSH times out while ICMP still answers, `nvidia-smi` blocks, no OOM kill, and the kernel
+log shows `NVRM: ... Out of memory [NV_ERR_NO_MEMORY] ... _memdescAllocInternal` with gigabytes
+still free. On GB10 driver allocations are unmovable host pages; after a load the order-8+ free
+blocks in `/proc/buddyinfo` zone `Normal` can be near zero, and the driver's contiguous request
+cannot be satisfied (MemAvailable stays healthy, so `scripts/verify/memguard.py`, which watches
+MemAvailable, does not fire). This is the reporters' diagnosis, not something measured on this
+repo's fleet. Their repair is one compaction after the load, as root:
+
+```bash
+awk '{t=0; for(i=13;i<=15;i++) t+=$i; s+=t} END{print "order8+ (>=1MiB):", s}' /proc/buddyinfo
+echo 1 | sudo tee /proc/sys/vm/compact_memory     # 0.04-0.06 s, no memory cost
+```
+
+Do not raise `vm.min_free_kbytes` / `vm.watermark_scale_factor` instead (reported to livelock a loaded
+box). The loader above already drops each shard's page cache when its handle closes
+(`POSIX_FADV_DONTNEED` in `adapter/fast_load.py`) and again after `load_weights`, rather than only at
+the end; whether that narrows the fragmenting window has not been measured.
