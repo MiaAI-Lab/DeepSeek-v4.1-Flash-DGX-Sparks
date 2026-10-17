@@ -67,7 +67,7 @@ else
     WORKER_HOSTS+=("${!_v:-${WORKER_IPS[$_i]}}")
   done
 fi
-WORKER_USER="${WORKER_USER:-zurih}"
+WORKER_USER="${WORKER_USER-zurih}"   # "" lets ~/.ssh/config pick each worker's user (as start.sh)
 SSH_IDENTITY="$(_abs "${SSH_IDENTITY:-$HOME/.ssh/id_ed25519_shared}")"
 NFS_VOLUME="${NFS_VOLUME:-dsv41-weights}"
 IMAGE="${IMAGE:-dsv41-3x-spark:local}"
@@ -126,7 +126,7 @@ if [[ -n "$ids" ]]; then
 fi
 
 for h in "${WORKER_HOSTS[@]}"; do
-  info "worker $WORKER_USER@$h: stop $WORKER_CTN"
+  info "worker ${WORKER_USER:+$WORKER_USER@}$h: stop $WORKER_CTN"
   if remote_on "$h" "
     if docker ps --format '{{.Names}}' | grep -qx $(printf '%q' "$WORKER_CTN"); then
       docker exec $(printf '%q' "$WORKER_CTN") bash -lc '

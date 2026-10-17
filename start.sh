@@ -105,6 +105,7 @@ BUILD_ARGS="${BUILD_ARGS:-}"
 HEAD_CTN="${HEAD_CTN:-dsv41-head}"
 WORKER_CTN="${WORKER_CTN:-dsv41-worker}"
 WORKER_DIR="${WORKER_DIR:-/home/${WORKER_USER}/dsv41-3x-spark}"
+[[ -n "$WORKER_USER" || "$WORKER_DIR" != /home//* ]] || { echo "WORKER_USER is empty: set WORKER_DIR to an absolute path (it defaults to /home/<user>/...)" >&2; exit 1; }
 
 NNODES="${NNODES:-$(( ${#WORKER_IPS[@]} + 1 ))}"
 [[ "$NNODES" -eq $(( ${#WORKER_IPS[@]} + 1 )) ]] || { echo "NNODES=$NNODES but ${#WORKER_IPS[@]} workers are configured" >&2; exit 1; }
@@ -578,7 +579,7 @@ nccl_preflight"); then
 cmd_doctor() {
   echo "=== doctor (DeepSeek-V4.1-Flash · ${NNODES}× Spark · TP${TP_SIZE} · SGLang) ==="
   echo "head:     $(hostname) / $(whoami) @ $HEAD_IP"
-  echo "workers:  ${WORKER_USER}@${WORKER_HOSTS[*]}  (${WORKER_IPS[*]})"
+  echo "workers:  ${WORKER_USER:+${WORKER_USER}@}${WORKER_HOSTS[*]}  (${WORKER_IPS[*]})"
   echo "image:    $IMAGE  (base $BASE_IMAGE)"
   echo "model:    $MODEL_DIR"
   echo "parallel: nnodes=$NNODES TP=$TP_SIZE EP=$EP_SIZE  ctx=$CONTEXT_LENGTH  util=$MEM_FRACTION_STATIC (head $HEAD_MEM_FRACTION_STATIC)"
