@@ -1,6 +1,9 @@
 # Local configuration and secrets (copy .env.example to .env)
 .env
 .env.tp4
+.env.tp4-switchless
+state-tp4-switchless/
+logs-tp4-switchless/
 .env.tp8
 state/
 state-tp4/

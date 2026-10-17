@@ -163,6 +163,10 @@ NCCL_P2P_LEVEL=SYS
 DSV41_SERIAL_WEIGHT_LOAD=1
 ```
 
+`./start-tp4-switchless.sh` does this for you: on first run it writes a separate `.env.tp4-switchless`
+(from `.env.tp4` if present) with this block appended, and uses `state-tp4-switchless/` and
+`logs-tp4-switchless/`, so a switched `.env.tp4` is left alone.
+
 The ring-only lines are commented in the shipped example. A copied profile
 uses switched transport settings until explicitly enabled; those settings
 cannot boot the tested switchless ring. Four channels are the tested ring
