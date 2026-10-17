@@ -77,6 +77,8 @@ class EngramLoader(importlib.abc.Loader):
         elif module.__name__ == 'sglang.srt.entrypoints.openai.serving_chat':
             from encoding_compat import install_serving_chat
             install_serving_chat(module)
+            from history_repair import install as install_history_repair
+            install_history_repair(module)
         elif module.__name__ == 'sglang.srt.model_loader.weight_utils' and _tp4_launcher():
             # Gated on DSV41_FAST_LOAD: this rank's tensors are read eagerly by a thread
             # pool instead of page-faulted through the loader's mmap (adapter/fast_load.py).

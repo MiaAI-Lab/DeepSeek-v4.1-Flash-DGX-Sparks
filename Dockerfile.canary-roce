@@ -43,6 +43,7 @@ COPY benchmarks /opt/dsv41/benchmarks
 RUN PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_thinking_alias.py \
  && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_max_new_tokens.py \
  && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_loop_abort.py \
+ && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_history_repair.py \
  && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_fast_load_pacing.py \
  && CUDA_VISIBLE_DEVICES= PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_fast_load_tp_slice.py \
  && CUDA_VISIBLE_DEVICES= PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_prefill_sp.py \

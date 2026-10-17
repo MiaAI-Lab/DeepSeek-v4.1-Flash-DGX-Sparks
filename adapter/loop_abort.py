@@ -5,8 +5,8 @@ VIS-04 (racing-animation HTML) streamed 714k tokens / ~2.6 h. SGLang's
 healthy as far as the GPU watchdog is concerned. The 2× EXL3 recipe has no
 decode-side loop detector either.
 
-This hook wraps ``Req.update_finish_state`` and finishes the request with
-OpenAI ``finish_reason=stop`` / ``matched=repetition`` when:
+This hook wraps ``Req.update_finish_state`` and finishes the request with a
+named error (``FINISH_ABORT``, HTTP 500, message starting ``loop_abort:``) when:
 
 * the last ``repeats`` copies of an n-gram of length ``ngram``..``ngram_max``
   are identical (keeps one copy of the unit), or
@@ -14,17 +14,24 @@ OpenAI ``finish_reason=stop`` / ``matched=repetition`` when:
 * the same decoded line (min ``line_min`` chars) appears ``line_repeats``
   times at the end of a short decode window.
 
+A cut answer must not look finished: with ``finish_reason=stop`` a truncated
+tool call reached clients as a complete one (invalid ``function.arguments``),
+and the next turn was rejected with HTTP 400. ``DSV41_LOOP_NAMED_EXIT=0``
+restores the old ``stop`` exit.
+
 Defaults catch a 32-token cycle after four copies (~128 tokens, a few seconds
 at 38 tok/s) without tripping on short HTML/CSS punctuation.  Set
 ``DSV41_LOOP_ABORT=0`` to disable.
 """
 import logging
 import os
+from http import HTTPStatus
 from types import SimpleNamespace
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_ABORT = 1
+DEFAULT_NAMED_EXIT = 1
 DEFAULT_NGRAM = 32
 DEFAULT_NGRAM_MAX = 256
 DEFAULT_REPEATS = 4
@@ -33,6 +40,7 @@ DEFAULT_LINE_REPEATS = 8
 DEFAULT_LINE_MIN = 16
 LINE_WINDOW_TOKENS = 512
 MATCHED_STOP = 'repetition'
+ERR_TYPE = 'loop_abort'
 
 
 def _env_int(name, default):
@@ -54,6 +62,7 @@ def load_config():
     identical = _env_int('DSV41_LOOP_IDENTICAL', DEFAULT_IDENTICAL)
     line_repeats = _env_int('DSV41_LOOP_LINE_REPEATS', DEFAULT_LINE_REPEATS)
     line_min = _env_int('DSV41_LOOP_LINE_MIN', DEFAULT_LINE_MIN)
+    named_exit = _env_int('DSV41_LOOP_NAMED_EXIT', DEFAULT_NAMED_EXIT)
     if ngram_max < ngram:
         ngram_max = ngram
     ngram_on = ngram > 0 and repeats > 0
@@ -66,6 +75,7 @@ def load_config():
         identical=identical,
         line_repeats=line_repeats,
         line_min=line_min,
+        named_exit=named_exit > 0,
         enabled=enabled,
     )
 
@@ -84,7 +94,15 @@ def repeated_line_suffix(text, repeats, min_chars):
 
 
 def detect_repetition(ids, text=None, cfg=None):
-    """Return ``(matched, finished_len)`` or ``None``.
+    """Return ``(matched, finished_len)`` or ``None``."""
+    hit = detect_repetition_detail(ids, text=text, cfg=cfg)
+    if hit is None:
+        return None
+    return MATCHED_STOP, hit[1]
+
+
+def detect_repetition_detail(ids, text=None, cfg=None):
+    """Return ``(art, finished_len, period)`` or ``None``; art is ngram/identical/line.
 
     ``finished_len`` is the prefix to keep: one copy of a cycling n-gram, or
     one token of an identical run. Line hits do not trim (no token boundary).
@@ -105,7 +123,7 @@ def detect_repetition(ids, text=None, cfg=None):
             run += 1
             i -= 1
         if run >= cfg.identical:
-            return MATCHED_STOP, n - run + 1
+            return 'identical', n - run + 1, 1
 
     if cfg.ngram > 0 and cfg.repeats > 0:
         max_p = min(cfg.ngram_max, n // cfg.repeats)
@@ -120,10 +138,10 @@ def detect_repetition(ids, text=None, cfg=None):
                     break
             if hit:
                 extra = (cfg.repeats - 1) * period
-                return MATCHED_STOP, n - extra
+                return 'ngram', n - extra, period
 
     if text is not None and repeated_line_suffix(text, cfg.line_repeats, cfg.line_min):
-        return MATCHED_STOP, n
+        return 'line', n, 0
     return None
 
 
@@ -148,6 +166,9 @@ def install(module):
 
     cls = module.Req
     finish_cls = module.FINISH_MATCHED_STR
+    abort_cls = getattr(module, 'FINISH_ABORT', None) if cfg.named_exit else None
+    if cfg.named_exit and abort_cls is None:
+        logger.warning('DSV41 loop abort: FINISH_ABORT not found; falling back to the stop exit')
     original = cls.update_finish_state
 
     def update_finish_state(self, new_accepted_len=1):
@@ -158,19 +179,26 @@ def install(module):
         text = None
         if cfg.line_repeats > 0:
             text = _decode_tail(self, ids)
-        hit = detect_repetition(ids, text=text, cfg=cfg)
+        hit = detect_repetition_detail(ids, text=text, cfg=cfg)
         if hit is None:
             return
-        matched, finished_len = hit
-        self.finished_reason = finish_cls(matched=matched)
+        art, finished_len, period = hit
+        if abort_cls is not None:
+            self.finished_reason = abort_cls(
+                f'{ERR_TYPE}: DSV41 repetition (art={art}, period={period}, '
+                f'output_tokens={len(ids)}, kept={finished_len})',
+                HTTPStatus.INTERNAL_SERVER_ERROR, ERR_TYPE)
+        else:
+            self.finished_reason = finish_cls(matched=MATCHED_STOP)
         self.finished_len = finished_len
         logger.warning(
-            'DSV41 loop abort rid=%s matched=%s output_tokens=%s kept=%s',
-            getattr(self, 'rid', None), matched, len(ids), finished_len)
+            'DSV41 loop abort rid=%s matched=%s art=%s period=%s output_tokens=%s kept=%s exit=%s',
+            getattr(self, 'rid', None), MATCHED_STOP, art, period, len(ids), finished_len,
+            ERR_TYPE if abort_cls is not None else 'stop')
 
     cls.update_finish_state = update_finish_state
     logger.warning(
         'DSV41 loop abort: ngram=%s-%s x%s, identical=%s, line_repeats=%s '
-        '(min %s chars); DSV41_LOOP_ABORT=0 disables',
+        '(min %s chars), exit=%s; DSV41_LOOP_ABORT=0 disables',
         cfg.ngram, cfg.ngram_max, cfg.repeats, cfg.identical,
-        cfg.line_repeats, cfg.line_min)
+        cfg.line_repeats, cfg.line_min, ERR_TYPE if abort_cls is not None else 'stop')
