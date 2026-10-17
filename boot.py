@@ -20,8 +20,8 @@ import threading
 import time
 import urllib.request
 
-REPO = 'deepseek-ai/DeepSeek-V4.1-Flash'
-REVISION = 'fb2764a5cf321eaa5070ca8f9e892818f477c16d'
+REPO = 'deepseek-ai/DeepSeek-V4.1-Flash-1017'
+REVISION = '1bae0e1088993b9b82de08f59de5be5a34e42170'
 MODEL = Path(os.environ.get('MODEL_PATH', '/models/DeepSeek-V4.1-Flash'))
 STATE = Path(os.environ.get('STATE_PATH', '/state'))
 PORT = int(os.environ.get('SERVER_PORT', '8888'))

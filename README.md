@@ -7,7 +7,7 @@
   <a href="https://x.com/MiaAI_lab" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin:0 8px;vertical-align:middle;"><img src="https://img.shields.io/badge/Follow%20me%20on%20X-000000?style=for-the-badge&logo=x&logoColor=white" alt="Follow Mia on X" height="28" style="height:28px;width:auto;vertical-align:middle;border:0;" /></a>
 </p>
 
-Serve [deepseek-ai/DeepSeek-V4.1-Flash](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash)
+Serve [deepseek-ai/DeepSeek-V4.1-Flash-1017](https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017)
 with SGLang on three DGX Spark boxes (GB10, SM121, 121.7 GiB unified memory each) over a
 ConnectX-7 RoCE triangle: **native MXFP4 experts, FP8 dense weights, NVMe-resident Engram
 tables, DSpark speculative decoding, tool calling and vision**, behind one OpenAI-compatible
@@ -484,7 +484,7 @@ fails), and the head has little RAM to spare.
 - Serving engine: [SGLang](https://github.com/sgl-project/sglang) dev build with
   [FlashInfer](https://github.com/flashinfer-ai/flashinfer) kernels.
 - Model weights stay on Hugging Face / local NVMe and are not redistributed. Pinned checkpoint:
-  `deepseek-ai/DeepSeek-V4.1-Flash` @ `fb2764a5cf321eaa5070ca8f9e892818f477c16d`.
+  `deepseek-ai/DeepSeek-V4.1-Flash-1017` @ `1bae0e1088993b9b82de08f59de5be5a34e42170`.
 
 ## License
 
