@@ -112,7 +112,7 @@ defaults:
 | TP4 setting | Value | Why |
 |---|---|---|
 | `CONTEXT_LENGTH` | 1,048,576 | model maximum; a 1M-context needle test passed at these settings |
-| `MAX_TOTAL_TOKENS` | 8,000,000 | 13.4 GB of KV per rank: 8 requests at ~1M tokens each; see below |
+| `MAX_TOTAL_TOKENS` | 8,000,000 | 13.4 GB of KV per rank: 8 requests at ~1M tokens each; see below. This bounds KV storage for concurrent requests, not how many sessions keep a reusable prefix (see *Memory*) |
 | `MAX_RUNNING_REQUESTS` | 16 | also `--cuda-graph-max-bs-decode`: capture covers batch 1-16. Needs `--min-free-slots-delay 1` to be reachable; see below |
 | `CHUNKED_PREFILL_SIZE` | 4096 | with `DSV41_INDEXER_CHUNKED=1` (sglang#39187 backport), which bounds the indexer transient; without the backport 1024 is the safe size (~15 GB peak at 1M context, 4096 would need ~60 GB) |
 | `MEM_FRACTION_STATIC` | 0.80 | keeps ~24 GiB per rank outside the static pool for that transient |
@@ -340,8 +340,13 @@ Where the 118 → 82 ms came from, in order of size:
   and use the LL protocol; prefill uses Simple. The `NCCL_*` knobs above cut it to 139 MB and
   turned the head's 0.2-0.8 GB of free memory into ~6 GB, which is why the boot-time "KV
   lottery" and the reclaim stalls went away. NCCL logs 2 communicators × 8 channels now.
-- Hierarchical cache, CPU offload and `swa_full_tokens_ratio` do not apply: host RAM is GPU
-  RAM, KV is small, and the SWA pool is cap-sized.
+- Hierarchical cache and CPU offload do not apply: host RAM is GPU RAM and KV is small. The SWA
+  pool is cap-sized by default (`prefix_tails = 4 x max_running_requests`), which is enough for
+  one long session but **not** for several 1M-context sessions kept warm in the radix cache:
+  field reports on the TP4 line (#27, #43) show a second long session evicting the first one's
+  prefix (`cached_tokens=0`, a full re-prefill) while most of the full pool is free. For that
+  workload set `--swa-full-tokens-ratio 0.065` in `EXTRA_SGLANG_ARGS` (see `.env.tp4.example`).
+  It is not the shipped default because it has been measured by users, not by us.
 - **Long prompts and the allocator.** Each 2048-token prefill chunk allocates an indexer-logits
   buffer proportional to the prefix so far. With PyTorch's native caching allocator a freed
   smaller block cannot serve the next larger request, so reserved memory grows with the
