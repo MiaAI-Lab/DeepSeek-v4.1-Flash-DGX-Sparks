@@ -67,7 +67,7 @@ spark3  10.0.0.3  rank 2   mounts spark1's checkpoint over ConnectX (10.0.23.1)
 cd ~/NewModels/DS4.1
 cp -n .env.example .env        # IPs, users and knobs; already set for spark1/2/3
 ./start.sh doctor              # ssh, docker, IB, checkpoint shards, image arch, busy GPU
-./start.sh download            # download the model that will be shared/buid
+./start.sh download            # download the pinned checkpoint (once; shared with the workers by `share`)
 ./start.sh build               # base image + this repo's overlay, on all three nodes
 ./start.sh share               # NFSv4 export + docker volumes on the workers
 ./start.sh pack                # Engram shards onto each node's NVMe (once; ~10 min)
