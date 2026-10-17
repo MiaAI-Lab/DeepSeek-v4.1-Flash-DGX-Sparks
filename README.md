@@ -234,7 +234,8 @@ runtime/sources.manifest pinned commits + sha256 of everything the TP4 images fe
 adapter/
   sitecustomize.py       import hooks that install the pieces below at process start
   encoding_compat.py     enable_thinking alias, publisher effort table, max_tokens cap
-  loop_abort.py          n-gram / identical-token / same-line stop on a live decode loop
+  loop_abort.py          n-gram / identical-token / same-line stop on a live decode loop (named error exit)
+  history_repair.py      keep a broken assistant tool call in the history instead of HTTP 400
   tp3_pad.py             TP=3 padding of heads / groups / vocab / draft experts
   engram_backend.py      EngramEmbedding replacement: exact rows from NVMe via a host callback
   row_store.cpp          the row store: O_DIRECT reads, 96-thread miss servicing, packed shards
@@ -280,7 +281,9 @@ benchmarks/, tests/      upstream benchmark, row-store, thinking-alias, encoder-
 | `SGLANG_FLASHINFER_MOE_FUSED_FINALIZE` | 0 | keep 0: the fused (atomic) finalize is nondeterministic |
 | `SGLANG_DSV41_REASONING_EFFORT` | 75 | default budget for thinking-mode requests without a `reasoning_effort`. SGLang's V4.1 encoder maps `low`/`high`/`xhigh`/`max` to 25/50/75/100 and defaults to `high` = 50; the publisher's `encoding.py` says 50/75/100, default 75. The adapter remaps the tiers; this pins the default. Integer 1-100; see *Correctness notes* |
 | `DSV41_MAX_NEW_TOKENS` | 32768 | fill-in and hard cap when a chat request omits `max_tokens` / `max_completion_tokens`, or asks for more. 0 leaves SGLang's remaining-context default (how VIS-04 ran to 714k tokens). |
-| `DSV41_LOOP_ABORT` | 1 | stop a request whose output is an n-gram cycle, a same-token run, or the same decoded line repeated. `finish_reason=stop` / `matched=repetition`. 0 disables. The 2× EXL3 recipe has no equivalent; `--watchdog-timeout` does not fire on a live stream. |
+| `DSV41_LOOP_ABORT` | 1 | end a request whose output is an n-gram cycle, a same-token run, or the same decoded line repeated. With the named exit (default) the request ends as an error whose message starts with `loop_abort:` (stream: an error event; nonstream: HTTP 500). 0 disables. The 2× EXL3 recipe has no equivalent; `--watchdog-timeout` does not fire on a live stream. |
+| `DSV41_LOOP_NAMED_EXIT` | 1 | 0 restores the previous exit, `finish_reason=stop` / `matched=repetition`, which a client cannot tell apart from a normal end (and which cut tool-call arguments mid-string). |
+| `DSV41_HISTORY_REPAIR` | 1 | an assistant tool call in the request history whose `arguments` are not a JSON object is passed to the template as `{"_unparseable_arguments": <raw text>}` instead of failing the request with HTTP 400. 0 restores the 400. |
 | `DSV41_LOOP_NGRAM` / `DSV41_LOOP_REPEATS` | 32 / 4 | minimum cycle length in tokens, and consecutive copies required (keeps one copy). |
 | `DSV41_LOOP_LINE_REPEATS` | 8 | identical decoded lines of at least 16 characters. 0 disables the line detector. |
 | `NCCL_BUFFSIZE` / `NCCL_LL128_BUFFSIZE` / `NCCL_PROTO` / `NCCL_MAX_NCHANNELS` | 1 MiB / 256 KiB / `^LL128` / 8 | NCCL connection buffers: 4.7 GiB → 0.14 GiB pinned per node |
@@ -386,9 +389,16 @@ Where the 118 → 82 ms came from, in order of size:
 - **Loop abort.** VIS-04 was a semantic loop, not a hung GPU: 714k tokens over ~2.6 h while
   `--watchdog-timeout 1800` stayed quiet. `adapter/loop_abort.py` finishes the request after
   four consecutive copies of a ≥32-token n-gram, 64 identical tokens, or eight identical
-  decoded lines, with OpenAI `finish_reason=stop` (`matched=repetition`). The 2× EXL3 recipe
-  has no decode-side detector. `python3 tests/test_loop_abort.py` covers the detector; set
-  `DSV41_LOOP_ABORT=0` to turn it off.
+  decoded lines. The request ends with a named error (`loop_abort: DSV41 repetition (art=…,
+  period=…)`), not with `finish_reason=stop`: a stop in the middle of a tool call handed the
+  client truncated JSON arguments that looked like a finished call (`DSV41_LOOP_NAMED_EXIT=0`
+  restores the stop). The 2× EXL3 recipe has no decode-side detector.
+  `python3 tests/test_loop_abort.py` covers the detector; set `DSV41_LOOP_ABORT=0` to turn it off.
+- **Broken tool calls in the history.** Agent clients keep a truncated tool call in the
+  history next to their own "invalid JSON, try again" tool result. Stock SGLang rejects that
+  history with HTTP 400, which agent clients do not retry. `adapter/history_repair.py` passes
+  such arguments to the template as `{"_unparseable_arguments": <raw>}` and logs
+  `DSV41 history repair: len=… reason=…`; `tests/test_history_repair.py`.
 - `runtime/flash_mla_sm120.py` sends prefills of more than 64 query tokens to FlashInfer's
   sparse-prefill specialisation and everything else through the decode kernel with a
   256→64-token page split; both paths were verified deterministic.

@@ -192,6 +192,74 @@ def test_install_respects_already_finished():
     assert req.finished_reason.matched == 'length'
 
 
+def _named_exit_run(env):
+    from http import HTTPStatus
+
+    class FakeFinish:
+        def __init__(self, matched):
+            self.matched = matched
+
+    class FakeAbort:
+        def __init__(self, message=None, status_code=None, err_type=None):
+            self.message = message
+            self.status_code = status_code
+            self.err_type = err_type
+
+    class FakeReq:
+        def __init__(self):
+            self.output_ids = list(range(40, 72)) * 4
+            self.finished_reason = None
+            self.finished_len = None
+            self.rid = 't'
+            self.tokenizer = None
+
+        def finished(self):
+            return self.finished_reason is not None
+
+        def update_finish_state(self, new_accepted_len=1):
+            return None
+
+    class FakeMod:
+        Req = FakeReq
+        FINISH_MATCHED_STR = FakeFinish
+        FINISH_ABORT = FakeAbort
+
+    def run():
+        install(FakeMod)
+        req = FakeReq()
+        req.update_finish_state(1)
+        return req
+
+    return _with_env(env, run), FakeFinish, FakeAbort, HTTPStatus
+
+
+def test_named_exit_is_a_named_error():
+    req, _, FakeAbort, HTTPStatus = _named_exit_run({'DSV41_LOOP_ABORT': '1', 'DSV41_LOOP_NAMED_EXIT': None})
+    assert isinstance(req.finished_reason, FakeAbort)
+    # The streaming error path only fires for an HTTPStatus instance, not an int.
+    assert isinstance(req.finished_reason.status_code, HTTPStatus)
+    assert req.finished_reason.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert req.finished_reason.err_type == 'loop_abort'
+    # err_type does not reach the stream; the name must be in the message itself.
+    assert req.finished_reason.message.startswith('loop_abort:')
+    assert 'art=ngram' in req.finished_reason.message and 'period=32' in req.finished_reason.message
+    assert req.finished_len == 32
+
+
+def test_named_exit_zero_restores_stop():
+    req, FakeFinish, _, _ = _named_exit_run({'DSV41_LOOP_ABORT': '1', 'DSV41_LOOP_NAMED_EXIT': '0'})
+    assert isinstance(req.finished_reason, FakeFinish)
+    assert req.finished_reason.matched == MATCHED_STOP
+    assert req.finished_len == 32
+
+
+def test_detail_reports_art_and_period():
+    from loop_abort import detect_repetition_detail
+    cfg = load_config()
+    assert detect_repetition_detail(list(range(40, 72)) * 4, cfg=cfg) == ('ngram', 32, 32)
+    assert detect_repetition_detail([7] * DEFAULT_IDENTICAL, cfg=cfg) == ('identical', 1, 1)
+
+
 if __name__ == '__main__':
     tests = [v for k, v in list(globals().items()) if k.startswith('test_')]
     failed = 0
