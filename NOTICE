@@ -24,6 +24,10 @@ Third-party components and their licences:
 - runtime/flash_mla_sm120.py is derived from SGLang and remains under the Apache
   License 2.0 (LICENSE.sglang); the page-split changes are distributed under the
   same terms.
+- runtime/sglang/deepseekv41_detector.py is sgl-project/sglang
+  python/sglang/srt/function_call/deepseekv41_detector.py at commit 464fffbec8d0
+  (sglang#39665), unmodified, Apache License 2.0 (LICENSE.sglang);
+  runtime/patch_v41_tool_constraint.py installs it into the main image.
 - The TP4 production line (docs/tp4.md: the other adapters, Dockerfile.canary,
   Dockerfile.canary-roce, scripts/fetch_runtime.sh, scripts/ring_mesh/, scripts/qeval*.py)
   is contributed from knapcio/DeepSeek-V4.1-Flash-4x-DGX-Spark-TP4, AGPL-3.0-or-later.

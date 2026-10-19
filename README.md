@@ -405,6 +405,12 @@ Where the 118 → 82 ms came from, in order of size:
   history with HTTP 400, which agent clients do not retry. `adapter/history_repair.py` passes
   such arguments to the template as `{"_unparseable_arguments": <raw>}` and logs
   `DSV41 history repair: len=… reason=…`; `tests/test_history_repair.py`.
+- **Forced tool choice.** With `tool_choice: "required"` or a named tool, the base image's V4.1
+  detector had no structural tag, so the fallback grammar forced a bare `<｜DSML｜ invoke>` without
+  the `<｜DSML｜ calls>` block that the parser looks for: the call came back as `message.content`
+  with no `tool_calls` and `finish_reason=stop`. `auto` was unaffected.
+  `runtime/patch_v41_tool_constraint.py` installs the detector from sglang#39665 at build time;
+  `tests/test_v41_tool_constraint.py` (image build) checks the compiled grammar and the parse.
 - `runtime/flash_mla_sm120.py` sends prefills of more than 64 query tokens to FlashInfer's
   sparse-prefill specialisation and everything else through the decode kernel with a
   256→64-token page split; both paths were verified deterministic.
