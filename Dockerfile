@@ -16,6 +16,13 @@ COPY runtime/flash_mla_sm120.py /sgl-workspace/sglang/python/sglang/kernels/ops/
 # encoding_dsv41.py no longer matches the anchor.
 COPY runtime/patch_encoding_dsv41.py /opt/dsv41/runtime/patch_encoding_dsv41.py
 RUN python3 /opt/dsv41/runtime/patch_encoding_dsv41.py
+# required/named tool_choice: the base's V4.1 detector has no structural tag, so the legacy
+# fallback grammar forces a bare invoke without the calls block and the reply comes back as
+# message.content with no tool_calls. Backport sglang#39665's V4.1 tag (xgrammar 0.2.1 API).
+# Fails the build if the base's deepseekv41_detector.py is neither the stock file nor the backport.
+COPY runtime/patch_v41_tool_constraint.py /opt/dsv41/runtime/patch_v41_tool_constraint.py
+COPY runtime/sglang/deepseekv41_detector.py /opt/dsv41/runtime/sglang/deepseekv41_detector.py
+RUN python3 -B /opt/dsv41/runtime/patch_v41_tool_constraint.py
 COPY boot.py /opt/dsv41/boot.py
 COPY scripts /opt/dsv41/scripts
 COPY tests /opt/dsv41/tests
@@ -28,7 +35,8 @@ RUN PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_thinking_alias.p
  && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_draft_head_fp8.py \
  && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_draft_tau.py \
  && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_folded_fence.py \
- && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_autotune_keep.py
+ && PYTHONPATH=/opt/dsv41/adapter python3 /opt/dsv41/tests/test_autotune_keep.py \
+ && CUDA_VISIBLE_DEVICES= PYTHONDONTWRITEBYTECODE=1 python3 -B /opt/dsv41/tests/test_v41_tool_constraint.py
 ENV PYTHONPATH=/opt/dsv41/adapter \
     MODEL_PATH=/models/DeepSeek-V4.1-Flash \
     STATE_PATH=/state OFFLOAD_MODE=nvme DSV41_CACHE_GIB=16
