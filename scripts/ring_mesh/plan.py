@@ -154,11 +154,11 @@ def host_scripts(plan, fabric, host_rank):
     rules = [x for x in plan.tc_rules if x.intermediate_rank == host_rank]
     qdiscs = sorted({x.ingress_netdev for x in rules})
     for q in qdiscs:
-        up.append(f"tc qdisc show dev {q} | grep -q clsact || tc qdisc add dev {q} clsact")
+        up.append(f"tc qdisc show dev {q} | grep clsact >/dev/null || tc qdisc add dev {q} clsact")
     for x in rules:
         add = fabric.tc_rule_command(x, add=True)
-        up.append(f"tc filter show dev {x.ingress_netdev} ingress pref {x.preference} | grep -q flower || {shlex.join(add)}")
-        up.append(f"tc -s filter show dev {x.ingress_netdev} ingress pref {x.preference} | grep -q in_hw "
+        up.append(f"tc filter show dev {x.ingress_netdev} ingress pref {x.preference} | grep flower >/dev/null || {shlex.join(add)}")
+        up.append(f"tc -s filter show dev {x.ingress_netdev} ingress pref {x.preference} | grep in_hw >/dev/null "
                   f"|| {{ echo 'rule pref {x.preference} on {x.ingress_netdev} is not in hardware'; exit 3; }}")
         down.append(f"tc filter del dev {x.ingress_netdev} ingress pref {x.preference} protocol 0x88b5 "
                     f"handle {x.handle} flower 2>/dev/null || true")
@@ -166,7 +166,7 @@ def host_scripts(plan, fabric, host_rank):
         down.append(f'[ -z "$(tc filter show dev {q} ingress; tc filter show dev {q} egress)" ] '
                     f"&& tc qdisc del dev {q} clsact 2>/dev/null || true")
     for r in (x for x in plan.routes if x.source_rank == host_rank):
-        up.append(f"ip route show exact {r.destination_ipv4}/32 | grep -q . || {shlex.join(fabric.route_command(r, add=True))}")
+        up.append(f"ip route show exact {r.destination_ipv4}/32 | grep . >/dev/null || {shlex.join(fabric.route_command(r, add=True))}")
         down.append(f"ip route del {r.destination_ipv4}/32 2>/dev/null || true")
     devs = sorted({m.rdma_device for m in plan.markers if m.source_rank == host_rank})
     ports = sorted({m.udp_source_port for m in plan.markers})
