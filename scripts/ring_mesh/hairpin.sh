@@ -14,7 +14,7 @@ for x in 0000:01:00.0:enp1s0f0np0:rocep1s0f0 0000:01:00.1:enp1s0f1np1:rocep1s0f1
   devlink dev param set "$B" name hairpin_queue_size value "$V" cmode driverinit
   devlink dev reload "$B" action driver_reinit >/dev/null
   for i in $(seq 1 30); do
-    [[ "$(cat /sys/class/net/$N/operstate 2>/dev/null)" == up ]] && ip -4 addr show "$N" | grep -q inet \
+    [[ "$(cat /sys/class/net/$N/operstate 2>/dev/null)" == up ]] && ip -4 addr show "$N" | grep inet >/dev/null \
       && [[ "$(cat /sys/class/net/$N/mtu)" == 9000 ]] && grep -q "4: ACTIVE" "/sys/class/infiniband/$D/ports/1/state" 2>/dev/null \
       && [[ "$(cat /sys/class/infiniband/$D/ports/1/gids/3)" != 0000:0000:0000:0000:0000:0000:0000:0000 ]] && break
     sleep 2
