@@ -1076,6 +1076,12 @@ cmd_pack() {
   if [[ "$need_share" -eq 1 ]]; then
     info "a worker cannot see the checkpoint over NFS — running share first"
     cmd_share
+    # With NFS_SHARE=0 share changes nothing, and the worker `docker run -v $NFS_VOLUME` below
+    # would create an empty volume and fail only after the head pack. Stop here instead.
+    for h in "${WORKER_HOSTS[@]}"; do
+      nfs_worker_has_model "$h" \
+        || die "$h cannot see the checkpoint in docker volume $NFS_VOLUME (NFS_SHARE=$NFS_SHARE); see docs/switchless-ring.md, Local weights with NFS_SHARE=0"
+    done
   fi
   info "packing Engram shards: head $ENGRAM_DIR, workers $WORKER_ENGRAM_DIR"
   mkdir -p "$ENGRAM_DIR"
@@ -1087,7 +1093,7 @@ cmd_pack() {
     /opt/dsv41/scripts/pack_engram.py --rank 0 --tp "$TP_SIZE" --out /engram \
     || die "pack failed on head"
   local idx=1 host
-  for host in "${WORKER_IPS[@]}"; do
+  for host in "${WORKER_HOSTS[@]}"; do
     info "packing rank $idx on $host..."
     remote_on "$host" "mkdir -p $WORKER_ENGRAM_DIR && docker run --rm --network host \
       -v $NFS_VOLUME:/models/DeepSeek-V4.1-Flash:ro \

@@ -2,8 +2,10 @@
 """cmd_pack must re-share the checkpoint when a worker cannot see it.
 
 `stop` can take the NFS exporter down; pack then died on the first worker after the head had
-already spent ~10 minutes. The function is extracted from start.sh and run with stubbed helpers:
-no Docker, SSH or network.
+already spent ~10 minutes. With NFS_SHARE=0 share cannot help, so pack must stop before the head
+packs rather than let `docker run -v` create an empty worker volume. Workers are reached by
+host name, like every other command. The function is extracted from start.sh and run with
+stubbed helpers: no Docker, SSH or network.
 """
 import re
 import subprocess
@@ -20,17 +22,18 @@ def pack_source():
     return m.group(0)
 
 
-def run(blind_hosts):
+def run(blind_hosts, share_fixes=True):
     script = f'''
 set -u
 info(){{ :; }}; die(){{ echo "DIE $*"; exit 9; }}
 model_src(){{ echo /tmp; }}
 docker(){{ echo docker-head >> "$LOG"; }}
 remote_on(){{ echo "remote $1" >> "$LOG"; }}
-nfs_worker_has_model(){{ case " {blind_hosts} " in *" $1 "*) return 1;; esac; return 0; }}
-cmd_share(){{ echo share >> "$LOG"; }}
-WORKER_HOSTS=(w1 w2); WORKER_IPS=(w1 w2); ENGRAM_DIR=$TMPD/e; WORKER_ENGRAM_DIR=/x
-NFS_VOLUME=v; IMAGE=i; TP_SIZE=3; NNODES=3
+BLIND="{blind_hosts}"
+nfs_worker_has_model(){{ case " $BLIND " in *" $1 "*) return 1;; esac; return 0; }}
+cmd_share(){{ echo share >> "$LOG"; {"BLIND=" if share_fixes else ":"}; }}
+WORKER_HOSTS=(w1 w2); WORKER_IPS=(10.0.0.2 10.0.0.3); ENGRAM_DIR=$TMPD/e; WORKER_ENGRAM_DIR=/x
+NFS_VOLUME=v; NFS_SHARE=0; IMAGE=i; TP_SIZE=3; NNODES=3
 mkdir -p "$ENGRAM_DIR"
 {pack_source()}
 cmd_pack
@@ -59,6 +62,19 @@ class PackReshare(unittest.TestCase):
     def test_all_blind_reshares_once(self):
         r, log = run("w1 w2")
         self.assertEqual(log.count("share"), 1)
+
+    def test_workers_reached_by_host_name(self):
+        r, log = run("")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertEqual([l for l in log if l.startswith("remote")], ["remote w1", "remote w2"])
+
+    def test_still_blind_after_share_stops_before_the_head(self):
+        # NFS_SHARE=0: share returns without changing anything
+        r, log = run("w2", share_fixes=False)
+        self.assertEqual(r.returncode, 9, r.stdout + r.stderr)
+        self.assertIn("DIE w2 cannot see the checkpoint", r.stdout)
+        self.assertNotIn("docker-head", log)
+        self.assertFalse(any(l.startswith("remote") for l in log), log)
 
 
 if __name__ == "__main__":
