@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Plan the hardware-forwarded opposite-node paths that let RoCEnante run on a switchless ring.
 
-    python3 scripts/ring_mesh/plan.py --sparkring ~/sparkring --out ring-mesh HEAD W1 W2 W3
+    python3 scripts/ring_mesh/plan.py --sparkring ~/sparkring --out ring-mesh [--gid-index N] HEAD W1 W2 W3
 
 HEAD W1 W2 W3 are SSH names of the four Sparks in tensor-parallel rank order (the head, then
 WORKER_HOSTS). Each is inventoried over SSH with inventory.sh; the cabling is read from the
@@ -39,13 +39,13 @@ PORTS = {
 HCAS = ("rocep1s0f0", "rocep1s0f1", "roceP2p1s0f0", "roceP2p1s0f1")  # B12X_ROCE_HCA order
 
 
-def inventory(host):
-    out = subprocess.run(["ssh", "-o", "BatchMode=yes", host, "bash -s"], input=(HERE / "inventory.sh").read_bytes(),
+def inventory(host, gid_index):
+    out = subprocess.run(["ssh", "-o", "BatchMode=yes", host, f"GID_INDEX={gid_index} bash -s"], input=(HERE / "inventory.sh").read_bytes(),
                          capture_output=True, timeout=60, check=True).stdout
     return json.loads(out.decode())
 
 
-def check_host(host, inv):
+def check_host(host, inv, gid_index):
     """Problems that stop the mesh from working on this host (empty list when fine)."""
     bad = []
     for nd, p in inv["ports"].items():
@@ -53,8 +53,8 @@ def check_host(host, inv):
             bad.append(f"{host} {nd}: link {p['state']} ip {p['ipv4'] or '-'}")
         if p["mtu"] != 9000:
             bad.append(f"{host} {nd}: MTU {p['mtu']} (9000 expected)")
-        if p["gid3_netdev"] != nd or not p["gid3"].endswith(_gid_tail(p["ipv4"])):
-            bad.append(f"{host} {nd}: RoCEv2 GID index 3 does not map this port's IPv4")
+        if p["gid_netdev"] != nd or not p["gid"].endswith(_gid_tail(p["ipv4"])):
+            bad.append(f"{host} {nd}: RoCEv2 GID index {gid_index} does not map this port's IPv4")
         if p["tc_offload"] != "on":
             bad.append(f"{host} {nd}: hw-tc-offload {p['tc_offload']}")
         if p["flow_steering_mode"] != "hmfs":
@@ -101,7 +101,7 @@ def ring_order(invs, hosts):
     return order
 
 
-def topology(invs, order, state_root="/run/dsv41-mesh"):
+def topology(invs, order, gid_index, state_root="/run/dsv41-mesh"):
     ranks = []
     for r, h in enumerate(order):
         ports = {}
@@ -119,7 +119,7 @@ def topology(invs, order, state_root="/run/dsv41-mesh"):
     return {"schema": "sparkring-cx7-hardware-diagonal-fabric/v1", "status": "research-only", "group_id": 77,
             "socket_direct_functions": 2, "flow_label_base": 16383, "shared_diagonal_flow_label": True,
             "endpoint_route_strategy": "adjacent_gateway", "standard_ether_type": 2048, "marked_ether_type": 34997,
-            "standard_udp_destination_port": 4791, "roce_gid_index": 3, "bounded_runtime_seconds": 7200,
+            "standard_udp_destination_port": 4791, "roce_gid_index": gid_index, "bounded_runtime_seconds": 7200,
             "expected_ethernet_mtu": 9000, "expected_roce_mtu": 4096,
             "orchestration": {"host_helper_path": "/UNSUPPORTED/external-fabric-orchestrator",
                               "remote_state_root": state_root},
@@ -185,18 +185,20 @@ def main():
     ap.add_argument("hosts", nargs=4, help="SSH names in TP rank order (head first)")
     ap.add_argument("--sparkring", required=True, help="FujitsuPolycom/sparkring checkout (tested at f16b5f4)")
     ap.add_argument("--out", default="ring-mesh")
+    ap.add_argument("--gid-index", type=int, default=3,
+                    help="RoCEv2 GID index of each port's IPv4 address, as NCCL_IB_GID_INDEX (default 3)")
     a = ap.parse_args()
     sys.path.insert(0, str(Path(a.sparkring) / "spark_transport/fabric/cx7_hairpin_diagonal"))
     import fabric  # sparkring's planner
 
-    invs = {h: inventory(h) for h in a.hosts}
-    problems = [p for h in a.hosts for p in check_host(h, invs[h])]
+    invs = {h: inventory(h, a.gid_index) for h in a.hosts}
+    problems = [p for h in a.hosts for p in check_host(h, invs[h], a.gid_index)]
     if problems:
         raise SystemExit("hosts not ready for the mesh:\n  " + "\n  ".join(problems))
     order = ring_order(invs, a.hosts)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "fabric.json").write_text(json.dumps(topology(invs, order), indent=2) + "\n", newline="\n")
+    (out / "fabric.json").write_text(json.dumps(topology(invs, order, a.gid_index), indent=2) + "\n", newline="\n")
     plan = fabric.build_rocenante_plan(fabric.build_plan(fabric.load_topology(out / "fabric.json")))
     for r, h in enumerate(order):
         up, down = host_scripts(plan, fabric, r)

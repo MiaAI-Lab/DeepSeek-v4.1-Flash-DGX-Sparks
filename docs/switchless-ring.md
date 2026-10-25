@@ -492,7 +492,13 @@ NCCL_DEBUG_SUBSYS=INIT,ENV,NET    # add NET while validating; drop it afterwards
   "no common IPv4 RoCE v2 GID", or `plan.py` refuses its index-3 check. A link bounce does not
   restore index 3; reloading the driver does (`modprobe -r mlx5_ib && modprobe mlx5_ib` with the
   engine stopped). Otherwise let the preflight pick the index, or set `NCCL_IB_GID_INDEX` to the
-  index that carries the ring address.
+  index that carries the ring address and give `plan.py` the same index with `--gid-index`.
+* **NetworkManager puts the IPv4 GID at index 5.** Indexes 0/1 always hold the port's EUI-64
+  link-local address. netplan's link-local is that same address, so IPv4 lands at 2/3. A
+  NetworkManager profile with `ipv6.method link-local` (or `auto`) and the default
+  `ipv6.addr-gen-mode` (stable-privacy) adds a second link-local, which takes 2/3, so IPv4 is at
+  4/5 (seen on all 16 functions of a four-Spark Omarchy ring). Set `NCCL_IB_GID_INDEX=5` and
+  `plan.py --gid-index 5`, or set `ipv6.addr-gen-mode eui64` on the ring profiles.
 * **After a cable or power event, check `carrier`, not only the IB port state.** A link can read
   `4 (ACTIVE)` on the IB port while the netdev carrier drops every few seconds (`cat
   /sys/class/net/<if>/carrier` sampled repeatedly); the symptoms are `Got non-fatal async event`
@@ -573,8 +579,8 @@ the two before it (the fast loader's boot-to-boot spread).
 ### Setup
 
 1. **The ring as above**, with both planes addressed (four RDMA functions per node, MTU 9000, the
-   RoCEv2 GID at index 3), and the NIC profile sparkring's hardware forwarding was qualified on:
-   `hairpin_num_queues` 4, `flow_steering_mode` `hmfs`, eswitch `legacy`, `hw-tc-offload on` on all
+   RoCEv2 GID at index 3, or the index given to `plan.py --gid-index`), and the NIC profile
+   sparkring's hardware forwarding was qualified on: `hairpin_num_queues` 4, `flow_steering_mode` `hmfs`, eswitch `legacy`, `hw-tc-offload on` on all
    four fabric netdevs (sparkring's
    [driver configuration notes](https://github.com/FujitsuPolycom/sparkring/blob/main/docs/GLM53_SPARK_MTP3_MESH_QUICKSTART.md#connectx-7-driver-configuration-for-hardware-forwarding)).
    `scripts/ring_mesh/inventory.sh` prints all of it per node; `plan.py` refuses a node whose links,
@@ -593,6 +599,9 @@ the two before it (the fast loader's boot-to-boot spread).
    ```bash
    python3 scripts/ring_mesh/plan.py --sparkring ~/sparkring --out ring-mesh spark1 spark2 spark3 spark4
    ```
+
+   With the IPv4 GID at another index, add `--gid-index N` (the fleet's `NCCL_IB_GID_INDEX`);
+   RoCEnante takes its index from `NCCL_IB_GID_INDEX` too.
 
    It inventories the nodes over SSH, reads the cabling from the fabric subnets, numbers the ring the
    way sparkring's planner needs it (every f0 port cabled to the next node's f1; it refuses anything
@@ -619,7 +628,7 @@ the two before it (the fast loader's boot-to-boot spread).
    instead of 262144.
 5. **Verify the path** before booting the engine: every rule shows `in_hw` (`tc -s filter show dev
    <netdev> ingress`), and an RDMA write to the opposite node goes through the neighbour's rule, not its
-   kernel (`ib_write_lat -d <dev> -x 3 --flow_label=16383` against the opposite node's port: ~10 us at
+   kernel (`ib_write_lat -d <dev> -x <GID index> --flow_label=16383` against the opposite node's port: ~10 us at
    61 KB here against 8.5 us to a direct neighbour; the neighbour's rule counters rise and its
    `IpForwDatagrams` does not).
 6. **`.env.tp4`**: build `Dockerfile.canary-roce` as usual and append `env.txt` to the production
