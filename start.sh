@@ -950,7 +950,9 @@ $(worker_env_lines "$wip" "$wgid" "$rank")
   while (( i < ${READY_TIMEOUT:-360} )); do
     # Ready = boot.py printed its banner, i.e. /health answered AND the smoke test
     # and warm-up passed (WARMUP=0 / SKIP_SMOKE=1 skip them; then it is /health alone).
-    if docker logs "$HEAD_CTN" 2>&1 | grep -q "^Ready: API on port ${PORT}" \
+    # Process substitution, not a pipe: under pipefail, grep -q exiting on the match makes docker logs
+    # die of SIGPIPE (141), and a large log never reports the ready server as ready.
+    if grep -q "^Ready: API on port ${PORT}" <(docker logs "$HEAD_CTN" 2>&1) \
        || { [[ "${SKIP_SMOKE:-0}" == "1" ]] && curl -fsS --max-time 3 "http://127.0.0.1:${PORT}/health" >/dev/null 2>&1; }; then
       _stop_logtail
       trap - EXIT
