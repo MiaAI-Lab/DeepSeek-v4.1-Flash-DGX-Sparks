@@ -199,6 +199,11 @@ source "$ROOT/files/nfs-share.sh"
 # shellcheck source=files/nccl.sh
 source "$ROOT/files/nccl.sh"
 
+# scripts/remote.py, which every worker step goes through, imports pexpect. Not every distribution
+# installs it with python3, and build otherwise fails on the first worker after the head image.
+remote_py_ready() { python3 -c 'import pexpect' 2>/dev/null; }
+REMOTE_PY_HINT="python3 cannot import pexpect, which scripts/remote.py needs to reach the workers (python3-pexpect on Debian/Ubuntu, python-pexpect on Arch, or pip install pexpect)"
+
 remote_on() {
   local host="$1"; shift
   local to_args=()
@@ -590,6 +595,7 @@ cmd_doctor() {
   command -v docker >/dev/null || { warn "docker missing on head"; ok=1; }
   command -v nvidia-smi >/dev/null && info "GPU: $(nvidia-smi -L | head -1)" || { warn "nvidia-smi missing"; ok=1; }
   [[ -f "$SSH_IDENTITY" ]] && info "SSH key $SSH_IDENTITY" || { warn "SSH key missing"; ok=1; }
+  remote_py_ready && info "python3 pexpect (scripts/remote.py)" || { warn "$REMOTE_PY_HINT"; ok=1; }
   local host_arch
   host_arch=$(uname -m)
   info "host arch: $host_arch (GB10 expects aarch64)"
@@ -701,6 +707,7 @@ cmd_pull() {
 
 cmd_build() {
   local dockerfile="Dockerfile" build_args=""
+  remote_py_ready || die "$REMOTE_PY_HINT"
   if [[ "${DSV41_LAUNCHER:-}" == tp4 ]]; then
     info "=== build $IMAGE from $ROOT ($BUILD_DOCKERFILE) ==="
     dockerfile="$BUILD_DOCKERFILE"
