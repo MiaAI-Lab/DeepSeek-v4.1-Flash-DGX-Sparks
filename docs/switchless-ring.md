@@ -36,6 +36,52 @@ was insufficient in the tested build. The `sparkring` switchless-cycle patch
 recognises `NCCL_SWITCHLESS_RING_ONLY` and skips both tree and PAT transport
 setup, while retaining subnet-aware port selection for adjacent peers.
 
+## Stock NCCL with cuMem on
+
+The tree connect at init comes from `NCCL_CUMEM_ENABLE=0`, which `start.sh` sets by default.
+NCCL's runtime connect (`NCCL_RUNTIME_CONNECT`, on by default) needs cuMem; with cuMem off,
+NCCL connects the transports of every algorithm during init, including the tree, whose peers
+include the opposite node, and fails there (`ibv_modify_qp failed with 110`).
+`NCCL_ALGO=Ring` is applied only later, when collectives are tuned. With cuMem on, which is
+NCCL's own default, transports are connected when a collective first needs them, and with
+`NCCL_ALGO=Ring` that is only the ring, whose peers are all neighbours. The image's own NCCL
+then runs the ring without the patch: set `NCCL_CUMEM_ENABLE=1` in `.env` / `.env.tp4` and leave
+`NCCL_SWITCHLESS_RING_ONLY` unset.
+
+Four GB10 Sparks on a switchless ring (Omarchy, driver 615.78), all-reduce at 1 GiB inside the
+serving image, one rank per node, `NCCL_ALGO=Ring`, four RDMA functions
+(`NCCL_IB_MERGE_NICS=0`, subnet-aware routing, `NCCL_IB_GID_INDEX` at the IPv4 RoCE v2 GID):
+
+| NCCL | `NCCL_CUMEM_ENABLE` | Result |
+|---|---|---|
+| 2.30.7 (the image's pip wheel) | 0 | init fails connecting rank 0 to rank 2 |
+| 2.32.3 (unpatched, host build overlaid) | 0 | same failure |
+| 2.32.3 | 1 | 183 Gb/s bus bandwidth, results correct |
+| 2.30.7 | 1 | 183 Gb/s bus bandwidth, results correct |
+
+The production TP4 line (canary-roce image, EP 1, `MEM_FRACTION_STATIC=0.80`) then served on
+the image's 2.30.7 with `NCCL_CUMEM_ENABLE=1 NCCL_ALGO=Ring NCCL_MIN_NCHANNELS=8
+NCCL_MAX_NCHANNELS=8` and `SGLANG_ROCE_ALLREDUCE=0`; seven boots reached serving with cuMem
+on and none hit a collective error. Measured from another host with `benchmarks/decode_window.py` and
+`scripts/qeval.py`:
+
+| | 2.30.7, two boots | 2.32.3 overlaid (`NCCL_OVERLAY_PIP=1`) |
+|---|---:|---:|
+| code C1, estimated window tok/s | 104.8 / 108.9 | 106.1 |
+| code C8, aggregate tok/s | 284.1 / 282.5 | 277.6 |
+| qeval (75 tasks) | 72/75, median 75.4 / 75.2 tok/s | 72/75, median 74.4 tok/s |
+
+The same three qeval misses as [tp4.md](tp4.md), task for task across all three boots.
+Both planes carry the traffic: during a 43,216-token prefill (8.1 s), rank 0 sent 14.2 GB on
+`rocep1s0f0` and 14.2 GB on `roceP2p1s0f0` (both toward its clockwise neighbour) and 0.06 GB
+on each `*f1` function. The KV budget at 0.80 was 6.0 M tokens. With RoCEnante over the mesh
+added ([below](#rocenante-on-the-ring-hardware-forwarded-opposite-node-paths); its collectives do
+not use NCCL), code C1 reached 118.3 tok/s and the qeval median 81-83 tok/s.
+
+Not covered: the three-node `./start.sh` path (the setting now reaches it too, untested), and
+cuMem on together with the patched NCCL. SGLang itself defaults to cuMem off
+(`NCCL_CUMEM_ENABLE=0` unless set), so this is the less exercised path there.
+
 ## Physical cable and address example
 
 Use four compatible DACs, each joining two CX7 ports, with no diagonal cables:
