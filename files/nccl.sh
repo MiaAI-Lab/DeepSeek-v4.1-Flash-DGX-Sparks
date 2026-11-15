@@ -84,13 +84,33 @@ nccl_validate_config() {
   fi
 }
 
+# Devices with an ACTIVE port under a sysfs root, comma-joined into an
+# IB_HCA-shaped list. The state word is the LAST field of ports/1/state
+# ("4: ACTIVE"); earlier fields are driver-specific, so match only $NF
+# (@hushengkai, PR #10). Returns 1 when the node has no ACTIVE port; callers
+# fall back to the configured IB_HCA instead of aborting the boot.
+active_hcas_sysfs() {
+  local sysfs="${1:-/sys/class/infiniband}" d state
+  local -a found=()
+  for d in "$sysfs"/*; do
+    [[ -f "$d/ports/1/state" ]] || continue
+    state=$(awk '{print $NF}' "$d/ports/1/state" 2>/dev/null)
+    [[ "$state" == ACTIVE ]] || continue
+    found+=("${d##*/}")
+  done
+  ((${#found[@]})) || return 1
+  local IFS=,
+  printf '%s\n' "${found[*]}"
+}
+
 # MANAGEMENT IPs need not appear in the CX7 GID table. Find a common, nonzero
 # IPv4 RoCE v2 index on all explicitly selected ports, or validate the override.
-# The optional sysfs root is used by host-side fixtures.
+# The optional sysfs root is used by host-side fixtures. An optional HCA list
+# (comma-joined names, optionally with :port) overrides $IB_HCA for one node.
 ring_gid_index() {
-  local sysfs="${1:-/sys/class/infiniband}" entry hca port state base g idx valid gid
+  local sysfs="${1:-/sys/class/infiniband}" hcas="${2:-$IB_HCA}" entry hca port state base g idx valid gid
   local -a entries=() ports=() candidates=()
-  IFS=, read -r -a entries <<<"${IB_HCA#=}"
+  IFS=, read -r -a entries <<<"${hcas#=}"
   for entry in "${entries[@]}"; do
     if [[ ! "$entry" =~ ^[a-zA-Z0-9_]+(:[1-9][0-9]*)?$ ]]; then
       echo 'Ring IB_HCA must list exact HCA names, optionally with :port' >&2
@@ -99,8 +119,8 @@ ring_gid_index() {
     hca="${entry%%:*}"; port=1
     [[ "$entry" != *:* ]] || port="${entry##*:}"
     base="$sysfs/$hca/ports/$port"
-    state=$(cat "$base/state" 2>/dev/null) || state=''
-    if [[ "$state" != '4: ACTIVE' ]]; then
+    state=$(awk '{print $NF}' "$base/state" 2>/dev/null) || state=''
+    if [[ "$state" != ACTIVE ]]; then
       echo "Ring: $hca:$port is not ACTIVE" >&2
       return 1
     fi
@@ -127,7 +147,7 @@ ring_gid_index() {
     done
     if [[ "$valid" == 1 ]]; then printf '%s\n' "$idx"; return 0; fi
   done
-  echo "Ring: no common IPv4 RoCE v2 GID on $IB_HCA (override: ${NCCL_IB_GID_INDEX:-auto})" >&2
+  echo "Ring: no common IPv4 RoCE v2 GID on $hcas (override: ${NCCL_IB_GID_INDEX:-auto})" >&2
   return 1
 }
 
@@ -149,7 +169,8 @@ nccl_preflight() {
       echo "NCCL: $IMAGE lacks the pip library at $NCCL_PIP_SO" >&2; return 1;
     }
   fi
-  if [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == 1 ]]; then ring_gid_index || return 1; fi
+  # "$1" (optional): a per-node HCA list; empty keeps the caller's IB_HCA.
+  if [[ "${NCCL_SWITCHLESS_RING_ONLY:-0}" == 1 ]]; then ring_gid_index "" "${1:-}" || return 1; fi
   return 0
 }
 
@@ -163,9 +184,11 @@ nccl_worker_settings() {
   else
     printf 'NCCL_HOST_DIR=%q\n' "$NCCL_HOST_DIR"
   fi
-  local key
-  for key in NCCL_OVERLAY_PIP NCCL_PIP_SO NCCL_CONTAINER_DIR NCCL_SWITCHLESS_RING_ONLY IB_HCA IMAGE NCCL_IB_GID_INDEX; do
+  # "$1" (optional): this node's detected HCA list; without it, $IB_HCA.
+  local key hcas="${1:-$IB_HCA}"
+  for key in NCCL_OVERLAY_PIP NCCL_PIP_SO NCCL_CONTAINER_DIR NCCL_SWITCHLESS_RING_ONLY IMAGE NCCL_IB_GID_INDEX; do
     printf '%s=%q\n' "$key" "${!key:-}"
   done
+  printf 'IB_HCA=%q\n' "$hcas"
   declare -f nccl_library nccl_mount_args ring_gid_index nccl_preflight
 }

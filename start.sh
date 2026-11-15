@@ -257,10 +257,10 @@ api_key() {
 }
 
 gid_index_local() {
-  local ip="$1" hex hca g i
+  local ip="$1" hcas="${2:-$IB_HCA}" hex hca g i
   hex=$(printf '%02x%02x:%02x%02x' $(echo "$ip" | tr . ' '))
   local IFS=','
-  for hca in $IB_HCA; do
+  for hca in $hcas; do
     hca="${hca// /}"
     [[ -d /sys/class/infiniband/"$hca" ]] || continue
     for g in /sys/class/infiniband/"$hca"/ports/1/gids/*; do
@@ -273,9 +273,9 @@ gid_index_local() {
 }
 
 gid_index_remote() {
-  local host="$1" ip="$2" hex
+  local host="$1" ip="$2" hcas="${3:-$IB_HCA}" hex
   hex=$(printf '%02x%02x:%02x%02x' $(echo "$ip" | tr . ' '))
-  remote_on "$host" "for hca in \$(echo $IB_HCA | tr ',' ' '); do
+  remote_on "$host" "for hca in \$(echo $hcas | tr ',' ' '); do
     [ -d /sys/class/infiniband/\$hca ] || continue;
     for g in /sys/class/infiniband/\$hca/ports/1/gids/*; do
       i=\${g##*/};
@@ -285,12 +285,22 @@ gid_index_remote() {
   done"
 }
 
+# ACTIVE devices on one node, comma-joined into an IB_HCA-shaped list. Emits
+# nothing when the node has no ACTIVE port; callers fall back to the configured
+# IB_HCA so a mid-boot or flapping node cannot take the fleet down
+# (@hushengkai). The state word is the LAST field of ports/1/state ("4:
+# ACTIVE"); earlier fields are driver-specific, so match only $NF.
+ib_hca_active_remote() {
+  remote_on "$1" "for d in /sys/class/infiniband/*; do s=\$(awk '{print \$NF}' \$d/ports/1/state 2>/dev/null); [ \"\$s\" = ACTIVE ] && echo \${d##*/}; done | paste -sd, -" | tr -d '\r'
+}
+
 docker_common_args() {
   local -n _a=$1
-  local src hip gid
+  local src hip gid hcas
   src=$(model_src)
   hip="$2"
   gid="$3"
+  hcas="${4:-$IB_HCA}"
   [[ -d "$src" ]] || die "model mount src missing: $src"
   _a+=(
     --network host --ipc host --privileged --cap-add IPC_LOCK --gpus all
@@ -346,7 +356,7 @@ docker_common_args() {
     -e "HOST=0.0.0.0"
     -e "NCCL_NET=$NCCL_NET"
     -e "NCCL_IB_DISABLE=$NCCL_IB_DISABLE"
-    -e "NCCL_IB_HCA=$IB_HCA"
+    -e "NCCL_IB_HCA=$hcas"
     -e "NCCL_SOCKET_IFNAME=$NCCL_SOCKET_IFNAME"
     -e "GLOO_SOCKET_IFNAME=$GLOO_SOCKET_IFNAME"
     -e "NCCL_P2P_DISABLE=$NCCL_P2P_DISABLE"
@@ -448,7 +458,7 @@ push_spec_tables() {
 }
 
 worker_env_lines() {
-  local wip="$1" wgid="$2" rank="$3"
+  local wip="$1" wgid="$2" rank="$3" hcas="${4:-$IB_HCA}"
   local -a worker_args=(
     -e "NODE_RANK=$rank"
     -e "NNODES=$NNODES"
@@ -497,7 +507,7 @@ worker_env_lines() {
     -e "SKIP_SMOKE=1"
     -e "NCCL_NET=$NCCL_NET"
     -e "NCCL_IB_DISABLE=$NCCL_IB_DISABLE"
-    -e "NCCL_IB_HCA=$IB_HCA"
+    -e "NCCL_IB_HCA=$hcas"
     -e "NCCL_SOCKET_IFNAME=$NCCL_SOCKET_IFNAME"
     -e "GLOO_SOCKET_IFNAME=$GLOO_SOCKET_IFNAME"
     -e "NCCL_P2P_DISABLE=$NCCL_P2P_DISABLE"
@@ -549,16 +559,21 @@ worker_env_lines() {
 preflight_all_nodes() {
   nccl_validate_config || return 1
   [[ "$NCCL_OVERLAY_PIP" == 1 || "$NCCL_SWITCHLESS_RING_ONLY" == 1 ]] || return 0
-  local h gid failed=0
+  # HEAD_HCAS / WORKER_HCAS are set by cmd_serve from per-node detection; any
+  # other caller (doctor) validates the configured IB_HCA as before.
+  local h hi gid hcas failed=0
   RING_WORKER_GIDS=()
-  if RING_GID_HEAD=$(nccl_preflight); then
-    info "NCCL preflight head OK${RING_GID_HEAD:+ (ACTIVE HCAs: $IB_HCA, RoCEv2 GID: $RING_GID_HEAD)}"
+  hcas="${HEAD_HCAS:-$IB_HCA}"
+  if RING_GID_HEAD=$(nccl_preflight "$hcas"); then
+    info "NCCL preflight head OK${RING_GID_HEAD:+ (ACTIVE HCAs: $hcas, RoCEv2 GID: $RING_GID_HEAD)}"
   else
     warn 'NCCL preflight failed on head'; failed=1
   fi
-  for h in "${WORKER_HOSTS[@]}"; do
+  for hi in "${!WORKER_HOSTS[@]}"; do
+    h="${WORKER_HOSTS[$hi]}"
+    hcas="${WORKER_HCAS[$hi]:-$IB_HCA}"
     if gid=$(remote_on "$h" "set -e
-$(nccl_worker_settings)
+$(nccl_worker_settings "$hcas")
 nccl_preflight"); then
       gid="${gid//$'\r'/}"
       gid="${gid#"${gid%%[![:space:]]*}"}"
@@ -568,7 +583,7 @@ nccl_preflight"); then
         continue
       fi
       RING_WORKER_GIDS+=("$gid")
-      info "NCCL preflight $h OK${gid:+ (ACTIVE HCAs: $IB_HCA, RoCEv2 GID: $gid)}"
+      info "NCCL preflight $h OK${gid:+ (ACTIVE HCAs: $hcas, RoCEv2 GID: $gid)}"
     else
       warn "NCCL preflight failed on $h"; failed=1
     fi
@@ -816,6 +831,21 @@ cmd_serve() {
       break
     fi
   done
+
+  # Per-node ACTIVE HCA detection (ports/1/state, last field; any rail count).
+  # Each node gets its own list through the ring preflight, the GID lookup and
+  # the container env; the global IB_HCA is never reassigned around calls. A
+  # node with no ACTIVE port (or an unreachable one) keeps the configured
+  # IB_HCA so one bad node cannot take the fleet down (@hushengkai).
+  local HEAD_HCAS hi hc
+  local -a WORKER_HCAS=()
+  HEAD_HCAS=$(active_hcas_sysfs 2>/dev/null || true)
+  HEAD_HCAS="${HEAD_HCAS:-$IB_HCA}"
+  for hi in "${!WORKER_HOSTS[@]}"; do
+    hc=$(ib_hca_active_remote "${WORKER_HOSTS[$hi]}" 2>/dev/null || true)
+    WORKER_HCAS+=("${hc:-$IB_HCA}")
+  done
+  info "RoCE HCAs per node: head=$HEAD_HCAS workers=${WORKER_HCAS[*]}"
   preflight_all_nodes || die "NCCL preflight failed; see docs/switchless-ring.md"
   if [[ "$NFS_SHARE" == 1 ]]; then
     cmd_share
@@ -841,10 +871,10 @@ cmd_serve() {
     GID_HEAD="$RING_GID_HEAD"
     WORKER_GIDS=("${RING_WORKER_GIDS[@]}")
   else
-    GID_HEAD=$(gid_index_local "$HEAD_IP" 2>/dev/null || true)
+    GID_HEAD=$(gid_index_local "$HEAD_IP" "$HEAD_HCAS" 2>/dev/null || true)
     GID_HEAD="${GID_HEAD:-${NCCL_IB_GID_INDEX:-3}}"
     for gi in "${!WORKER_IPS[@]}"; do
-      g=$(gid_index_remote "${WORKER_HOSTS[$gi]}" "${WORKER_IPS[$gi]}" | tr -d '\r' || true)
+      g=$(gid_index_remote "${WORKER_HOSTS[$gi]}" "${WORKER_IPS[$gi]}" "${WORKER_HCAS[$gi]:-$IB_HCA}" | tr -d '\r' || true)
       WORKER_GIDS+=("${g:-${NCCL_IB_GID_INDEX:-3}}")
     done
   fi
@@ -867,7 +897,7 @@ cmd_serve() {
       docker volume inspect $(printf '%q' "$NFS_VOLUME") >/dev/null
       test -d /dev/infiniband
       mkdir -p $(printf '%q' "$WORKER_DIR/state") $(printf '%q' "$WORKER_DIR/logs")
-$(nccl_worker_settings)
+$(nccl_worker_settings "${WORKER_HCAS[$idx]:-$IB_HCA}")
       nccl_args=()
       nccl_mount_args nccl_args
       docker run -d --name $(printf '%q' "$WORKER_CTN") \
@@ -879,7 +909,7 @@ $(nccl_worker_settings)
         -v $(printf '%q' "$WORKER_DIR/state:/state") \
         -v \"\$HOME/.cache:/root/.cache\" \
         \"\${nccl_args[@]}\" \\
-$(worker_env_lines "$wip" "$wgid" "$rank")
+$(worker_env_lines "$wip" "$wgid" "$rank" "${WORKER_HCAS[$idx]:-$IB_HCA}")
         -e $(printf '%q' "API_KEY=$API_KEY") \\
         -e $(printf '%q' "EXTRA_SGLANG_ARGS=${EXTRA_SGLANG_ARGS:-}") \\
         $(printf '%q' "$IMAGE") run
@@ -889,7 +919,7 @@ $(worker_env_lines "$wip" "$wgid" "$rank")
 
   info "Starting head (rank 0, API :$PORT)..."
   local -a head_args=()
-  docker_common_args head_args "$HEAD_IP" "$GID_HEAD"
+  docker_common_args head_args "$HEAD_IP" "$GID_HEAD" "$HEAD_HCAS"
   local head_cid=""
   head_cid=$(docker run -d --name "$HEAD_CTN" --restart=no \
     "${head_args[@]}" \
