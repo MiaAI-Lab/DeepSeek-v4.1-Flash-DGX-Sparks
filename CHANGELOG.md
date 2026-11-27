@@ -14,6 +14,6 @@ Ported from open pull requests with authorship preserved (`git log` shows the or
 - **Rhys Jones (rhys101)**, #39 (subset): shared-expert K padding follows `TP_SIZE`; TP8 with `EP_SIZE=1` is refused up front. The rest of #39 is not merged.
 - **Zbigniew Majewski (knapcio)**, #7 (partial): warning that the DSpark SPS table cannot be used with Engram.
 
-Fixes from issues: #6/#12 the SPS table is ignored on this Engram model unless `DSPARK_SPS_ALLOW_ENGRAM=1` (reported by ecohash-co and hushengkai); #31 `--fp8-gemm-backend` is kept when `EXTRA_SGLANG_ARGS` is set (reported by motzudao).
+Fixes from issues: #6/#12 the SPS table is ignored on this Engram model unless `DSPARK_SPS_ALLOW_ENGRAM=1` (reported by ecohash-co and hushengkai); #31 `--fp8-gemm-backend` is kept when `EXTRA_SGLANG_ARGS` is set (reported by motzudao); #51 nonstream tool batches that mix native and plain DSML tags, omit `string` or lack the `calls` wrapper are validated whole and parsed, invalid ones stay text with no calls (`adapter/dsml_strict.py`, `DSV41_DSML_STRICT=0` disables; reported by mimeding).
 
 Docs: switched-fabric notes (#2, #38), multi-session 1M chat and stale TP4 comments (#43, #27, #35), switchless-ring field findings (#40, #41), host-memory fragmentation at load (#23).

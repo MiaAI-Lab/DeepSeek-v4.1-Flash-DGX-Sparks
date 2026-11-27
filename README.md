@@ -405,6 +405,10 @@ Where the 118 → 82 ms came from, in order of size:
   history with HTTP 400, which agent clients do not retry. `adapter/history_repair.py` passes
   such arguments to the template as `{"_unparseable_arguments": <raw>}` and logs
   `DSV41 history repair: len=… reason=…`; `tests/test_history_repair.py`.
+- **Mixed DSML tool batches.** Stock nonstream parsing drops calls that mix native and plain
+  tags, omit `string` or lack the `calls` wrapper. `adapter/dsml_strict.py` validates the whole
+  batch against the offered tools; an invalid one stays text with no calls (streaming unchanged,
+  `DSV41_DSML_STRICT=0` turns it off; `tests/test_dsml_strict.py`).
 - `runtime/flash_mla_sm120.py` sends prefills of more than 64 query tokens to FlashInfer's
   sparse-prefill specialisation and everything else through the decode kernel with a
   256→64-token page split; both paths were verified deterministic.
